@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<!-- 1. Titlul din fila browserului -->
+<title>Titlul lecției</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<!-- 2. data-id = numele fișierului fără .html, exact ca în assets/catalog.js -->
+<body data-root="../" data-id="numele-fisierului">
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow"></div>  <!-- se completează singur: clasa și tipul lecției -->
+    <h1>Titlul <span class="pr">lecției</span></h1>
+    <p class="lede">O propoziție despre lecție (se poate șterge).</p>
+  </div>
+</header>
+
+<div class="wrap layout">
+  <nav class="toc" data-auto aria-label="Cuprins"></nav>  <!-- cuprinsul se face singur -->
+  <main class="prose">
+
+    <!-- O secțiune: un <section> cu id și un <h2>. Apare în cuprins. -->
+    <section id="teorie">
+      <h2>Ideea</h2>
+      <p>Textul lecției.</p>
+    </section>
+
+    <!-- O secțiune cu probleme. Fiecare problemă: <div class="prob" id="..."> cu un <h3>. -->
+    <section id="aplicatii">
+      <h2>Aplicații</h2>
+
+      <div class="prob" id="p-prima">
+        <h3>Problema <a href="https://www.pbinfo.ro/" target="_blank" rel="noopener">Nume</a> <span class="src">pbinfo #...</span></h3>
+        <p>Enunțul problemei.</p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th></tr></thead><tbody><tr><td class="m">3
+1 2 3</td><td class="m">6</td></tr></tbody></table></div>
+
+        <div class="think">
+          <p class="q">Gândiți-vă: întrebarea pentru clasă.</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Primul indiciu.</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>Explicația soluției.</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+using namespace std;
+
+int main()
+{
+    int n, x, s = 0;
+    cin >> n;
+    for (int i = 1; i <= n; i++)
+    {
+        cin >> x;
+        s += x;
+    }
+    cout << s;
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section id="tema">
+      <h2>Tema</h2>
+      <ul>
+        <li><a href="https://www.pbinfo.ro/" target="_blank" rel="noopener">Nume problemă</a> (sursa)</li>
+      </ul>
+    </section>
+  </main>
+</div>
+
+<script src="../assets/catalog.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="../assets/site.js"></script>
+</body>
+</html>
