@@ -1,0 +1,674 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Elementul majoritar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body data-root="../" data-id="element-majoritar">
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow"></div>
+    <h1>Elementul <span class="pl">majoritar</span></h1>
+    <p class="lede">Algoritmul de vot Boyer-Moore, de ce funcționează și unde îl folosim.</p>
+  </div>
+</header>
+
+<div class="wrap layout">
+  <nav class="toc" data-auto aria-label="Cuprins"></nav>
+  <main class="prose">
+    <section id="m-problema" data-toc="Problema">
+      <div class="prob" style="border-top:0;margin-top:0;padding-top:0">
+        <h2>Elementul majoritar</h2>
+        <p>Se dă un vector cu n numere naturale. Un element se numește <strong>majoritar</strong> dacă apare de mai mult de n/2 ori (adică de cel puțin n/2 + 1 ori, cu împărțire întreagă). Afișați elementul majoritar sau −1 dacă acesta nu există.</p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th><th>Explicație</th></tr></thead><tbody>
+          <tr><td class="m">7
+2 2 1 1 1 2 2</td><td class="m">2</td><td>2 apare de 4 ori, iar 4 &gt; 7/2.</td></tr>
+          <tr><td class="m">6
+3 1 3 2 1 3</td><td class="m">-1</td><td>3 apare de 3 ori, dar 3 nu este mai mare decât 6/2.</td></tr>
+        </tbody></table></div>
+        <p>Observați că un vector poate avea cel mult un element majoritar: două elemente care apar fiecare de mai mult de jumătate din ori nu încap în vector.</p>
+        <div class="think">
+          <p class="q">Gândiți-vă: cum rezolvăm cu ce știm deja? Ce timp și câtă memorie folosește fiecare idee?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Dacă sortăm vectorul, pe ce poziție se află sigur elementul majoritar, dacă există?</p></div></details>
+        <details class="hint"><summary>Încă un indiciu</summary><div><p>Imaginați-vă că scoatem din vector, de câte ori putem, câte două elemente <em>diferite</em>. Ce rămâne la final?</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p><strong>Soluția 1.</strong> Pentru fiecare element numărăm de câte ori apare în vector. Complexitatea este O(n²).</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+using namespace std;
+
+int n, a[5001];
+
+int main()
+{
+    cin >> n;
+    for (int i = 1; i <= n; i++) cin >> a[i];
+
+    for (int i = 1; i <= n; i++)
+    {
+        int cnt = 0;                    // de câte ori apare a[i]
+        for (int j = 1; j <= n; j++)
+            if (a[j] == a[i]) cnt++;
+        if (cnt > n / 2)
+        {
+            cout << a[i];
+            return 0;
+        }
+    }
+    cout << -1;
+    return 0;
+}
+</script>
+
+            <p><strong>Soluția 2: vector de frecvență.</strong> Dacă valorile sunt mici (de exemplu cel mult 10⁶), numărăm aparițiile într-un vector de frecvență. Timpul este O(n), dar memoria depinde de valoarea maximă, iar dacă valorile ajung la 10⁹ metoda nu mai merge.</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+using namespace std;
+
+int n, a[1000001], fr[1000001];      // valorile sunt între 0 și 1 000 000
+
+int main()
+{
+    cin >> n;
+    for (int i = 1; i <= n; i++)
+    {
+        cin >> a[i];
+        fr[a[i]]++;
+    }
+    for (int i = 1; i <= n; i++)
+        if (fr[a[i]] > n / 2)
+        {
+            cout << a[i];
+            return 0;
+        }
+    cout << -1;
+    return 0;
+}
+</script>
+
+            <p><strong>Soluția 3: sortare.</strong> Elementul majoritar ocupă mai mult de jumătate din vector, deci după sortare blocul lui de valori egale acoperă sigur poziția din mijloc. Luăm elementul din mijloc ca <em>candidat</em> și verificăm de câte ori apare. Complexitatea este O(n log n), din cauza sortării.</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+int n, a[1000001];
+
+int main()
+{
+    cin >> n;
+    for (int i = 1; i <= n; i++) cin >> a[i];
+    sort(a + 1, a + n + 1);
+
+    // dacă există un element majoritar, el ocupă sigur poziția din mijloc
+    int cand = a[(n + 1) / 2], cnt = 0;
+    for (int i = 1; i <= n; i++)
+        if (a[i] == cand) cnt++;
+
+    if (cnt > n / 2) cout << cand;
+    else cout << -1;
+    return 0;
+}
+</script>
+
+            <p><strong>Soluția 4: algoritmul de vot Boyer-Moore.</strong> Ideea este <em>anularea reciprocă</em>. Dacă scoatem din vector două elemente diferite, elementul majoritar rămâne majoritar în ce a rămas: am scos cel mult o apariție a lui și cel puțin o apariție a altui element. Repetând, la final rămân doar valori egale, iar dacă există un element majoritar, el este cel rămas.</p>
+            <p>Nu scoatem efectiv elemente. Ținem un <code>candidat</code> și un <code>contor</code>:</p>
+            <ol>
+              <li>dacă contorul este 0, elementul curent devine candidat, cu contorul 1;</li>
+              <li>dacă elementul curent este egal cu candidatul, creștem contorul;</li>
+              <li>altfel scădem contorul: elementul curent „anulează” o apariție a candidatului.</li>
+            </ol>
+            <div class="demo" id="demoM">
+              <div class="stats" data-stats></div>
+              <div class="cells" data-cells></div>
+              <p class="status" data-status aria-live="polite"></p>
+              <div class="ctrl">
+                <label for="mIn">Vector <input id="mIn" value="2 2 1 1 1 2 2" autocomplete="off" spellcheck="false" style="width:13em"></label>
+                <button class="btn" type="button" data-prev>Înapoi</button>
+                <button class="btn pri" type="button" data-next>Pasul următor</button>
+                <button class="btn" type="button" data-play>Rulează</button>
+                <span class="step-ct" data-ct></span>
+              </div>
+            </div>
+            <p>La final, candidatul este singurul element care <em>poate</em> fi majoritar, dar nu este sigur că este. De exemplu, pentru 1 2 3 candidatul rămâne 3, deși niciun element nu este majoritar. De aceea facem a doua parcurgere, în care numărăm aparițiile candidatului. Încercați în simulare vectorul <span class="mono">1 2 3</span>.</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+using namespace std;
+
+int n, a[1000001];
+
+int main()
+{
+    cin >> n;
+    for (int i = 1; i <= n; i++) cin >> a[i];
+
+    // Pasul 1: găsim candidatul
+    int cand = 0, contor = 0;
+    for (int i = 1; i <= n; i++)
+    {
+        if (contor == 0)
+        {
+            cand = a[i];
+            contor = 1;
+        }
+        else if (a[i] == cand)
+            contor++;
+        else
+            contor--;
+    }
+
+    // Pasul 2: verificăm candidatul
+    int cnt = 0;
+    for (int i = 1; i <= n; i++)
+        if (a[i] == cand) cnt++;
+
+    if (cnt > n / 2) cout << cand;
+    else cout << -1;
+    return 0;
+}
+</script>
+            <p>Complexitatea este O(n) în timp și O(1) memorie suplimentară, indiferent cât de mari sunt valorile.</p>
+            <div class="tbl"><table class="io"><thead><tr><th>Soluția</th><th>Timp</th><th>Memorie suplimentară</th></tr></thead><tbody>
+              <tr><td>1. numărare pentru fiecare element</td><td class="m">O(n²)</td><td class="m">O(1)</td></tr>
+              <tr><td>2. vector de frecvență</td><td class="m">O(n)</td><td class="m">cât valoarea maximă</td></tr>
+              <tr><td>3. sortare</td><td class="m">O(n log n)</td><td class="m">O(1)</td></tr>
+              <tr><td>4. Boyer-Moore</td><td class="m">O(n)</td><td class="m">O(1)</td></tr>
+            </tbody></table></div>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section id="m-teorie">
+      <h2>De ce funcționează votul?</h2>
+      <p>Ne putem imagina contorul ca pe o grămadă de bilețele, toate cu aceeași valoare scrisă pe ele, valoarea candidatului. Când vine un element egal cu candidatul, mai punem un bilețel. Când vine un element diferit, aruncăm un bilețel din grămadă împreună cu elementul nou: am eliminat o <strong>pereche de două valori diferite</strong>. Când grămada se golește, următorul element începe o grămadă nouă.</p>
+      <p>Să presupunem că x este majoritar, deci apare de mai mult de n/2 ori. Fiecare pereche aruncată conține cel mult un x, pentru că cele două valori sunt diferite. Dacă toate aparițiile lui x ar fi aruncate, ar trebui să existe cel puțin tot atâtea elemente diferite de x, deci în total cel puțin 2 · (numărul de x) &gt; n elemente. Asta e imposibil, deci la final grămada conține x, iar candidatul este x.</p>
+      <p>Raționamentul arată doar că, <em>dacă</em> există un element majoritar, el este candidatul. Nu spune nimic dacă nu există, de aceea verificarea este obligatorie.</p>
+
+      <h3>Urmăriți votul pe hârtie</h3>
+      <p>Pentru vectorul <span class="mono">3 3 4 2 4 4 2 4 4</span> (n = 9, 4 apare de 5 ori):</p>
+      <div class="tbl"><table class="io"><thead><tr><th>i</th><th>a[i]</th><th>Ce se întâmplă</th><th>candidat</th><th>contor</th></tr></thead><tbody>
+        <tr><td class="m">1</td><td class="m">3</td><td>contor 0: 3 devine candidat</td><td class="m">3</td><td class="m">1</td></tr>
+        <tr><td class="m">2</td><td class="m">3</td><td>egal cu candidatul</td><td class="m">3</td><td class="m">2</td></tr>
+        <tr><td class="m">3</td><td class="m">4</td><td>diferit: perechea (3, 4) se anulează</td><td class="m">3</td><td class="m">1</td></tr>
+        <tr><td class="m">4</td><td class="m">2</td><td>diferit: perechea (3, 2) se anulează</td><td class="m">3</td><td class="m">0</td></tr>
+        <tr><td class="m">5</td><td class="m">4</td><td>contor 0: 4 devine candidat</td><td class="m">4</td><td class="m">1</td></tr>
+        <tr><td class="m">6</td><td class="m">4</td><td>egal cu candidatul</td><td class="m">4</td><td class="m">2</td></tr>
+        <tr><td class="m">7</td><td class="m">2</td><td>diferit: perechea (4, 2) se anulează</td><td class="m">4</td><td class="m">1</td></tr>
+        <tr><td class="m">8</td><td class="m">4</td><td>egal cu candidatul</td><td class="m">4</td><td class="m">2</td></tr>
+        <tr><td class="m">9</td><td class="m">4</td><td>egal cu candidatul</td><td class="m">4</td><td class="m">3</td></tr>
+      </tbody></table></div>
+      <p>Candidatul final este 4. La verificare găsim 5 apariții, iar 5 &gt; 9/2 = 4, deci 4 este majoritar.</p>
+
+      <h3>Greșeli frecvente</h3>
+      <p>Contorul de la final <strong>nu</strong> este frecvența candidatului. În exemplul de mai sus contorul este 3, dar 4 apare de 5 ori. Frecvența o aflăm doar la verificare.</p>
+      <p>„Mai mult de n/2 ori” înseamnă <code>cnt &gt; n / 2</code> cu împărțire întreagă, sau, fără împărțire, <code>2 * cnt &gt; n</code>. Pentru n = 6, un element care apare de 3 ori nu este majoritar.</p>
+      <p>Verificarea nu se sare decât dacă enunțul garantează că există un element majoritar.</p>
+    </section>
+
+    <section id="m-exemple">
+      <h2>Exemple populare</h2>
+
+      <div class="prob" id="m-flux" data-toc="Fără să păstrăm numerele">
+        <h3>Majoritar fără să păstrăm numerele</h3>
+        <p>Se citesc n numere, cu n până la 10⁷, iar valorile pot ajunge la 10⁹. Se garantează că există un element majoritar. Afișați-l. Limita de memorie este mică, astfel încât nu putem păstra numerele într-un vector.</p>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th></tr></thead><tbody><tr><td class="m">7
+5 9 5 5 2 5 9</td><td class="m">5</td></tr></tbody></table></div>
+        <div class="think">
+          <p class="q">Gândiți-vă: care dintre cele patru soluții merg aici?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>Soluțiile 1 și 3 au nevoie de toate numerele, iar soluția 2 de un vector de frecvență de mărimea valorilor. Votul are nevoie doar de două variabile, iar pentru că existența este garantată, nu facem verificarea. Așa citim fiecare număr o singură dată și nu păstrăm nimic.</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+using namespace std;
+
+int main()
+{
+    int n, x, cand = 0, contor = 0;
+    cin >> n;
+    for (int i = 1; i <= n; i++)
+    {
+        cin >> x;                 // nu păstrăm numerele, doar votăm
+        if (contor == 0)
+        {
+            cand = x;
+            contor = 1;
+        }
+        else if (x == cand)
+            contor++;
+        else
+            contor--;
+    }
+    cout << cand;                 // se garantează că există majoritar
+    return 0;
+}
+</script>
+            <p>Acesta este principalul avantaj al votului Boyer-Moore față de celelalte metode și motivul pentru care apare des la concursuri.</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="prob" id="m-half" data-toc="Cel puțin jumătate">
+        <h3>Cel puțin jumătate</h3>
+        <p>Aceeași problemă, dar acum ne interesează elementele care apar de <strong>cel puțin</strong> n/2 ori (adică 2 · cnt ≥ n). Pot exista două astfel de elemente, de exemplu în <span class="mono">1 2 1 2</span>. Afișați-le în ordine crescătoare, sau −1 dacă nu există niciunul.</p>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th></tr></thead><tbody>
+          <tr><td class="m">6
+2 2 1 2 3 2</td><td class="m">2</td></tr>
+          <tr><td class="m">4
+1 2 1 2</td><td class="m">1 2</td></tr>
+        </tbody></table></div>
+        <div class="think">
+          <p class="q">Gândiți-vă: votul garantează ceva doar pentru „mai mult de jumătate”. Cum ne aducem în acea situație?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Scoateți un singur element, de exemplu ultimul. Ce se întâmplă cu un element care apărea de exact n/2 ori, dar nu era pe ultima poziție?</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>Fie x un element care apare de cel puțin n/2 ori. Avem două cazuri:</p>
+            <ol>
+              <li>x este chiar a[n]: îl verificăm direct;</li>
+              <li>x nu este a[n]: atunci în primele n − 1 elemente x apare de cel puțin n/2 ori, adică de mai mult de (n − 1)/2 ori. Deci x este majoritar în a[1..n−1] și îl găsim cu votul.</li>
+            </ol>
+            <p>Avem așadar doar doi candidați: a[n] și candidatul votului pe primele n − 1 elemente. Îi verificăm pe amândoi.</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+using namespace std;
+
+int n, a[1000001];
+
+// votul Boyer-Moore pe pozițiile 1..m
+int candidat(int m)
+{
+    int cand = 0, contor = 0;
+    for (int i = 1; i <= m; i++)
+    {
+        if (contor == 0) { cand = a[i]; contor = 1; }
+        else if (a[i] == cand) contor++;
+        else contor--;
+    }
+    return cand;
+}
+
+bool bun(int x)                   // apare x de cel puțin n/2 ori?
+{
+    int cnt = 0;
+    for (int i = 1; i <= n; i++)
+        if (a[i] == x) cnt++;
+    return 2 * cnt >= n;
+}
+
+int main()
+{
+    cin >> n;
+    for (int i = 1; i <= n; i++) cin >> a[i];
+
+    int c1 = a[n];                // candidatul 1: ultimul element
+    int c2 = candidat(n - 1);     // candidatul 2: majoritarul din primele n-1
+
+    bool b1 = bun(c1), b2 = (c2 != c1 && n > 1 && bun(c2));
+    if (b1 && b2) cout << min(c1, c2) << ' ' << max(c1, c2);
+    else if (b1) cout << c1;
+    else if (b2) cout << c2;
+    else cout << -1;
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+
+      <div class="prob" id="m-n3" data-toc="Varianta n/3">
+        <h3>Varianta n/3</h3>
+        <p>Afișați toate elementele care apar de mai mult de n/3 ori, sau −1 dacă nu există niciunul.</p>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th><th>Explicație</th></tr></thead><tbody><tr><td class="m">6
+3 1 3 2 1 3</td><td class="m">3</td><td>3 apare de 3 ori, iar 3 &gt; 6/3. 1 apare de 2 ori, iar 2 nu este mai mare decât 2.</td></tr></tbody></table></div>
+        <div class="think">
+          <p class="q">Gândiți-vă: câte astfel de elemente pot exista cel mult?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Cel mult două. Încercați să țineți doi candidați, fiecare cu contorul lui. Ce anulăm acum, perechi sau grupuri de câte trei elemente diferite?</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>Pot exista cel mult două astfel de elemente, pentru că trei elemente care apar fiecare de mai mult de n/3 ori ar însemna mai mult de n elemente. Generalizăm votul: ținem doi candidați, c1 și c2, cu contoarele k1 și k2.</p>
+            <ol>
+              <li>dacă x este egal cu un candidat, creștem contorul acelui candidat;</li>
+              <li>altfel, dacă unul dintre contoare este 0, x devine candidat în locul lui, cu contorul 1;</li>
+              <li>altfel scădem ambele contoare: am anulat un grup de trei elemente diferite (x, c1, c2).</li>
+            </ol>
+            <p>Raționamentul este același ca la n/2: un grup aruncat conține cel mult o apariție a unui element, deci un element care apare de mai mult de n/3 ori nu poate fi aruncat complet. La final verificăm ambii candidați.</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+using namespace std;
+
+int n, a[1000001];
+
+int main()
+{
+    cin >> n;
+    for (int i = 1; i <= n; i++) cin >> a[i];
+
+    // Pasul 1: doi candidați, fiecare cu contorul lui
+    int c1 = 0, k1 = 0, c2 = 0, k2 = 0;
+    for (int i = 1; i <= n; i++)
+    {
+        int x = a[i];
+        if (k1 > 0 && x == c1) k1++;
+        else if (k2 > 0 && x == c2) k2++;
+        else if (k1 == 0) { c1 = x; k1 = 1; }
+        else if (k2 == 0) { c2 = x; k2 = 1; }
+        else { k1--; k2--; }          // x anulează câte un vot din fiecare
+    }
+
+    // Pasul 2: verificăm candidații
+    int f1 = 0, f2 = 0;
+    for (int i = 1; i <= n; i++)
+    {
+        if (k1 > 0 && a[i] == c1) f1++;
+        else if (k2 > 0 && a[i] == c2) f2++;
+    }
+
+    bool gasit = false;
+    if (f1 > n / 3) { cout << c1 << ' '; gasit = true; }
+    if (f2 > n / 3) { cout << c2 << ' '; gasit = true; }
+    if (!gasit) cout << -1;
+    return 0;
+}
+</script>
+            <p>Aceeași idee merge pentru n/k, cu k − 1 candidați.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section id="m-discutie">
+      <h2>Probleme de discuție</h2>
+
+      <div class="prob" id="m-pairs" data-toc="Perechi diferite">
+        <h3>Perechi de elemente diferite</h3>
+        <p>La o serbare sunt n elevi (n par), fiecare cu numărul clasei lui. Profesorul vrea să-i împartă în n/2 perechi astfel încât în fiecare pereche să fie doi elevi din clase diferite. Se poate? Dacă da, afișați o împărțire.</p>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th></tr></thead><tbody>
+          <tr><td class="m">8
+1 1 2 2 2 3 3 1</td><td class="m">DA
+1 2
+1 2
+1 3
+2 3</td></tr>
+          <tr><td class="m">6
+1 1 1 1 2 3</td><td class="m">NU</td></tr>
+        </tbody></table></div>
+        <div class="think">
+          <p class="q">Gândiți-vă: în al doilea exemplu, de ce nu se poate? Când, în general, nu se poate?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Fiecare elev din clasa 1 are nevoie de un partener din altă clasă. Câți elevi din clasa 1 pot fi, cel mult?</p></div></details>
+        <details class="hint"><summary>Încă un indiciu</summary><div><p>Pentru construcție: sortați și puneți în pereche elementul de pe poziția i cu cel de pe poziția i + n/2.</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>Dacă o clasă are mai mult de n/2 elevi, fiecare dintre ei are nevoie de un partener din altă clasă, dar nu există suficienți. Deci <strong>nu se poate exact atunci când există un element majoritar</strong>. Este chiar ideea votului, privită invers: votul anulează perechi de valori diferite, iar aici vrem ca <em>toate</em> elementele să fie anulate în perechi.</p>
+            <p>Dacă nu există element majoritar, sortăm și facem perechile (a[i], a[i + n/2]). O valoare care apare de cel mult n/2 ori ocupă după sortare un bloc de cel mult n/2 poziții consecutive, deci nu poate fi în același timp pe poziția i și pe poziția i + n/2. Bonus: dacă vreo pereche iese cu elemente egale, înseamnă că acel bloc are mai mult de n/2 poziții, adică am găsit un element majoritar.</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+int n, a[200001];
+
+int main()
+{
+    cin >> n;                     // n este par
+    for (int i = 1; i <= n; i++) cin >> a[i];
+    sort(a + 1, a + n + 1);
+
+    int h = n / 2;
+    for (int i = 1; i <= h; i++)
+        if (a[i] == a[i + h])     // un bloc de valori egale acoperă mai mult de n/2 poziții
+        {
+            cout << "NU";
+            return 0;
+        }
+
+    cout << "DA\n";
+    for (int i = 1; i <= h; i++)
+        cout << a[i] << ' ' << a[i + h] << '\n';
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+
+      <div class="prob" id="m-reorg" data-toc="Fără vecini egali">
+        <h3>Fără doi vecini egali</h3>
+        <p>Se dau n numere naturale (cel mult 100 000). Rearanjați-le astfel încât oricare două numere vecine să fie diferite, sau afișați −1 dacă nu se poate.</p>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th></tr></thead><tbody>
+          <tr><td class="m">7
+1 1 1 2 2 3 1</td><td class="m">1 2 1 2 1 3 1</td></tr>
+          <tr><td class="m">4
+5 5 5 1</td><td class="m">-1</td></tr>
+        </tbody></table></div>
+        <div class="think">
+          <p class="q">Gândiți-vă: de câte ori poate apărea cel mult o valoare, ca rearanjarea să fie posibilă?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Cea mai „aglomerată” valoare trebuie să aibă mereu ceva între aparițiile ei. Pe câte poziții o putem pune, cel mult, fără să fie vecine?</p></div></details>
+        <details class="hint"><summary>Încă un indiciu</summary><div><p>Puneți valoarea cea mai frecventă pe pozițiile 1, 3, 5, …, apoi continuați cu celelalte valori, pe rând, pe pozițiile impare rămase și apoi pe 2, 4, 6, …</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>O valoare poate ocupa cel mult pozițiile 1, 3, 5, …, adică (n + 1)/2 poziții, fără să aibă doi vecini egali. Deci condiția este ca frecvența maximă să fie cel mult (n + 1)/2. Este o „rudă” a elementului majoritar: pentru n par, condiția spune exact că nu există element majoritar.</p>
+            <p>Construcție: așezăm întâi valoarea cea mai frecventă pe pozițiile 1, 3, 5, …, apoi celelalte valori, una câte una, continuând pe pozițiile impare și apoi pe cele pare. Aparițiile aceleiași valori ajung pe poziții de aceeași paritate, deci la distanță cel puțin 2. Excepția este o valoare care trece de la pozițiile impare la cele pare. Ea nu poate ajunge să aibă doi vecini egali, pentru că valoarea cea mai frecventă ocupă primele poziții impare.</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+using namespace std;
+
+const int VMAX = 100000;
+int n, a[200001], fr[VMAX + 1], b[200001];
+
+int main()
+{
+    cin >> n;
+    for (int i = 1; i <= n; i++)
+    {
+        cin >> a[i];
+        fr[a[i]]++;
+    }
+
+    int vmax = 0;                         // valoarea cu frecvența cea mai mare
+    for (int v = 0; v <= VMAX; v++)
+        if (fr[v] > fr[vmax]) vmax = v;
+
+    if (fr[vmax] > (n + 1) / 2)
+    {
+        cout << -1;
+        return 0;
+    }
+
+    // completăm întâi pozițiile 1, 3, 5, ..., apoi 2, 4, 6, ...
+    // începând cu valoarea cea mai frecventă, apoi celelalte, pe rând
+    int poz = 1;
+    for (int k = 0; k <= VMAX + 1; k++)
+    {
+        int v = (k == 0 ? vmax : k - 1);
+        if (k > 0 && v == vmax) continue;
+        while (fr[v] > 0)
+        {
+            b[poz] = v;
+            fr[v]--;
+            poz += 2;
+            if (poz > n) poz = 2;         // am terminat pozițiile impare
+        }
+    }
+
+    for (int i = 1; i <= n; i++) cout << b[i] << ' ';
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+
+      <div class="prob" id="m-changes" data-toc="Cele mai puține modificări">
+        <h3>Cele mai puține modificări</h3>
+        <p>Se dau n numere naturale (cel mult 10⁶). O modificare înseamnă înlocuirea unui număr cu orice alt număr. Care este numărul minim de modificări după care vectorul are un element majoritar?</p>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th><th>Explicație</th></tr></thead><tbody><tr><td class="m">7
+1 2 3 1 2 3 4</td><td class="m">2</td><td>Transformăm 3 și 4 în 1: 1 apare de 4 ori.</td></tr></tbody></table></div>
+        <div class="think">
+          <p class="q">Gândiți-vă: ce valoare merită să devină majoritară?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>Merită să alegem valoarea care apare deja cel mai des, cu frecvența fmax. Ca să devină majoritară, are nevoie de n/2 + 1 apariții, deci facem n/2 + 1 − fmax modificări, sau 0 dacă e deja majoritară.</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+using namespace std;
+
+int n, x, fr[1000001];
+
+int main()
+{
+    cin >> n;
+    int fmax = 0;
+    for (int i = 1; i <= n; i++)
+    {
+        cin >> x;
+        fr[x]++;
+        if (fr[x] > fmax) fmax = fr[x];
+    }
+    // vrem ca valoarea cea mai frecventă să apară de n/2 + 1 ori
+    int nevoie = n / 2 + 1 - fmax;
+    if (nevoie < 0) nevoie = 0;
+    cout << nevoie;
+    return 0;
+}
+</script>
+            <p>O problemă scurtă, dar bună pentru a verifica dacă definiția „mai mult de jumătate” a fost înțeleasă corect.</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="prob" id="m-longest" data-toc="Cea mai lungă secvență">
+        <h3>Cea mai lungă secvență în care x este majoritar</h3>
+        <p>Mai grea. Se dă un vector cu n numere și o valoare x. Determinați lungimea maximă a unei secvențe în care x este element majoritar (apare de mai mult de jumătate din lungimea secvenței), sau 0 dacă nu există.</p>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th><th>Explicație</th></tr></thead><tbody><tr><td class="m">9 1
+1 2 2 1 1 3 2 2 1</td><td class="m">5</td><td>Secvența 1 2 2 1 1 are trei de 1 din 5 elemente.</td></tr></tbody></table></div>
+        <div class="think">
+          <p class="q">Gândiți-vă: cum scriem „x este majoritar în secvență” ca o condiție despre o sumă?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Înlocuiți fiecare x cu +1 și fiecare alt număr cu −1. x este majoritar exact când suma secvenței este pozitivă. Exact ca la votul Boyer-Moore!</p></div></details>
+        <details class="hint"><summary>Încă un indiciu</summary><div><p>Cu sumele parțiale p, suma secvenței [j + 1, i] este p[i] − p[j]. Pentru i fixat căutăm cel mai mic j cu p[j] &lt; p[i]. Sumele parțiale cresc sau scad mereu cu câte 1: unde apare prima dată o valoare mai mică decât p[i]?</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>Cu înlocuirea +1/−1, x este majoritar în [j + 1, i] exact când p[i] − p[j] &gt; 0, adică p[j] &lt; p[i]. Pentru i fixat vrem j cât mai mic.</p>
+            <ul>
+              <li>Dacă p[i] &gt; 0, merge j = 0 (p[0] = 0), deci toată secvența [1, i] este bună.</li>
+              <li>Altfel, pentru că p pornește de la 0 și se schimbă mereu cu câte 1, prima poziție unde p ajunge sub p[i] este prima poziție unde p ia valoarea p[i] − 1. Ținem minte, pentru fiecare valoare, prima poziție unde apare. Valorile pot fi negative, așa că le deplasăm cu n.</li>
+            </ul>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+using namespace std;
+
+int n, x, a[200001];
+int prima[400003];               // prima[s + n] = primul indice j cu p[j] = s, sau -1
+
+int main()
+{
+    cin >> n >> x;
+    for (int i = 1; i <= n; i++) cin >> a[i];
+
+    for (int s = 0; s <= 2 * n; s++) prima[s] = -1;
+
+    // b[i] = +1 dacă a[i] == x, altfel -1;  p = sumele parțiale ale lui b
+    // x este majoritar în [j+1, i]  <=>  p[i] - p[j] > 0  <=>  p[j] < p[i]
+    int p = 0, best = 0;
+    prima[0 + n] = 0;
+    for (int i = 1; i <= n; i++)
+    {
+        p += (a[i] == x ? 1 : -1);
+        if (prima[p + n] == -1) prima[p + n] = i;
+
+        if (p > 0)
+            best = i;                              // toată secvența [1, i]
+        else if (p - 1 >= -n && prima[p - 1 + n] != -1)   // primul j cu p[j] = p - 1
+        {
+            if (i - prima[p - 1 + n] > best) best = i - prima[p - 1 + n];
+        }
+    }
+    cout << best;
+    return 0;
+}
+</script>
+            <p>Complexitatea este O(n). Dacă întrebarea era doar <em>suma maximă</em> a unei secvențe în vectorul +1/−1, adică „cu cât poate depăși x restul”, era exact <a href="kadane.html">algoritmul lui Kadane</a>.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section id="m-tema">
+      <h2>Tema</h2>
+      <ul>
+        <li><a href="https://infoarena.ro/problema/elmaj" target="_blank" rel="noopener">elmaj</a> (infoarena): problema clasică a elementului majoritar</li>
+        <li><a href="https://leetcode.com/problems/majority-element/" target="_blank" rel="noopener">Majority Element</a> (LeetCode #169)</li>
+        <li><a href="https://leetcode.com/problems/majority-element-ii/" target="_blank" rel="noopener">Majority Element II</a> (LeetCode #229): varianta n/3</li>
+        <li><a href="https://leetcode.com/problems/reorganize-string/" target="_blank" rel="noopener">Reorganize String</a> (LeetCode #767): fără doi vecini egali, pe litere</li>
+        <li><a href="https://leetcode.com/problems/longest-well-performing-interval/" target="_blank" rel="noopener">Longest Well-Performing Interval</a> (LeetCode #1124): cea mai lungă secvență cu majoritate</li>
+      </ul>
+    </section>
+  
+  </main>
+</div>
+
+<script src="../assets/catalog.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="../assets/site.js"></script>
+<script>
+/* Boyer-Moore demo */
+(() => {
+  const mIn = document.getElementById('mIn');
+  const demo = Stepper(document.getElementById('demoM'), () => {
+    let a = (mIn.value.match(/-?\d+/g) || ['1']).slice(0, 14).map(Number);
+    const n = a.length, frames = [];
+    let cand = '–', cnt = 0;
+    const stats = () => `<div><span>candidat =</span> <b>${cand}</b></div><div><span>contor =</span> <b>${cnt}</b></div>`;
+    frames.push({ base1: true, l: -1, r: -1, msg: 'Pornim cu contorul 0 și fără candidat.', stats: stats() });
+    for (let i = 0; i < n; i++) {
+      let msg;
+      if (cnt === 0) { cand = a[i]; cnt = 1; msg = `Contorul era 0, deci <b>${a[i]}</b> devine candidat, cu contorul 1.`; }
+      else if (a[i] === cand) { cnt++; msg = `a[${i + 1}] = ${a[i]} este egal cu candidatul: contorul crește la ${cnt}.`; }
+      else { cnt--; msg = `a[${i + 1}] = ${a[i]} este diferit de candidat: anulează o apariție, contorul scade la ${cnt}.`; }
+      frames.push({ base1: true, ln: 'i', l: i, r: -1, done: k => k < i, msg, stats: stats() });
+    }
+    const good = []; a.forEach((x, k) => { if (x === cand) good.push(k); });
+    const ok = good.length > Math.floor(n / 2);
+    frames.push({ base1: true, l: -1, r: -1, good, msg: `Verificăm candidatul ${cand}: apare ${good.length === 1 ? 'o dată' : 'de ' + good.length + ' ori'}, iar n/2 = ${Math.floor(n / 2)}. ` + (ok ? `<span class="ok">Elementul majoritar este ${cand}.</span>` : `<span class="bad">${good.length} nu este mai mare decât ${Math.floor(n / 2)}, deci nu există element majoritar.</span>`), stats: stats() });
+    return { arr: a, frames };
+  });
+  mIn.addEventListener('input', () => demo.reset());
+})();
+
+
+</script>
+</body>
+</html>
