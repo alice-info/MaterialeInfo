@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Ghid pentru materiale</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body data-root="">
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Pentru profesori</div>
+    <h1>Ghid pentru <span class="pr">materiale noi</span></h1>
+    <p class="lede">Cum se adaugă o lecție nouă pe site și ce componente se pot folosi în ea.</p>
+  </div>
+</header>
+
+<div class="wrap layout">
+  <nav class="toc" data-auto aria-label="Cuprins"></nav>
+  <main class="prose">
+
+    <section id="pasi">
+      <h2>Cum adaug un material nou</h2>
+      <ol class="steps">
+        <li>Copiați fișierul <code>materiale/_sablon.html</code> și redenumiți copia, de exemplu <code>materiale/cautare-binara.html</code>. Folosiți litere mici, fără diacritice, cu cratimă între cuvinte.</li>
+        <li>În fișierul nou schimbați trei lucruri: textul din <code>&lt;title&gt;</code>, atributul <code>data-id="cautare-binara"</code> de pe <code>&lt;body&gt;</code> (numele fișierului fără <code>.html</code>) și titlul din <code>&lt;h1&gt;</code>.</li>
+        <li>Deschideți <code>assets/catalog.js</code> și adăugați un rând nou în lista <code>MATERIALE</code>. Ordinea din listă este ordinea lecțiilor în cadrul clasei.
+          <script type="text/x-js" class="cod" data-lang="javascript" data-limbaj="JS">
+  {
+    id: 'cautare-binara',
+    titlu: 'Căutarea binară',
+    clasa: 8,
+    capitol: 'Algoritmi',
+    tip: 'Predare',
+    descriere: 'Căutarea unei valori într-un vector sortat, în O(log n).'
+  },
+</script></li>
+        <li>Scrieți conținutul lecției cu componentele de mai jos. Puteți copia orice bucată de aici.</li>
+        <li>Gata. Lecția apare singură pe prima pagină, la clasa ei. Cuprinsul, bara de sus, eticheta cu clasa și legăturile spre lecția anterioară și următoare se fac automat.</li>
+      </ol>
+      <p>Site-ul este format doar din fișiere, fără server. Funcționează deschis direct de pe calculator și poate fi pus pe orice găzduire de pagini statice (de exemplu GitHub Pages sau Netlify).</p>
+    </section>
+
+    <section id="culori">
+      <h2>Culori</h2>
+      <p>Toate culorile sunt definite o singură dată, în <code>assets/site.css</code>, și au variante pentru tema întunecată. Albastrul și portocaliul vin de la cei doi pointeri.</p>
+      <div class="swatches"><div class="swatch"><i style="background:var(--l)"></i><span>--l<br>albastru: stânga, legături</span></div><div class="swatch"><i style="background:var(--r)"></i><span>--r<br>portocaliu: dreapta, accent</span></div><div class="swatch"><i style="background:var(--think)"></i><span>--think<br>violet: Gândiți-vă, indicii</span></div><div class="swatch"><i style="background:var(--ok)"></i><span>--ok<br>verde: corect, rezultat</span></div><div class="swatch"><i style="background:var(--bad)"></i><span>--bad<br>roșu: greșit, prea lent</span></div><div class="swatch"><i style="background:var(--fg)"></i><span>--fg<br>text</span></div><div class="swatch"><i style="background:var(--surface)"></i><span>--surface<br>fundal casete</span></div><div class="swatch"><i style="background:var(--bg)"></i><span>--bg<br>fundal pagină</span></div></div>
+    </section>
+
+    <section id="text">
+      <h2>Text</h2>
+      <p style="font-family:var(--f-display);font-weight:700;font-size:1.4em;margin-bottom:4px">Bricolage Grotesque</p>
+      <p>pentru titluri și butoane.</p>
+      <p style="font-size:1.2em;margin-bottom:4px">Source Serif 4</p>
+      <p>pentru textul lecțiilor.</p>
+      <p class="mono" style="font-size:1.05em;margin-bottom:4px">JetBrains Mono</p>
+      <p>pentru cod, date de intrare și etichete.</p>
+    </section>
+
+    <section id="componente">
+      <h2>Componente</h2>
+      <p>Pentru fiecare componentă: cum arată, apoi codul HTML de copiat.</p>
+
+      <div class="prob" id="c-sectiune">
+        <h3>Secțiune</h3>
+        <p>Fiecare <code>&lt;section&gt;</code> cu <code>id</code> și <code>&lt;h2&gt;</code> apare în cuprins. Atributul <code>data-toc</code> dă o etichetă mai scurtă în cuprins.</p>
+        <div class="spec">
+        <div class="code"><span class="tag">HTML</span><pre><code>&lt;section id=&quot;teorie&quot; data-toc=&quot;Ideea&quot;&gt;
+  &lt;h2&gt;Ideea tehnicii&lt;/h2&gt;
+  &lt;p&gt;Textul lecției.&lt;/p&gt;
+&lt;/section&gt;</code></pre></div>
+        </div>
+      </div>
+
+      <div class="prob" id="c-problema">
+        <h3>Problemă</h3>
+        <p>O problemă este un <code>&lt;div class="prob"&gt;</code> cu <code>id</code> și <code>&lt;h3&gt;</code>. Apare în cuprins sub secțiunea ei. Sursa se scrie într-un <code>&lt;span class="src"&gt;</code>.</p>
+        <div class="spec"><div class="show"><div class="prob" id="p-exemplu">
+  <h3>Problema <a href="https://cses.fi/problemset/task/1640" target="_blank" rel="noopener">Sum of Two Values</a> <span class="src">CSES</span></h3>
+  <p>Enunțul problemei.</p>
+  <h4>Date de intrare</h4>
+  <p>Pe prima linie se află n.</p>
+  <h4>Restricții și precizări</h4>
+  <p class="mono">1 ≤ n ≤ 2·10⁵</p>
+</div></div>
+        <div class="code"><span class="tag">HTML</span><pre><code>&lt;div class=&quot;prob&quot; id=&quot;p-exemplu&quot;&gt;
+  &lt;h3&gt;Problema &lt;a href=&quot;https://cses.fi/problemset/task/1640&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Sum of Two Values&lt;/a&gt; &lt;span class=&quot;src&quot;&gt;CSES&lt;/span&gt;&lt;/h3&gt;
+  &lt;p&gt;Enunțul problemei.&lt;/p&gt;
+  &lt;h4&gt;Date de intrare&lt;/h4&gt;
+  &lt;p&gt;Pe prima linie se află n.&lt;/p&gt;
+  &lt;h4&gt;Restricții și precizări&lt;/h4&gt;
+  &lt;p class=&quot;mono&quot;&gt;1 ≤ n ≤ 2·10⁵&lt;/p&gt;
+&lt;/div&gt;</code></pre></div>
+        </div>
+      </div>
+
+      <div class="prob" id="c-exemplu">
+        <h3>Tabel cu exemple</h3>
+        <p>Celulele cu <code>class="m"</code> păstrează rândurile noi, exact ca în fișierul de intrare.</p>
+        <div class="spec"><div class="show"><div class="tbl"><table class="io">
+  <thead><tr><th>Intrare</th><th>Ieșire</th><th>Explicație</th></tr></thead>
+  <tbody><tr><td class="m">4 8
+2 7 5 1</td><td class="m">2 4</td><td>2 + 5 = 7, 7 + 1 = 8</td></tr></tbody>
+</table></div></div>
+        <div class="code"><span class="tag">HTML</span><pre><code>&lt;div class=&quot;tbl&quot;&gt;&lt;table class=&quot;io&quot;&gt;
+  &lt;thead&gt;&lt;tr&gt;&lt;th&gt;Intrare&lt;/th&gt;&lt;th&gt;Ieșire&lt;/th&gt;&lt;th&gt;Explicație&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+  &lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;m&quot;&gt;4 8
+2 7 5 1&lt;/td&gt;&lt;td class=&quot;m&quot;&gt;2 4&lt;/td&gt;&lt;td&gt;2 + 5 = 7, 7 + 1 = 8&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;</code></pre></div>
+        </div>
+      </div>
+
+      <div class="prob" id="c-think">
+        <h3>Gândiți-vă, cu cronometru</h3>
+        <p>Întrebarea pentru clasă. Cronometrul are 3, 5 și 10 minute.</p>
+        <div class="spec"><div class="show"><div class="think">
+  <p class="q">Gândiți-vă: cum folosim faptul că vectorul este sortat?</p>
+  <div class="timer" data-timer></div>
+</div></div>
+        <div class="code"><span class="tag">HTML</span><pre><code>&lt;div class=&quot;think&quot;&gt;
+  &lt;p class=&quot;q&quot;&gt;Gândiți-vă: cum folosim faptul că vectorul este sortat?&lt;/p&gt;
+  &lt;div class=&quot;timer&quot; data-timer&gt;&lt;/div&gt;
+&lt;/div&gt;</code></pre></div>
+        </div>
+      </div>
+
+      <div class="prob" id="c-indiciu">
+        <h3>Indiciu și soluție ascunsă</h3>
+        <p>Indiciile și soluțiile sunt închise la început. Butonul „Arată toate soluțiile” din bara de sus le deschide pe toate.</p>
+        <div class="spec"><div class="show"><details class="hint"><summary>Indiciu</summary><div><p>Ce se întâmplă cu suma dacă mutăm pointerul din dreapta?</p></div></details>
+<details class="sol">
+  <summary>Soluție <span class="arr"></span></summary>
+  <div class="body">
+    <p>Explicația soluției.</p>
+  </div>
+</details></div>
+        <div class="code"><span class="tag">HTML</span><pre><code>&lt;details class=&quot;hint&quot;&gt;&lt;summary&gt;Indiciu&lt;/summary&gt;&lt;div&gt;&lt;p&gt;Ce se întâmplă cu suma dacă mutăm pointerul din dreapta?&lt;/p&gt;&lt;/div&gt;&lt;/details&gt;
+&lt;details class=&quot;sol&quot;&gt;
+  &lt;summary&gt;Soluție &lt;span class=&quot;arr&quot;&gt;&lt;/span&gt;&lt;/summary&gt;
+  &lt;div class=&quot;body&quot;&gt;
+    &lt;p&gt;Explicația soluției.&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/details&gt;</code></pre></div>
+        </div>
+      </div>
+
+      <div class="prob" id="c-cod">
+        <h3>Bloc de cod</h3>
+        <p>Codul se lipește așa cum este, fără nicio modificare, între cele două etichete. Primește automat culori și butonul de copiere.</p>
+        <div class="spec"><div class="show"><script type="text/x-cpp" class="cod">
+#include <iostream>
+using namespace std;
+
+int main()
+{
+    cout << "Salut!";
+    return 0;
+}
+</script></div>
+        <div class="code"><span class="tag">HTML</span><pre><code>&lt;script type=&quot;text/x-cpp&quot; class=&quot;cod&quot;&gt;
+#include &lt;iostream&gt;
+using namespace std;
+
+int main()
+{
+    cout &lt;&lt; &quot;Salut!&quot;;
+    return 0;
+}
+&lt;/script&gt;</code></pre></div>
+        </div>
+      </div>
+
+      <div class="prob" id="c-pseudo">
+        <h3>Pseudocod</h3>
+        <p>Cu <code>lv</code> (albastru, pointerul din stânga) și <code>rv</code> (portocaliu, pointerul din dreapta) se pot colora variabile.</p>
+        <div class="spec"><div class="show"><div class="pseudo"><span class="lv">st</span> = 1;  <span class="rv">dr</span> = n
+<span class="k">cât timp</span> <span class="lv">st</span> &lt; <span class="rv">dr</span>:
+    ...</div></div>
+        <div class="code"><span class="tag">HTML</span><pre><code>&lt;div class=&quot;pseudo&quot;&gt;&lt;span class=&quot;lv&quot;&gt;st&lt;/span&gt; = 1;  &lt;span class=&quot;rv&quot;&gt;dr&lt;/span&gt; = n
+&lt;span class=&quot;k&quot;&gt;cât timp&lt;/span&gt; &lt;span class=&quot;lv&quot;&gt;st&lt;/span&gt; &amp;lt; &lt;span class=&quot;rv&quot;&gt;dr&lt;/span&gt;:
+    ...&lt;/div&gt;</code></pre></div>
+        </div>
+      </div>
+
+      <div class="prob" id="c-nota">
+        <h3>Notă, formulă și complexitate</h3>
+        <p>O notă scoate în evidență o idee sau o formulă. Complexitățile se pot marca verde (bună) sau roșu (prea lentă).</p>
+        <div class="spec"><div class="show"><div class="note r"><p class="big">S[i] = max(a[i], S[i − 1] + a[i])</p></div>
+<div class="note"><p>Atenție: suma poate depăși <code>int</code>.</p></div>
+<p>Timp <span class="cx">O(n)</span>, față de <span class="cx slow">O(n²)</span>.</p></div>
+        <div class="code"><span class="tag">HTML</span><pre><code>&lt;div class=&quot;note r&quot;&gt;&lt;p class=&quot;big&quot;&gt;S[i] = max(a[i], S[i − 1] + a[i])&lt;/p&gt;&lt;/div&gt;
+&lt;div class=&quot;note&quot;&gt;&lt;p&gt;Atenție: suma poate depăși &lt;code&gt;int&lt;/code&gt;.&lt;/p&gt;&lt;/div&gt;
+&lt;p&gt;Timp &lt;span class=&quot;cx&quot;&gt;O(n)&lt;/span&gt;, față de &lt;span class=&quot;cx slow&quot;&gt;O(n²)&lt;/span&gt;.&lt;/p&gt;</code></pre></div>
+        </div>
+      </div>
+
+    </section>
+
+    <section id="simulare">
+      <h2>Simulare pas cu pas</h2>
+      <p>Simulările se fac cu funcția <code>Stepper</code> din <code>assets/site.js</code>. În pagină se pune caseta, iar la finalul paginii, după <code>site.js</code>, un script care descrie pașii. Fiecare pas spune unde sunt pointerii (<code>l</code>, <code>r</code>), ce celule se colorează și ce text se afișează.</p>
+      <div class="spec"><div class="show"><div class="demo" id="demoDesign">
+  <div class="stats" data-stats></div>
+  <div class="cells" data-cells></div>
+  <p class="status" data-status aria-live="polite"></p>
+  <div class="ctrl">
+    <button class="btn" type="button" data-prev>Înapoi</button>
+    <button class="btn pri" type="button" data-next>Pasul următor</button>
+    <button class="btn" type="button" data-play>Rulează</button>
+    <span class="step-ct" data-ct></span>
+  </div>
+</div></div>
+      <div class="code"><span class="tag">HTML</span><pre><code>&lt;div class=&quot;demo&quot; id=&quot;demoDesign&quot;&gt;
+  &lt;div class=&quot;stats&quot; data-stats&gt;&lt;/div&gt;
+  &lt;div class=&quot;cells&quot; data-cells&gt;&lt;/div&gt;
+  &lt;p class=&quot;status&quot; data-status aria-live=&quot;polite&quot;&gt;&lt;/p&gt;
+  &lt;div class=&quot;ctrl&quot;&gt;
+    &lt;button class=&quot;btn&quot; type=&quot;button&quot; data-prev&gt;Înapoi&lt;/button&gt;
+    &lt;button class=&quot;btn pri&quot; type=&quot;button&quot; data-next&gt;Pasul următor&lt;/button&gt;
+    &lt;button class=&quot;btn&quot; type=&quot;button&quot; data-play&gt;Rulează&lt;/button&gt;
+    &lt;span class=&quot;step-ct&quot; data-ct&gt;&lt;/span&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre></div>
+      <div class="code"><span class="tag">JS</span><pre><code>Stepper(document.getElementById(&#x27;demoDesign&#x27;), () =&gt; {
+  const a = [3, 8, 1, 5], frames = [];
+  let s = 0;
+  for (let i = 0; i &lt; a.length; i++) {
+    s += a[i];
+    frames.push({
+      l: i, ln: &#x27;i&#x27;,                     // poziția pointerului și eticheta lui
+      done: k =&gt; k &lt; i,                  // celulele estompate
+      stats: `&lt;div&gt;&lt;span&gt;s =&lt;/span&gt; &lt;b&gt;${s}&lt;/b&gt;&lt;/div&gt;`,
+      msg: `Adunăm a[${i}] = ${a[i]}, iar suma devine ${s}.`
+    });
+  }
+  return { arr: a, frames };
+});</code></pre></div>
+      </div>
+      <p>Opțiuni pentru un pas: <code>l</code> și <code>r</code> (pozițiile pointerilor), <code>ln</code> și <code>rn</code> (etichetele lor), <code>win: [st, dr]</code> (interval colorat verde), <code>good</code> și <code>bad</code> (liste de poziții verzi sau roșii), <code>done</code> (o funcție care spune ce celule se estompează), <code>base1: true</code> (numerotare de la 1), <code>stats</code> și <code>msg</code> (textele afișate).</p>
+    </section>
+  </main>
+</div>
+
+<script src="assets/catalog.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="assets/site.js"></script>
+<script>
+Stepper(document.getElementById('demoDesign'), () => {
+  const a = [3, 8, 1, 5], frames = [];
+  let s = 0;
+  for (let i = 0; i < a.length; i++) {
+    s += a[i];
+    frames.push({
+      l: i, ln: 'i',                     // poziția pointerului și eticheta lui
+      done: k => k < i,                  // celulele estompate
+      stats: `<div><span>s =</span> <b>${s}</b></div>`,
+      msg: `Adunăm a[${i}] = ${a[i]}, iar suma devine ${s}.`
+    });
+  }
+  return { arr: a, frames };
+});
+</script>
+</body>
+</html>

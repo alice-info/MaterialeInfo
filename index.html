@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Materiale de informatică</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+
+<header class="home-hero">
+  <div class="wrap">
+    <div class="eyebrow" id="autor">CEX Prahova</div>
+    <h1 id="numeSite">Materiale de <span class="pr">informatică</span></h1>
+    <p class="lede" id="descSite">Lecții, probleme rezolvate și teme pentru pregătirea de olimpiadă.</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="home-tools">
+    <div class="filters" role="group" aria-label="Alege clasa" id="filtre"></div>
+    <input class="search" type="search" id="cauta" placeholder="Caută un subiect" aria-label="Caută un subiect" autocomplete="off">
+  </div>
+  <div id="lista"></div>
+</main>
+
+<footer>
+  <div class="wrap home-foot">
+    <span id="subsol">Materiale de informatică · CEX Prahova</span>
+    <a href="design.html">Ghid pentru materiale noi</a>
+  </div>
+</footer>
+
+<script src="assets/catalog.js"></script>
+<script>
+(function () {
+  const LISTA = window.MATERIALE || [], CLASE = window.CLASE || {}, SITE = window.SITE || {};
+  if (SITE.autor) document.getElementById('autor').textContent = SITE.autor;
+  if (SITE.descriere) document.getElementById('descSite').textContent = SITE.descriere;
+  document.getElementById('subsol').textContent = [SITE.nume, SITE.autor].filter(Boolean).join(' · ');
+
+  const fara = s => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const esc = s => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const clase = [...new Set(LISTA.map(m => m.clasa))].sort((a, b) => a - b);
+  const scurt = c => (CLASE[c] || 'Clasa ' + c).replace(/^Clasa\s+/, '');
+
+  const filtre = document.getElementById('filtre'), cauta = document.getElementById('cauta'), lista = document.getElementById('lista');
+  let clasa = 'toate';
+
+  filtre.innerHTML = '<button type="button" data-c="toate">Toate clasele</button>' +
+    clase.map(c => `<button type="button" data-c="${c}">${esc(scurt(c))}</button>`).join('');
+  filtre.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    clasa = b.dataset.c;
+    try { history.replaceState(null, '', clasa === 'toate' ? location.pathname : '#clasa-' + clasa); } catch (err) {}
+    draw();
+  });
+  cauta.addEventListener('input', draw);
+
+  function draw() {
+    filtre.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.c === String(clasa)));
+    const q = fara(cauta.value.trim());
+    let html = '';
+    for (const c of clase) {
+      if (clasa !== 'toate' && String(c) !== String(clasa)) continue;
+      const items = LISTA.filter(m => m.clasa === c && (!q || fara(m.titlu + ' ' + m.descriere + ' ' + m.capitol).includes(q)));
+      if (!items.length) continue;
+      html += `<section class="grade" id="clasa-${c}"><h2>${esc(CLASE[c] || 'Clasa ' + c)}</h2><div class="cards">` +
+        items.map(m => `<a class="card" href="materiale/${encodeURIComponent(m.id)}.html">
+          <span class="card-k">${esc(m.capitol)}</span>
+          <span class="card-t">${esc(m.titlu)}</span>
+          <p class="card-d">${esc(m.descriere)}</p>
+          <span class="card-tip${m.tip === 'Studiu individual' ? ' self' : ''}">${esc(m.tip)}</span>
+        </a>`).join('') + '</div></section>';
+    }
+    lista.innerHTML = html || `<p class="empty">Niciun material${q ? ' pentru „' + esc(cauta.value.trim()) + '”' : ''}.</p>`;
+  }
+
+  const m = location.hash.match(/^#clasa-(\d+)$/);
+  if (m && clase.includes(Number(m[1]))) clasa = m[1];
+  draw();
+})();
+</script>
+</body>
+</html>
