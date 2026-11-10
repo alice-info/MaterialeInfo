@@ -1,0 +1,717 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Algoritmul lui Kadane</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body data-root="../" data-id="kadane">
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow"></div>
+    <h1>Algoritmul lui <span class="pr">Kadane</span></h1>
+    <p class="lede">Secvența de sumă maximă și câteva variante ale ei.</p>
+  </div>
+</header>
+
+<div class="wrap layout">
+  <nav class="toc" data-auto aria-label="Cuprins"></nav>
+  <main class="prose">
+    <section id="k-problema" data-toc="Problema">
+      <div class="prob" style="border-top:0;margin-top:0;padding-top:0">
+        <h2>Secvența de sumă maximă</h2>
+        <p>Se dă un vector cu n numere întregi, pozitive și negative. Determinați suma maximă a unei secvențe nevide de elemente alăturate a[i], a[i+1], …, a[j], precum și pozițiile i și j.</p>
+        <p>Atenție la termeni: o <strong>secvență</strong> este formată din elemente alăturate, pe când un <strong>subșir</strong> poate sări peste elemente. Pentru subșir problema este simplă: luăm toate numerele pozitive. Aici ne interesează secvențele.</p>
+        <h4>Date de intrare</h4>
+        <p>Pe prima linie se află n, iar pe a doua linie n numere întregi.</p>
+        <h4>Date de ieșire</h4>
+        <p>Pe prima linie suma maximă, pe a doua linie pozițiile de început și de sfârșit ale secvenței.</p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th><th>Explicație</th></tr></thead><tbody><tr><td class="m">9
+-2 1 -3 4 -1 2 1 -5 4</td><td class="m">6
+4 7</td><td>Secvența 4 −1 2 1, de pe pozițiile 4…7, are suma 6.</td></tr></tbody></table></div>
+        <div class="think">
+          <p class="q">Gândiți-vă: câte secvențe are un vector cu n elemente? Putem evita să le verificăm pe toate?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Fixați capătul din dreapta i. Care este cea mai bună secvență care se termină exact în i?</p></div></details>
+        <details class="hint"><summary>Încă un indiciu</summary><div><p>Dacă cea mai bună secvență care se termină în i − 1 are suma negativă, mai merită să o continuăm cu a[i]?</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p><strong>Soluția 1.</strong> Fixăm începutul i și extindem sfârșitul j, adunând pe rând elementele. Sunt aproximativ n²/2 secvențe, deci complexitatea este O(n²). Merge pentru n de ordinul miilor, dar nu pentru n = 10⁶.</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+using namespace std;
+
+int n, a[5001];
+
+int main()
+{
+    cin >> n;
+    for (int i = 1; i <= n; i++) cin >> a[i];
+
+    long long best = a[1];
+    for (int i = 1; i <= n; i++)          // începutul secvenței
+    {
+        long long s = 0;
+        for (int j = i; j <= n; j++)      // sfârșitul secvenței
+        {
+            s += a[j];                    // s = a[i] + ... + a[j]
+            if (s > best) best = s;
+        }
+    }
+    cout << best;
+    return 0;
+}
+</script>
+            <p><strong>De ce contează numerele negative.</strong> Dacă toate numerele ar fi pozitive, răspunsul ar fi tot vectorul: orice element adăugat mărește suma. Numerele negative creează dilema. Un −3 merită inclus dacă după el urmează un 10, dar nu și dacă după el urmează doar un 1.</p>
+            <p><strong>Soluția 2: algoritmul lui Kadane.</strong> Notăm cu S[i] suma maximă a unei secvențe care se termină exact în poziția i. Pentru a[i] avem doar două variante:</p>
+            <ol>
+              <li>continuăm cea mai bună secvență care se termina în i − 1: S[i − 1] + a[i];</li>
+              <li>începem o secvență nouă, formată doar din a[i].</li>
+            </ol>
+            <div class="note r"><p class="big">S[i] = max(a[i], S[i − 1] + a[i])</p></div>
+            <p>A doua variantă este mai bună exact atunci când S[i − 1] este negativ: o sumă negativă nu face decât să micșoreze ce urmează. Răspunsul este cel mai mare dintre toate valorile S[i].</p>
+            <p>Pentru că S[i] depinde doar de S[i − 1], nu avem nevoie de un vector: ne ajunge o variabilă <code>suma</code> pentru secvența curentă și una <code>best</code> pentru cel mai bun rezultat. Ca să aflăm și pozițiile, ținem minte unde a început secvența curentă.</p>
+            <div class="demo" id="demoK">
+              <div class="demo-head"><div class="legend"><span><i style="background:var(--l)"></i>începutul secvenței curente</span><span><i style="background:var(--r)"></i>poziția i</span><span><i style="background:var(--ok)"></i>secvența maximă</span></div></div>
+              <div class="stats" data-stats></div>
+              <div class="cells" data-cells></div>
+              <p class="status" data-status aria-live="polite"></p>
+              <div class="ctrl">
+                <button class="btn" type="button" data-prev>Înapoi</button>
+                <button class="btn pri" type="button" data-next>Pasul următor</button>
+                <button class="btn" type="button" data-play>Rulează</button>
+                <span class="step-ct" data-ct></span>
+              </div>
+            </div>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+using namespace std;
+
+int n, a[1000001];
+
+int main()
+{
+    cin >> n;
+    for (int i = 1; i <= n; i++) cin >> a[i];
+
+    long long suma = 0;          // suma secvenței curente, care se termină în i
+    long long best = a[1];       // cea mai mare sumă găsită până acum
+    int st = 1;                  // începutul secvenței curente
+    int bst = 1, bdr = 1;        // capetele secvenței de sumă maximă
+
+    for (int i = 1; i <= n; i++)
+    {
+        if (suma < 0)            // o sumă negativă doar ne încurcă:
+        {                        // începem o secvență nouă din i
+            suma = 0;
+            st = i;
+        }
+        suma += a[i];
+        if (suma > best)
+        {
+            best = suma;
+            bst = st;
+            bdr = i;
+        }
+    }
+    cout << best << '\n' << bst << ' ' << bdr;
+    return 0;
+}
+</script>
+            <p>Complexitatea este O(n) în timp, iar memoria suplimentară este O(1).</p>
+            <p>Atenție la două detalii. <code>best</code> pornește de la a[1], nu de la 0: dacă toate numerele sunt negative, răspunsul este cel mai mare dintre ele, nu 0 (secvența trebuie să fie nevidă). Iar suma poate depăși <code>int</code>, așa că folosim <code>long long</code>.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section id="k-variante">
+      <h2>Variante</h2>
+
+      <div class="prob" id="k-min" data-toc="Suma minimă">
+        <h3>Secvența de sumă minimă</h3>
+        <p>Același enunț, dar se cere suma minimă a unei secvențe nevide.</p>
+        <div class="think">
+          <p class="q">Gândiți-vă: ce schimbăm în algoritmul lui Kadane?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>Totul se întoarce invers: acum o sumă <em>pozitivă</em> ne încurcă, pentru că mărește ce urmează. Când suma curentă devine pozitivă, începem o secvență nouă.</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+using namespace std;
+
+int n, a[1000001];
+
+int main()
+{
+    cin >> n;
+    for (int i = 1; i <= n; i++) cin >> a[i];
+
+    long long suma = 0, best = a[1];
+    for (int i = 1; i <= n; i++)
+    {
+        if (suma > 0) suma = 0;   // o sumă pozitivă ar mări minimul
+        suma += a[i];
+        if (suma < best) best = suma;
+    }
+    cout << best;
+    return 0;
+}
+</script>
+            <p>Varianta aceasta este folosită în următoarele două probleme.</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="prob" id="k-circ" data-toc="Secvența circulară">
+        <h3>Secvența circulară de sumă maximă</h3>
+        <p>Elementele vectorului sunt așezate pe un cerc: după a[n] urmează din nou a[1]. Determinați suma maximă a unei secvențe de elemente alăturate pe cerc.</p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th><th>Explicație</th></tr></thead><tbody><tr><td class="m">5
+5 -3 5 -8 1</td><td class="m">8</td><td>Secvența 1, 5, −3, 5 trece peste capăt (a[5], a[1], a[2], a[3]).</td></tr></tbody></table></div>
+        <div class="think">
+          <p class="q">Gândiți-vă: dacă secvența trece peste capătul vectorului, ce rămâne în afara ei?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Elementele care nu sunt alese formează o secvență obișnuită, care nu trece peste capăt.</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>Secvența cea mai bună este de unul din două tipuri:</p>
+            <ol>
+              <li>nu trece peste capăt: o găsim cu Kadane obișnuit;</li>
+              <li>trece peste capăt: atunci elementele rămase pe dinafară formează o secvență obișnuită din mijloc. Suma aleasă este <code>total − suma din mijloc</code>, deci ea este maximă când secvența din mijloc are suma minimă.</li>
+            </ol>
+            <div class="note r"><p class="big">răspuns = max(Kadane maxim, total − Kadane minim)</p></div>
+            <p>Un caz special: dacă toate numerele sunt negative, Kadane minim ia tot vectorul, iar <code>total − minim</code> ar însemna o secvență goală, cu suma 0. Atunci răspunsul este pur și simplu Kadane maxim, adică cel mai mare număr.</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+using namespace std;
+
+int n, a[1000001];
+
+int main()
+{
+    cin >> n;
+    for (int i = 1; i <= n; i++) cin >> a[i];
+
+    long long total = 0;
+    long long sMax = 0, bestMax = a[1];   // Kadane pentru maxim
+    long long sMin = 0, bestMin = a[1];   // Kadane pentru minim
+
+    for (int i = 1; i <= n; i++)
+    {
+        total += a[i];
+
+        if (sMax < 0) sMax = 0;
+        sMax += a[i];
+        if (sMax > bestMax) bestMax = sMax;
+
+        if (sMin > 0) sMin = 0;
+        sMin += a[i];
+        if (sMin < bestMin) bestMin = sMin;
+    }
+
+    if (bestMax < 0)                 // toate numerele sunt negative
+        cout << bestMax;
+    else
+        cout << max(bestMax, total - bestMin);
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+
+      <div class="prob" id="k-flip" data-toc="Schimbarea semnului">
+        <h3>Schimbarea semnului unei secvențe</h3>
+        <p>Putem alege o singură secvență și înmulți toate elementele ei cu −1 (sau putem să nu schimbăm nimic). Care este cea mai mare sumă a întregului vector pe care o putem obține?</p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th><th>Explicație</th></tr></thead><tbody><tr><td class="m">5
+1 2 -10 3 4</td><td class="m">20</td><td>Schimbăm semnul lui −10: 1 + 2 + 10 + 3 + 4 = 20.</td></tr></tbody></table></div>
+        <div class="think">
+          <p class="q">Gândiți-vă: cu cât se schimbă suma totală dacă inversăm semnul unei secvențe cu suma s?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>Dacă secvența are suma s, după inversare ea contribuie cu −s în loc de s, deci noua sumă este <code>total − s − s = total − 2·s</code>. Ca aceasta să fie cât mai mare, s trebuie să fie cât mai mic: căutăm secvența de sumă minimă. Dacă și aceasta este pozitivă, nu merită să schimbăm nimic.</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+using namespace std;
+
+int n, a[1000001];
+
+int main()
+{
+    cin >> n;
+    for (int i = 1; i <= n; i++) cin >> a[i];
+
+    long long total = 0, suma = 0, minim = a[1];
+    for (int i = 1; i <= n; i++)
+    {
+        total += a[i];
+        if (suma > 0) suma = 0;      // Kadane pentru suma minimă
+        suma += a[i];
+        if (suma < minim) minim = suma;
+    }
+
+    // dacă inversăm o secvență cu suma s, noua sumă este total - 2 * s
+    if (minim < 0)
+        cout << total - 2 * minim;
+    else
+        cout << total;               // nu merită să inversăm nimic
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+
+      <div class="prob" id="k-lenk" data-toc="Lungime cel puțin K">
+        <h3>Secvența de sumă maximă de lungime cel puțin K</h3>
+        <p>Se dau n, K și un vector cu n numere întregi. Determinați suma maximă a unei secvențe care are cel puțin K elemente.</p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th></tr></thead><tbody><tr><td class="m">9 3
+-2 1 -3 4 -1 2 1 -5 4</td><td class="m">6</td></tr></tbody></table></div>
+        <div class="think">
+          <p class="q">Gândiți-vă: cum scriem suma unei secvențe folosind sumele parțiale?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Suma secvenței [j, i] este p[i] − p[j − 1]. Pentru i fixat, ce valoare a lui p[j − 1] ne convine?</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>Calculăm sumele parțiale p[i] = a[1] + … + a[i], cu p[0] = 0. Secvența [j, i] are suma p[i] − p[j − 1] și lungimea i − j + 1 ≥ K, adică j − 1 ≤ i − K.</p>
+            <p>Pentru un capăt drept i fixat, suma este maximă când p[j − 1] este minim, unde j − 1 ia valori de la 0 la i − K. Când trecem de la i la i + 1, apare o singură valoare nouă, p[i + 1 − K], așa că minimul îl ținem într-o singură variabilă.</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+using namespace std;
+
+int n, k, a[1000001];
+long long p[1000001];               // p[i] = a[1] + ... + a[i], p[0] = 0
+
+int main()
+{
+    cin >> n >> k;
+    for (int i = 1; i <= n; i++)
+    {
+        cin >> a[i];
+        p[i] = p[i - 1] + a[i];
+    }
+
+    // secvența [j, i] are suma p[i] - p[j - 1] și lungimea i - j + 1 >= k,
+    // adică j - 1 <= i - k. Pentru fiecare i vrem p[j - 1] cât mai mic.
+    long long minPref = p[0];
+    long long best = p[k];          // prima secvență: [1, k]
+    for (int i = k; i <= n; i++)
+    {
+        if (p[i - k] < minPref) minPref = p[i - k];
+        if (p[i] - minPref > best) best = p[i] - minPref;
+    }
+    cout << best;
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+
+      <div class="prob" id="k-2d" data-toc="Submatricea de sumă maximă">
+        <h3>Submatricea de sumă maximă</h3>
+        <p>Se dă o matrice cu n linii și m coloane, cu numere întregi. Determinați suma maximă a unei submatrice. Este problema <a href="https://www.pbinfo.ro/probleme/2943/maru" target="_blank" rel="noopener">Maru</a> din <a href="two-pointers.html#p-maru">lecția de Two Pointers</a>.</p>
+        <div class="matrix" role="img" aria-label="Matrice 4 pe 5 cu submatricea de sumă maximă evidențiată pe liniile 2-4 și coloanele 2-4">
+          <span>1</span><span>2</span><span>−1</span><span>−4</span><span>−20</span>
+          <span>−8</span><span class="hl">−3</span><span class="hl">4</span><span class="hl">2</span><span>1</span>
+          <span>3</span><span class="hl">8</span><span class="hl">10</span><span class="hl">1</span><span>3</span>
+          <span>−4</span><span class="hl">−1</span><span class="hl">1</span><span class="hl">7</span><span>−6</span>
+        </div>
+        <p>Pentru matricea de mai sus răspunsul este 29.</p>
+        <div class="think">
+          <p class="q">Gândiți-vă: cum transformăm problema de pe matrice într-o problemă pe vector?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Fixați linia de sus și linia de jos a submatricei.</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>Fixăm linia de sus i și linia de jos j. Pentru fiecare coloană k calculăm v[k] = a[i][k] + a[i+1][k] + … + a[j][k]. O submatrice cuprinsă între liniile i și j corespunde unei secvențe din v, cu aceeași sumă, deci aplicăm Kadane pe v. Când coborâm linia de jos de la j la j + 1, doar adunăm linia j + 1 la v.</p>
+            <p>Pentru liniile 2…4 din exemplu, v = −9, 4, 15, 10, −2, iar Kadane găsește 4 + 15 + 10 = 29.</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+using namespace std;
+
+int n, m, a[201][201];
+long long v[201];
+
+int main()
+{
+    cin >> n >> m;
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= m; j++)
+            cin >> a[i][j];
+
+    long long best = a[1][1];
+    for (int i = 1; i <= n; i++)            // linia de sus
+    {
+        for (int k = 1; k <= m; k++) v[k] = 0;
+        for (int j = i; j <= n; j++)        // linia de jos
+        {
+            for (int k = 1; k <= m; k++)
+                v[k] += a[j][k];            // v[k] = suma coloanei k între liniile i și j
+
+            long long suma = 0;             // Kadane pe v
+            for (int k = 1; k <= m; k++)
+            {
+                if (suma < 0) suma = 0;
+                suma += v[k];
+                if (suma > best) best = suma;
+            }
+        }
+    }
+    cout << best;
+    return 0;
+}
+</script>
+            <p>Complexitatea este O(n² · m).</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section id="k-exemple">
+      <h2>Exemple populare</h2>
+      <p>Două probleme cunoscute care, la prima vedere, nu par să aibă legătură cu secvențe de sumă maximă.</p>
+
+      <div class="prob" id="k-bursa" data-toc="Bursa">
+        <h3>Bursa: cumpără o dată, vinde o dată</h3>
+        <p>Se cunosc prețurile unei acțiuni în n zile consecutive: p[1], p[2], …, p[n]. Putem cumpăra acțiunea într-o zi și o putem vinde într-o zi ulterioară. Care este profitul maxim? Dacă nu putem obține profit, răspunsul este 0.</p>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th><th>Explicație</th></tr></thead><tbody><tr><td class="m">6
+7 1 5 3 6 4</td><td class="m">5</td><td>Cumpărăm la 1 (ziua 2), vindem la 6 (ziua 5).</td></tr></tbody></table></div>
+        <div class="think">
+          <p class="q">Gândiți-vă: nu este, pur și simplu, cel mai mare preț minus cel mai mic preț?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Încercați pe exemplu: cel mai mare preț este 7, cel mai mic este 1. Putem cumpăra la 1 și vinde la 7? Dacă vindem în ziua j, în ce zi trebuia să cumpărăm?</p></div></details>
+        <details class="hint"><summary>Încă un indiciu</summary><div><p>Scrieți diferențele dintre zile consecutive: d[k] = p[k] − p[k − 1]. Ce este profitul p[j] − p[i] în funcție de aceste diferențe?</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>Răspunsul nu este maximul minus minimul pe tot vectorul: în exemplu, 7 vine înaintea lui 1, deci 7 − 1 = 6 nu este un profit posibil. Contează ordinea, iar minimul trebuie să fie înaintea maximului. Pentru 9 8 7 2, max − min ar da 7, dar prețul doar scade, deci răspunsul este 0.</p>
+            <p><strong>Varianta 1.</strong> Dacă vindem în ziua j, cel mai bine era să fi cumpărat la cel mai mic preț de dinaintea zilei j. Parcurgem zilele și ținem minimul de până acum.</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+using namespace std;
+
+int n, p[1000001];
+
+int main()
+{
+    cin >> n;
+    for (int i = 1; i <= n; i++) cin >> p[i];
+
+    int minim = p[1];               // cel mai mic preț de până acum
+    int best = 0;
+    for (int j = 2; j <= n; j++)
+    {
+        if (p[j] - minim > best) best = p[j] - minim;   // vindem azi
+        if (p[j] < minim) minim = p[j];
+    }
+    cout << best;
+    return 0;
+}
+</script>
+            <p><strong>Varianta 2, cu Kadane.</strong> Profitul p[j] − p[i] se scrie ca o sumă de diferențe: (p[i+1] − p[i]) + (p[i+2] − p[i+1]) + … + (p[j] − p[j−1]). Deci profitul maxim este suma maximă a unei secvențe din vectorul diferențelor. Pentru exemplu, diferențele sunt −6, 4, −2, 3, −2, iar secvența 4, −2, 3 are suma 5.</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+using namespace std;
+
+int n, p[1000001];
+
+int main()
+{
+    cin >> n;
+    for (int i = 1; i <= n; i++) cin >> p[i];
+
+    // profitul pentru cumpărare în ziua i și vânzare în ziua j este
+    // d[i+1] + d[i+2] + ... + d[j], unde d[k] = p[k] - p[k-1]
+    long long suma = 0, best = 0;   // best = 0: putem să nu tranzacționăm
+    for (int k = 2; k <= n; k++)
+    {
+        if (suma < 0) suma = 0;
+        suma += p[k] - p[k - 1];
+        if (suma > best) best = suma;
+    }
+    cout << best;
+    return 0;
+}
+</script>
+            <p>Ambele variante sunt O(n). Ideea din varianta 2 apare des: o problemă despre <em>diferența</em> a două valori devine o problemă despre <em>suma</em> unei secvențe.</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="prob" id="k-flipgame" data-toc="Jocul inversărilor">
+        <h3>Jocul inversărilor</h3>
+        <p>Se dă un șir de n cifre 0 și 1. Trebuie să alegem exact o secvență nevidă și să inversăm toate cifrele din ea (0 devine 1, 1 devine 0). Care este numărul maxim de cifre 1 pe care îl putem obține? Problema este <a href="https://codeforces.com/problemset/problem/327/A" target="_blank" rel="noopener">Flipping Game</a> de pe Codeforces.</p>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th><th>Explicație</th></tr></thead><tbody><tr><td class="m">5
+1 0 0 1 0</td><td class="m">4</td><td>Inversăm cifrele 2…3 și obținem 1 1 1 1 0.</td></tr></tbody></table></div>
+        <div class="think">
+          <p class="q">Gândiți-vă: cu cât se schimbă numărul de cifre 1 când inversăm o secvență?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Fiecare 0 din secvență devine 1 (câștigăm unul), fiecare 1 devine 0 (pierdem unul). Înlocuiți 0 cu +1 și 1 cu −1.</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>Dacă inversăm o secvență cu z cifre 0 și u cifre 1, numărul de cifre 1 crește cu z − u. Înlocuim fiecare 0 cu +1 și fiecare 1 cu −1: câștigul este suma secvenței. Răspunsul este numărul inițial de cifre 1 plus suma maximă găsită cu Kadane.</p>
+            <p>Atenție: secvența trebuie să fie nevidă. Dacă șirul are doar cifre 1, suma maximă este −1 și răspunsul este n − 1. De aceea <code>best</code> nu pornește de la 0.</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+using namespace std;
+
+int n, a[100001];
+
+int main()
+{
+    cin >> n;
+    int unu = 0;
+    for (int i = 1; i <= n; i++)
+    {
+        cin >> a[i];
+        if (a[i] == 1) unu++;
+    }
+
+    // dacă inversăm o secvență, fiecare 0 din ea ne aduce +1, fiecare 1 ne costă -1
+    int suma = 0, best = -1000000;
+    for (int i = 1; i <= n; i++)
+    {
+        if (suma < 0) suma = 0;
+        suma += (a[i] == 0 ? 1 : -1);
+        if (suma > best) best = suma;
+    }
+    cout << unu + best;
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section id="k-discutie">
+      <h2>Probleme de discuție</h2>
+
+      <div class="prob" id="k-elim" data-toc="Cel mult o eliminare">
+        <h3>Suma maximă cu cel mult o eliminare</h3>
+        <p>Se dă un vector cu n numere întregi. Alegem o secvență și avem voie să eliminăm din ea cel mult un element (secvența trebuie să rămână nevidă). Care este suma maximă pe care o putem obține?</p>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th><th>Explicație</th></tr></thead><tbody><tr><td class="m">4
+1 -2 0 3</td><td class="m">4</td><td>Alegem 1 −2 0 3 și eliminăm −2.</td></tr></tbody></table></div>
+        <div class="think">
+          <p class="q">Gândiți-vă: dacă eliminăm elementul de pe poziția i, din ce două bucăți se formează secvența?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>O bucată se termină în i − 1, cealaltă începe în i + 1. Puteți calcula pentru fiecare poziție cea mai bună secvență care se termină acolo și cea mai bună secvență care începe acolo?</p></div></details>
+        <details class="hint"><summary>Încă un indiciu</summary><div><p>A doua valoare se calculează cu Kadane parcurgând vectorul de la dreapta la stânga.</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>Calculăm L[i], suma maximă a unei secvențe care se termină în i (Kadane obișnuit), și R[i], suma maximă a unei secvențe care începe în i (Kadane de la dreapta la stânga). Dacă eliminăm a[i], cea mai bună secvență este L[i − 1] + R[i + 1]. Răspunsul este maximul dintre aceste valori și Kadane fără eliminare.</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+using namespace std;
+
+int n, a[100002];
+long long L[100002], R[100002];   // L[i]: suma maximă care se termină în i; R[i]: care începe în i
+
+int main()
+{
+    cin >> n;
+    for (int i = 1; i <= n; i++) cin >> a[i];
+
+    L[1] = a[1];
+    for (int i = 2; i <= n; i++) L[i] = max((long long)a[i], L[i - 1] + a[i]);
+    R[n] = a[n];
+    for (int i = n - 1; i >= 1; i--) R[i] = max((long long)a[i], R[i + 1] + a[i]);
+
+    long long best = L[1];
+    for (int i = 1; i <= n; i++)          // fără eliminare
+        best = max(best, L[i]);
+    for (int i = 2; i <= n - 1; i++)      // eliminăm a[i]: lipim [.., i-1] cu [i+1, ..]
+        best = max(best, L[i - 1] + R[i + 1]);
+    cout << best;
+    return 0;
+}
+</script>
+            <p>Complexitatea este O(n). Ideea de a calcula ceva „de la stânga” și ceva „de la dreapta” și apoi de a le combina în fiecare poziție apare în multe probleme.</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="prob" id="k-rep" data-toc="Vectorul repetat">
+        <h3>Vectorul repetat de k ori</h3>
+        <p>Se dă un vector cu n numere întregi și un număr k. Scriem vectorul de k ori, unul după altul, și obținem un vector cu n · k elemente. Determinați suma maximă a unei secvențe nevide din vectorul obținut. n · k poate fi foarte mare, de exemplu 10⁵ · 10⁵, deci vectorul nu poate fi construit.</p>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th><th>Explicație</th></tr></thead><tbody>
+          <tr><td class="m">2 3
+1 2</td><td class="m">9</td><td>1 2 1 2 1 2: luăm tot.</td></tr>
+          <tr><td class="m">3 2
+1 -2 1</td><td class="m">2</td><td>1 −2 1 1 −2 1: secvența 1 1 din mijloc.</td></tr>
+        </tbody></table></div>
+        <div class="think">
+          <p class="q">Gândiți-vă: când merită ca secvența să conțină o copie întreagă a vectorului?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>O copie întreagă adaugă la sumă exact suma totală a vectorului. Discutați după semnul ei.</p></div></details>
+        <details class="hint"><summary>Încă un indiciu</summary><div><p>Ce se poate obține cu doar două copii? O secvență poate începe în prima copie și se poate termina în a doua.</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>Dacă k = 1, aplicăm Kadane obișnuit. Altfel, aplicăm Kadane pe două copii ale vectorului (fără să le construim: elementul de pe poziția i este a[(i − 1) % n + 1]). Astfel prindem și secvențele care trec de la o copie la următoarea.</p>
+            <p>Dacă suma totală este pozitivă, merită să adăugăm la mijloc toate celelalte k − 2 copii întregi, fiecare aducând suma totală. Dacă este negativă sau 0, nu merită.</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+using namespace std;
+
+int n, k, a[200001];
+
+long long kadane(int m)                   // Kadane pe primele m elemente ale vectorului repetat
+{
+    long long suma = 0, best = a[1];
+    for (int i = 1; i <= m; i++)
+    {
+        if (suma < 0) suma = 0;
+        suma += a[(i - 1) % n + 1];
+        if (suma > best) best = suma;
+    }
+    return best;
+}
+
+int main()
+{
+    cin >> n >> k;
+    long long total = 0;
+    for (int i = 1; i <= n; i++)
+    {
+        cin >> a[i];
+        total += a[i];
+    }
+
+    if (k == 1)
+        cout << kadane(n);
+    else if (total > 0)
+        cout << kadane(2 * n) + (long long)(k - 2) * total;
+    else
+        cout << kadane(2 * n);
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+
+      <div class="prob" id="k-prod" data-toc="Produsul maxim">
+        <h3>Produsul maxim</h3>
+        <p>Mai grea. Se dă un vector cu n numere întregi (pozitive, negative sau 0). Determinați produsul maxim al unei secvențe nevide. Pentru ca produsele să încapă în <code>long long</code>, considerăm n ≤ 18 și numere între −10 și 10.</p>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th><th>Explicație</th></tr></thead><tbody>
+          <tr><td class="m">4
+2 3 -2 4</td><td class="m">6</td><td>2 · 3</td></tr>
+          <tr><td class="m">6
+-2 0 -1 3 -4 2</td><td class="m">24</td><td>(−1) · 3 · (−4) · 2</td></tr>
+        </tbody></table></div>
+        <div class="think">
+          <p class="q">Gândiți-vă: de ce nu merge Kadane direct, cu produse în loc de sume?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Un produs foarte mic (foarte negativ) poate deveni foarte mare dacă îl înmulțim cu un număr negativ.</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>Pentru fiecare poziție i ținem două valori: cel mai mare și cel mai mic produs al unei secvențe care se termină în i. Noul element x poate începe o secvență nouă, poate continua secvența cu produs maxim sau pe cea cu produs minim. Dacă x este negativ, minimul înmulțit cu x devine candidat la maxim.</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+using namespace std;
+
+int n, a[20];
+
+int main()
+{
+    cin >> n;
+    for (int i = 1; i <= n; i++) cin >> a[i];
+
+    // pentru fiecare i: cel mai mare și cel mai mic produs care se termină în i
+    long long mx = a[1], mn = a[1], best = a[1];
+    for (int i = 2; i <= n; i++)
+    {
+        long long x = a[i];
+        long long p1 = mx * x, p2 = mn * x;
+        mx = max(x, max(p1, p2));       // un minim negativ înmulțit cu x < 0 devine maxim
+        mn = min(x, min(p1, p2));
+        best = max(best, mx);
+    }
+    cout << best;
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section id="k-tema">
+      <h2>Tema</h2>
+      <ul>
+        <li><a href="https://infoarena.ro/problema/ssm" target="_blank" rel="noopener">ssm</a> (infoarena): problema clasică, cu afișarea pozițiilor</li>
+        <li><a href="https://cses.fi/problemset/task/1643" target="_blank" rel="noopener">Maximum Subarray Sum</a> (CSES)</li>
+        <li><a href="https://leetcode.com/problems/maximum-subarray/" target="_blank" rel="noopener">Maximum Subarray</a> (LeetCode #53)</li>
+        <li><a href="https://leetcode.com/problems/maximum-sum-circular-subarray/" target="_blank" rel="noopener">Maximum Sum Circular Subarray</a> (LeetCode #918): varianta circulară</li>
+        <li><a href="https://www.pbinfo.ro/probleme/2943/maru" target="_blank" rel="noopener">Maru</a> (pbinfo #2943): submatricea de sumă maximă</li>
+        <li><a href="https://leetcode.com/problems/best-time-to-buy-and-sell-stock/" target="_blank" rel="noopener">Best Time to Buy and Sell Stock</a> (LeetCode #121): bursa</li>
+        <li><a href="https://codeforces.com/problemset/problem/327/A" target="_blank" rel="noopener">Flipping Game</a> (Codeforces 327A): jocul inversărilor</li>
+        <li><a href="https://leetcode.com/problems/maximum-subarray-sum-with-one-deletion/" target="_blank" rel="noopener">Maximum Subarray Sum with One Deletion</a> (LeetCode #1186)</li>
+        <li><a href="https://leetcode.com/problems/k-concatenation-maximum-sum/" target="_blank" rel="noopener">K-Concatenation Maximum Sum</a> (LeetCode #1191): vectorul repetat (acolo secvența poate fi și goală)</li>
+        <li><a href="https://leetcode.com/problems/maximum-product-subarray/" target="_blank" rel="noopener">Maximum Product Subarray</a> (LeetCode #152)</li>
+      </ul>
+    </section>
+  
+  </main>
+</div>
+
+<script src="../assets/catalog.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="../assets/site.js"></script>
+<script>
+/* Kadane demo */
+Stepper(document.getElementById('demoK'), () => {
+  const a = [-2, 1, -3, 4, -1, 2, 1, -5, 4], n = a.length, frames = [];
+  let suma = 0, best = a[0], st = 0, bst = 0, bdr = 0;
+  const stats = () => `<div><span>suma =</span> <b>${suma}</b></div><div><span>best =</span> <b>${best}</b></div><div><span>secvența maximă:</span> <b>${bst + 1}…${bdr + 1}</b></div>`;
+  frames.push({ base1: true, l: -1, r: -1, msg: 'Pornim cu suma = 0 și best = a[1] = −2.', stats: stats() });
+  for (let i = 0; i < n; i++) {
+    let msg = '';
+    if (suma < 0) { msg = `Suma curentă (${suma}) este negativă, deci o abandonăm și începem o secvență nouă din poziția ${i + 1}. `; suma = 0; st = i; }
+    suma += a[i];
+    msg += `Adăugăm a[${i + 1}] = ${a[i]}: suma = <b>${suma}</b>.`;
+    if (suma > best) { best = suma; bst = st; bdr = i; msg += ` <span class="ok">Este mai mare decât best, deci best = ${best}.</span>`; }
+    frames.push({ base1: true, ln: 'st', rn: 'i', l: st, r: i, win: [bst, bdr], msg, stats: stats() });
+  }
+  frames.push({ base1: true, l: -1, r: -1, win: [bst, bdr], msg: `Am terminat. <span class="ok">Suma maximă este ${best}, pe pozițiile ${bst + 1}…${bdr + 1}.</span>`, stats: stats() });
+  return { arr: a, frames };
+});
+
+
+</script>
+</body>
+</html>
