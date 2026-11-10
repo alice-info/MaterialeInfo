@@ -1,0 +1,703 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Tehnica Two Pointers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body data-root="../" data-id="two-pointers">
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow"></div>
+    <h1>Tehnica <span class="pl">Two</span> <span class="pr">Pointers</span></h1>
+  </div>
+</header>
+
+<div class="wrap layout">
+  <nav class="toc" data-auto aria-label="Cuprins"></nav>
+  <main class="prose">
+    <section id="concept" data-toc="Tehnica">
+      <h2>Tehnica Two Pointers</h2>
+      <p>Two pointers este o abordare algoritmică fundamentală care joacă un rol esențial în optimizarea soluțiilor la anumite tipuri de probleme. Strategia folosește doi pointeri, de obicei indici, care traversează simultan o structură de date (un vector, o listă sau un șir) pentru a găsi subsecvențe cu diverse proprietăți.</p>
+      <p>Implementarea generală a tehnicii:</p>
+<div class="pseudo"><span class="lv">stânga</span> = 0
+<span class="rv">dreapta</span> = lungime - 1
+<span class="k">cât timp</span> <span class="lv">stânga</span> &lt; <span class="rv">dreapta</span>:
+    <span class="k">în funcție de problemă, se decide una dintre:</span>
+    1. <span class="lv">stânga++</span>
+    2. <span class="rv">dreapta--</span>
+    3. atât <span class="lv">stânga++</span> cât și <span class="rv">dreapta--</span></div>
+      <p>Puterea acestei tehnici este că bucla nu va face niciodată mai mult de O(n) iterații, deoarece pointerii pornesc de la primul și ultimul element și se apropie cu cel puțin un pas la fiecare iterație. Dacă păstrăm complexitatea fiecărei iterații la O(1), tehnica are timp de rulare liniar.</p>
+      <p>Tehnica apare în două forme. În varianta <strong>convergentă</strong> pointerii pornesc din capete opuse (<code>st = 1</code>, <code>dr = n</code>) și se apropie unul de altul; o folosim la vectori sortați, palindromuri, perechi cu sumă dată. În varianta <strong>paralelă</strong> (fereastra glisantă) amândoi pornesc de la început (<code>st = 1</code>, <code>dr = 1</code>): <code>dr</code> extinde fereastra, iar <code>st</code> o restrânge când condiția nu mai e îndeplinită; o folosim la subsecvențe cu o anumită proprietate.</p>
+    </section>
+
+    <section id="exemple">
+      <div class="prob" id="ex-pal" data-toc="Exemplul 1: palindrom">
+        <h3>Exemplul 1: verificarea unui șir palindrom</h3>
+        <p>Se dă un șir de caractere. Verificați dacă este palindrom.</p>
+        <div class="think">
+          <p class="q">Gândiți-vă: cum verificăm? Câtă memorie folosim? Se poate fără memorie suplimentară?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Comparați primul caracter cu ultimul, al doilea cu penultimul și așa mai departe.</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p><strong>Soluția 1.</strong> Construim șirul inversat și testăm egalitatea celor două șiruri.</p>
+<div class="pseudo"><span class="k">funcția</span> estePalindrom(s):
+    inversatS = inversat(s)
+    <span class="k">dacă</span> s == inversatS: <span class="k">returnează</span> adevărat
+    <span class="k">altfel</span>: <span class="k">returnează</span> fals</div>
+            <p>Inversarea durează O(n), comparația tot O(n), deci complexitatea în timp este O(n). Avem nevoie de spațiu suplimentar pentru șirul inversat, deci complexitatea spațiului este tot O(n).</p>
+            <p><strong>Soluția 2.</strong> Valorificăm faptul că, într-un palindrom, primul caracter este egal cu ultimul, al doilea cu penultimul și așa mai departe. Cu doi pointeri, unul pornind de la început și celălalt de la sfârșit, verificăm dacă toate perechile de caractere sunt egale. La prima nepotrivire putem concluziona că șirul nu este palindrom.</p>
+<div class="pseudo"><span class="k">funcția</span> estePalindrom(s):
+    <span class="lv">st</span> = 0;  <span class="rv">dr</span> = lungime(s) - 1
+    <span class="k">cât timp</span> <span class="lv">st</span> &lt; <span class="rv">dr</span>:
+        <span class="k">dacă</span> s[<span class="lv">st</span>] != s[<span class="rv">dr</span>]: <span class="k">returnează</span> fals
+        <span class="lv">st++</span>;  <span class="rv">dr--</span>
+    <span class="k">returnează</span> adevărat</div>
+            <p>Algoritmul rulează în O(n) și folosește doar O(1) spațiu.</p>
+            <div class="demo" id="demoPal">
+              <div class="cells" data-cells></div>
+              <p class="status" data-status aria-live="polite"></p>
+              <div class="ctrl">
+                <label for="palIn">Șir <input id="palIn" value="racecar" maxlength="14" autocomplete="off" spellcheck="false"></label>
+                <button class="btn" type="button" data-prev>Înapoi</button>
+                <button class="btn pri" type="button" data-next>Pasul următor</button>
+                <button class="btn" type="button" data-play>Rulează</button>
+                <span class="step-ct" data-ct></span>
+              </div>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <div class="prob" id="ex-suma" data-toc="Exemplul 2: suma S">
+        <h3>Exemplul 2: pereche cu suma S</h3>
+        <p>Având un vector sortat de numere întregi distincte și un număr întreg S, returnați <code>true</code> dacă există o pereche de numere care au suma S, <code>false</code> în caz contrar. Problema este asemănătoare cu <a href="https://leetcode.com/problems/two-sum/" target="_blank" rel="noopener">Two Sum</a> (acolo vectorul nu este sortat).</p>
+        <p>Exemplu: <span class="mono">1 2 4 6 8 9 14 15</span>, S = 13.</p>
+        <div class="think">
+          <p class="q">Gândiți-vă: cum folosim faptul că vectorul este sortat?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Ce se întâmplă cu suma <code>a[st] + a[dr]</code> dacă mutăm <code>dr</code> la stânga? Dar dacă mutăm <code>st</code> la dreapta?</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p><strong>Soluția 1.</strong> Testăm toate perechile (i, j) și verificăm suma elementelor de pe pozițiile i și j. Complexitatea în timp este O(n²), iar spațiul O(1). Nu folosim deloc faptul că vectorul este ordonat.</p>
+            <p><strong>Soluția 2.</strong> Ne uităm la primul și la ultimul număr. 1 + 15 = 16 &gt; S, deci suma trebuie să scadă și mutăm pointerul din dreapta. 1 + 14 = 15, tot prea mare, îl mutăm din nou. 1 + 9 = 10 &lt; S, acum suma trebuie să crească, deci mutăm pointerul din stânga. 2 + 9 = 11 &lt; S, îl mutăm din nou. În final 4 + 9 = 13 = S.</p>
+            <div class="demo" id="demoSum">
+              <div class="stats" data-stats></div>
+              <div class="cells" data-cells></div>
+              <p class="status" data-status aria-live="polite"></p>
+              <div class="ctrl">
+                <label for="sumS">S = <input id="sumS" class="n" type="number" value="13" inputmode="numeric"></label>
+                <button class="btn" type="button" data-prev>Înapoi</button>
+                <button class="btn pri" type="button" data-next>Pasul următor</button>
+                <button class="btn" type="button" data-play>Rulează</button>
+                <span class="step-ct" data-ct></span>
+              </div>
+            </div>
+            <p>Complexitatea este O(n), sau O(n log n) dacă trebuie mai întâi să sortăm. Pentru varianta nesortată se poate folosi <code>unordered_set</code>: <a href="https://www.geeksforgeeks.org/2sum/" target="_blank" rel="noopener">2Sum pe GeeksforGeeks</a>.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section id="aplicatii">
+      <h2>Aplicații</h2>
+
+      <div class="prob" id="p-sum2">
+        <h3>Problema <a href="https://cses.fi/problemset/task/1640" target="_blank" rel="noopener">Sum of Two Values</a> <span class="src">CSES</span></h3>
+        <p>Se dă un vector cu n valori pozitive și o valoare x. Scrieți un program care să determine două valori aflate pe poziții distincte care adunate să dea suma x.</p>
+        <h4>Date de intrare</h4>
+        <p>De la intrare se citesc valorile n și x, apoi n numere reprezentând elementele vectorului.</p>
+        <h4>Date de ieșire</h4>
+        <p>Afișați pe ecran două numere separate prin spațiu, reprezentând pozițiile celor două valori. Dacă există mai multe soluții, poate fi afișată oricare. Dacă nu există nicio soluție, afișați mesajul <code>IMPOSSIBLE</code>.</p>
+        <h4>Restricții și precizări</h4>
+        <p class="mono">1 ≤ n ≤ 2·10⁵, &nbsp; 1 ≤ x, aᵢ ≤ 10⁹</p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th></tr></thead><tbody><tr><td class="m">4 8
+2 7 5 1</td><td class="m">2 4</td></tr></tbody></table></div>
+        <div class="think">
+          <p class="q">Gândiți-vă: dacă sortăm vectorul, cum mai afișăm pozițiile inițiale?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Salvați valorile (sau perechi valoare–poziție) înainte de sortare.</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>Păstrăm o copie a vectorului, sortăm, aplicăm cei doi pointeri, iar când găsim suma căutăm pozițiile celor două valori în copie.</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+int n, x, a[200002], b[200002];
+
+int main()
+{
+    int i;
+    cin >> n >> x;
+    for (i = 1; i <= n; ++i)
+    {
+        cin >> a[i];
+        b[i] = a[i]; // avem nevoie de un alt vector pentru a afla pozițiile inițiale
+    }
+    sort(a + 1, a + n + 1); // sortăm șirul
+    int p1 = 1, p2 = n, valA, valB;
+    while (p1 < p2)
+    {
+        if (a[p1] + a[p2] == x) // dacă am găsit suma, aflăm pozițiile valorilor
+        {
+            valA = a[p1];
+            valB = a[p2];
+            for (i = 1; i <= n; ++i)
+                if (b[i] == valA)
+                { cout << i << " "; valA = 0; }
+                else if (b[i] == valB)
+                { cout << i << " "; valB = 0; }
+            // ieșim din program ca să evităm afișarea mai multor soluții
+            return 0;
+        }
+        else // dacă suma e mai mare decât x, scădem p2, altfel creștem p1
+            if (a[p1] + a[p2] > x) --p2;
+            else ++p1;
+    }
+    cout << "IMPOSSIBLE";
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+
+      <div class="prob" id="p-sumainsecv">
+        <h3>Problema <a href="https://www.pbinfo.ro/probleme/300/sumainsecv" target="_blank" rel="noopener">sumainsecv</a> <span class="src">pbinfo #300</span></h3>
+        <p>Se dă un vector cu n numere naturale și o valoare k. Determinați o pereche de indici pentru care suma elementelor cuprinse între ei este exact k.</p>
+        <div class="think">
+          <p class="q">Gândiți-vă: ce se întâmplă cu suma când extindem secvența la dreapta? Dar când o scurtăm din stânga?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p><strong>Varianta 1</strong>, cu o singură buclă <code>while</code>:</p>
+            <script type="text/x-cpp" class="cod">
+int l = 1, r = 0, s = 0;
+while (s != k) {
+    if (s < k) {
+        if (r == n) return make_pair(0, 0);
+        s += v[++r];
+    }
+    if (s > k) s -= v[l++];
+}
+return make_pair(l, r);
+</script>
+            <p><strong>Varianta 2</strong>, cu <code>for</code> pe capătul din dreapta și <code>while</code> pe cel din stânga:</p>
+            <script type="text/x-cpp" class="cod">
+int l = 1, s = 0;
+for (int r = 1; r <= n; r++) {
+    s += v[r];
+    while (s > k) s -= v[l++];
+    if (s == k) return make_pair(l, r);
+}
+return make_pair(0, 0);
+</script>
+            <p><strong>Dacă sunt și numere negative</strong>, soluția se bazează pe șirul sumelor parțiale. Dacă secvența [x+1, y] are suma k, atunci <code>ps[y] − ps[x] = k</code>. Deci, dacă există o astfel de secvență cu capătul din dreapta în y, trebuie să existe un indice x &lt; y pentru care <code>ps[x] = ps[y] − k</code>. Putem găsi rapid un astfel de indice în timpul calculării sumelor parțiale folosind un vector <code>pos</code>: în <code>pos</code> reținem, pentru fiecare valoare s a sumelor parțiale, un indice x găsit până la pasul curent, astfel încât <code>ps[x] = s</code>, sau −1 dacă nu am găsit încă. Pentru că sumele parțiale pot fi negative, folosim poziția <code>s + OFF</code> în loc de s. La început <code>ps[0] = 0</code>.</p>
+            <script type="text/x-cpp" class="cod">
+const int OFF = 1000000;          // presupunem că sumele parțiale sunt între -10^6 și 10^6
+vector<int> pos(2 * OFF + 1, -1); // pos[s + OFF] = un indice x cu ps[x] = s, sau -1
+int ps = 0;
+pos[0 + OFF] = 0;
+int n; cin >> n;
+for (int i = 1; i <= n; i++) {
+    int x; cin >> x;
+    ps += x;
+    int cautat = ps - k;
+    if (cautat >= -OFF && cautat <= OFF && pos[cautat + OFF] != -1) {
+        cout << pos[cautat + OFF] + 1 << ' ' << i << '\n';
+        return 0;
+    }
+    pos[ps + OFF] = i;
+}
+</script>
+          </div>
+        </details>
+      </div>
+
+      <div class="prob" id="p-subarray">
+        <h3>Problema <a href="https://cses.fi/problemset/task/1660/" target="_blank" rel="noopener">Subarray Sums</a> <span class="src">CSES</span></h3>
+        <p>Dat fiind un vector cu n elemente numere naturale, determinați numărul de subsecvențe din vector pentru care suma elementelor este egală cu x.</p>
+        <h4>Date de intrare</h4>
+        <p>De pe prima linie se citesc valorile n și x. Pe a doua linie se află n numere naturale a₁, a₂, …, aₙ.</p>
+        <h4>Date de ieșire</h4>
+        <p>Afișați numărul de subsecvențe cu suma elementelor egală cu x.</p>
+        <h4>Restricții și precizări</h4>
+        <p class="mono">1 ≤ n ≤ 200 000, &nbsp; 1 ≤ x, aᵢ ≤ 10⁹</p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th></tr></thead><tbody><tr><td class="m">5 7
+2 4 1 2 7</td><td class="m">3</td></tr></tbody></table></div>
+        <div class="think">
+          <p class="q">Gândiți-vă: dacă fixăm poziția de început, până unde extindem secvența? Când trecem la următoarea poziție de început, o luăm de la capăt?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Toate numerele sunt pozitive, deci suma crește când extindem secvența la dreapta.</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>Ne folosim de faptul că toate numerele din șir sunt pozitive. Pentru fiecare poziție de început aflăm care este poziția cea mai din dreapta pentru care suma valorilor din interval este mai mică sau egală cu x. Dacă suma este egală cu x, incrementăm răspunsul. Înainte de a incrementa <code>st</code>, scădem valoarea de pe poziția <code>st</code> din suma curentă.</p>
+            <div class="demo" id="demoWin">
+              <div class="stats" data-stats></div>
+              <div class="cells" data-cells></div>
+              <p class="status" data-status aria-live="polite"></p>
+              <div class="ctrl">
+                <button class="btn" type="button" data-prev>Înapoi</button>
+                <button class="btn pri" type="button" data-next>Pasul următor</button>
+                <button class="btn" type="button" data-play>Rulează</button>
+                <span class="step-ct" data-ct></span>
+              </div>
+            </div>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+using namespace std;
+
+int n, v[200002], x, st = 1, dr = 1, ans;
+long long sum;
+
+int main()
+{
+    cin >> n >> x;
+    for (int i = 1; i <= n; i++) cin >> v[i];
+    while (st <= n)
+    {
+        while (dr <= n && sum < x)
+        { sum += v[dr]; dr++; }
+        if (sum == x) ans++;
+        sum -= v[st]; st++;
+    }
+    cout << ans;
+    return 0;
+}
+</script>
+            <p>Atenție: suma poate ajunge la 2·10⁵ · 10⁹, deci <code>sum</code> trebuie să fie <code>long long</code>.</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="prob" id="p-produs">
+        <h3>Problema <a href="https://infoarena.ro/problema/produs" target="_blank" rel="noopener">Produs</a> <span class="src">infoarena</span></h3>
+        <p>Pentru un număr natural p, cuprins între 1 și 10<sup>10000</sup>, să se determine două numere naturale l și r astfel încât <code>l · (l+1) · … · r = p</code>. Se garantează că există o soluție cu 1 ≤ l ≤ r ≤ 100 000.</p>
+        <div class="think">
+          <p class="q">Gândiți-vă: problema seamănă cu sumainsecv, doar că avem produse în loc de sume. Ce ne împiedică să o rezolvăm la fel?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Numărul p poate avea 10 000 de cifre și nu încape în niciun tip de date. Ne trebuie un mod de a transforma produsele în sume.</p></div></details>
+        <details class="hint"><summary>Încă un indiciu</summary><div><p>10² · 10³ = 10⁵. Când înmulțim puteri ale lui 10, adunăm exponenții.</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>Pornim de la ce știm despre puteri: 10² · 10³ = 10²⁺³ = 10⁵. La înmulțire, exponenții se adună.</p>
+            <p>Logaritmul în baza 10 al unui număr x, scris <code>log10(x)</code>, este exponentul la care trebuie ridicat 10 ca să obținem x. De exemplu <code>log10(100) = 2</code>, <code>log10(1000) = 3</code>. Merge și pentru numere care nu sunt puteri ale lui 10: <code>log10(2) ≈ 0,301</code>, pentru că 10<sup>0,301</sup> ≈ 2. Din regula exponenților rezultă:</p>
+            <div class="note r"><p class="big">log10(a · b) = log10(a) + log10(b)</p></div>
+            <p>Să verificăm pe un exemplu mic, 2 · 3 · 4 = 24:</p>
+            <div class="tbl"><table class="io"><thead><tr><th>x</th><th>log10(x)</th></tr></thead><tbody>
+              <tr><td class="m">2</td><td class="m">0,301</td></tr>
+              <tr><td class="m">3</td><td class="m">0,477</td></tr>
+              <tr><td class="m">4</td><td class="m">0,602</td></tr>
+              <tr><td class="m">suma</td><td class="m">1,380</td></tr>
+              <tr><td class="m">24</td><td class="m">1,380</td></tr>
+            </tbody></table></div>
+            <p>Deci în loc să înmulțim numere uriașe, adunăm logaritmii lor, care sunt numere mici: logaritmul unui număr cu 10 000 de cifre este cam 10 000 și încape lejer pe <code>double</code>. Problema devine exact sumainsecv: căutăm o secvență 1, 2, 3, … cu suma logaritmilor egală cu <code>log10(p)</code>.</p>
+            <p>Rămâne să calculăm <code>log10(p)</code> fără să-l citim ca număr. Dacă p are c cifre, ne ajung primele 18: dacă ele formează numărul m, atunci <code>p ≈ m · 10<sup>c−18</sup></code>, deci <code>log10(p) ≈ log10(m) + (c − 18)</code>.</p>
+            <p>Valorile reale au mici erori de rotunjire, așa că nu comparăm cu <code>==</code>, ci verificăm dacă diferența este foarte mică (de exemplu sub 10⁻⁹). Folosim <code>long double</code> pentru precizie mai bună.</p>
+            <script type="text/x-cpp" class="cod">
+#include <bits/stdc++.h>
+using namespace std;
+
+const int MAXV = 100000;
+long double L[MAXV + 1]; // L[i] = log10(1) + log10(2) + ... + log10(i)
+
+int main()
+{
+    ifstream cin("produs.in");
+    ofstream cout("produs.out");
+    string p;
+    cin >> p;
+
+    // log10(P): P are c cifre, deci P = 0,d1d2d3... * 10^c
+    int c = p.size();
+    long double m = 0;
+    for (int i = 0; i < c && i < 18; i++)        // primele 18 cifre ajung
+        m = m * 10 + (p[i] - '0');
+    int folosite = min(c, 18);
+    long double logP = log10l(m) + (c - folosite); // log10(P)
+
+    for (int i = 1; i <= MAXV; i++)
+        L[i] = L[i - 1] + log10l((long double)i);
+
+    // fereastra glisantă: suma logaritmilor din [l, r] = L[r] - L[l-1]
+    const long double EPS = 1e-9;
+    int l = 1;
+    for (int r = 1; r <= MAXV; r++)
+    {
+        while (l < r && L[r] - L[l - 1] > logP + EPS) l++; // produs prea mare: scoatem l
+        if (fabsl(L[r] - L[l - 1] - logP) < EPS)
+        {
+            cout << l << ' ' << r << '\n';
+            return 0;
+        }
+    }
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+
+      <div class="prob" id="p-maru">
+        <h3>Problema <a href="https://www.pbinfo.ro/probleme/2943/maru" target="_blank" rel="noopener">Maru</a> <span class="src">pbinfo #2943</span></h3>
+        <p>Se dă o matrice cu numere întregi, pozitive și negative. Determinați submatricea de sumă maximă.</p>
+        <div class="think">
+          <p class="q">Gândiți-vă: cum putem reduce problema de pe matrice la o problemă pe vector?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Fixați linia de sus și linia de jos a submatricei.</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>Este o extindere pe matrice a tehnicii. Ne fixăm două linii i și j ale matricei și reducem problema găsirii submatricei de sumă maximă care începe pe linia i și se termină pe linia j la problema găsirii subsecvenței de sumă maximă într-un vector (vezi <a href="kadane.html">algoritmul lui Kadane</a>). Pentru asta construim un vector v de lungime n, cu <code>v[k] = a[i][k] + a[i+1][k] + … + a[j][k]</code>.</p>
+            <script type="text/x-cpp" class="cod">
+int ans = -2e9;
+for (int i = 1; i <= m; i++) {
+    vector<int> v(n + 1);
+    for (int j = i; j <= m; j++) {
+        for (int k = 1; k <= n; k++)
+            v[k] += a[j][k];
+        int sum = 0;
+        for (int k = 1; k <= n; k++) {      // Kadane
+            sum = max(sum, 0) + v[k];
+            ans = max(ans, sum);
+        }
+    }
+}
+</script>
+            <div class="matrix" role="img" aria-label="Matricea a, cu submatricea de sumă maximă evidențiată pe liniile 2-4 și coloanele 2-4">
+              <span>1</span><span>2</span><span>−1</span><span>−4</span><span>−20</span>
+              <span>−8</span><span class="hl">−3</span><span class="hl">4</span><span class="hl">2</span><span>1</span>
+              <span>3</span><span class="hl">8</span><span class="hl">10</span><span class="hl">1</span><span>3</span>
+              <span>−4</span><span class="hl">−1</span><span class="hl">1</span><span class="hl">7</span><span>−6</span>
+            </div>
+            <p>Submatricea de sumă maximă este cea colorată și are suma 29. Vectorul v asociat perechii de linii (2, 4) este ⟨−9, 4, 15, 10, −2⟩. Subsecvența lui de sumă maximă este ⟨4, 15, 10⟩, are suma 29 și îi corespunde submatricea cu colțurile în (2, 2) și (4, 4), adică chiar răspunsul.</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="prob" id="p-nane">
+        <h3>Problema <a href="https://www.infoarena.ro/problema/nane" target="_blank" rel="noopener">Nane</a> <span class="src">infoarena · opțional, necesită operații pe biți</span></h3>
+        <p>Nane de pe Jiu, mare algoritmician fiind, vă provoacă să rezolvați o problemă prea ușoară pentru el. Nane vă dă N numere naturale și un număr K. Numim subsecvență specială o subsecvență pentru care, efectuând operația OR pe biți pentru elementele din subsecvență (să numim această operație sumă OR), obținem un rezultat care are, în reprezentare binară, cel mult K biți de 1. Două subsecvențe sunt diferite dacă cel puțin o poziție din una nu se regăsește în cealaltă. Determinați numărul de subsecvențe speciale.</p>
+        <h4>Date de intrare</h4>
+        <p>Fișierul <code>nane.in</code> conține pe prima linie numerele N și K, iar pe a doua linie N numere naturale.</p>
+        <h4>Date de ieșire</h4>
+        <p>În fișierul <code>nane.out</code> se va afla un singur număr, numărul de subsecvențe speciale.</p>
+        <h4>Restricții și precizări</h4>
+        <p class="mono">1 ≤ N ≤ 10⁵, &nbsp; 1 ≤ K ≤ 30, &nbsp; numerele se pot reprezenta pe 30 de biți</p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io"><thead><tr><th>nane.in</th><th>nane.out</th></tr></thead><tbody><tr><td class="m">5 2
+2 14 3 2 10</td><td class="m">6</td></tr></tbody></table></div>
+        <div class="think">
+          <p class="q">Gândiți-vă: cum scoatem un element dintr-un OR fără să recalculăm totul?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>Folosim metoda celor doi pointeri pentru a afla numărul de secvențe care au suma OR cu cel mult K biți de 1, actualizările fiind foarte asemănătoare cu cele de la celelalte probleme de acest tip. Deoarece vorbim de suma OR, folosim un vector de frecvență pentru fiecare bit, ca să evităm calculele suplimentare.</p>
+            <script type="text/x-cpp" class="cod">
+#include <bits/stdc++.h>
+#define ll long long
+using namespace std;
+
+int n, k, v[100002], fr[32], st = 1, dr = 1;
+ll ans;
+
+bool ok()
+{
+    int i, cnt = 0;
+    for (i = 0; i <= 30; ++i)
+        if (fr[i]) ++cnt;
+    if (cnt <= k) return 1;
+    return 0;
+}
+
+void add(int poz, int val)
+{
+    for (int i = 0; i <= 30; ++i)
+        if ((v[poz] & (1 << i))) fr[i] += val;
+}
+
+int main()
+{
+    ifstream cin("nane.in");
+    ofstream cout("nane.out");
+    cin >> n >> k;
+    for (int i = 1; i <= n; ++i) cin >> v[i];
+    while (st <= n)
+    {
+        while (st <= n && (dr > n || !ok()))
+            if (ok())
+            { ans += dr - st; add(st, -1); ++st; }
+            else
+            { add(st, -1); ++st; ans += dr - st; }
+        while (dr <= n && ok()) add(dr, 1), ++dr;
+    }
+    cout << ans << '\n';
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+
+      <div class="prob" id="p-jjooii">
+        <h3>Problema <a href="https://oj.uz/problem/view/JOI20_ho_t2" target="_blank" rel="noopener">JJOOII</a> <span class="src">JOI 2020 · pentru cei care vor mai mult</span></h3>
+        <p>Se consideră un șir format din N caractere din mulțimea {J, O, I}. Se numește JOI-șir de nivel K un șir format din K litere J, K litere O și K litere I (în această ordine). De exemplu, JJOOII este un JOI-șir de nivel 2. Bitaro dorește să transforme șirul S într-un JOI-șir de nivel K, folosind următoarele operații de oricâte ori și în orice ordine:</p>
+        <ol>
+          <li>șterge primul caracter din S;</li>
+          <li>șterge ultimul caracter din S;</li>
+          <li>șterge un caracter din interiorul lui S (care nu este nici primul, nici ultimul).</li>
+        </ol>
+        <p>Deoarece operațiile de tip 3 durează mult, Bitaro vrea să folosească un număr minim de astfel de operații. Determinați acest număr sau afișați −1 dacă transformarea nu este posibilă.</p>
+        <h4>Restricții și precizări</h4>
+        <p class="mono">3 ≤ N ≤ 200 000, &nbsp; 1 ≤ K ≤ N/3</p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th><th>Explicații</th></tr></thead><tbody><tr><td class="m">10 2
+OJIJOIOIIJ</td><td class="m">2</td><td>
+Operația 1: <span class="mono">JIJOIOIIJ</span><br>
+Operația 2: <span class="mono">JIJOIOII</span><br>
+Operația 3 (al doilea caracter): <span class="mono">JJOIOII</span><br>
+Operația 3 (al patrulea caracter): <span class="mono">JJOOII</span></td></tr></tbody></table></div>
+        <div class="think">
+          <p class="q">Gândiți-vă: operațiile 1 și 2 sunt „gratuite”. Ce rămâne din șir la final?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>Mai întâi aflăm unde sunt situate literele J, O și I în șirul S. Apoi, pe măsură ce fixăm grupul de K litere J, avem pointeri care duc la grupurile corespunzătoare de O și I, iar calculele devin destul de ușoare: numărul de operații de tip 3 este lungimea intervalului de la primul J la ultimul I, minus 3K.</p>
+            <script type="text/x-cpp" class="cod">
+#include <bits/stdc++.h>
+using namespace std;
+
+int vj[200001], vo[200001], vi[200001];
+int lj, lo, li;
+
+int main()
+{
+    int n, k, i;
+    cin >> n >> k;
+    string s;
+    cin >> s;
+    for (i = 0; i < n; i++)
+    {
+        if (s[i] == 'J') vj[++lj] = i;
+        if (s[i] == 'O') vo[++lo] = i;
+        if (s[i] == 'I') vi[++li] = i;
+    }
+    int pj = 1, po = 1, pi = 1, ans = n + 1;
+    while (pj + k - 1 <= lj && po + k - 1 <= lo && pi + k - 1 <= li)
+    {
+        while (po + k - 1 <= lo && vo[po] <= vj[pj + k - 1]) po++;
+        if (po + k - 1 <= lo)
+            while (pi + k - 1 <= li && vi[pi] <= vo[po + k - 1]) pi++;
+        if (pj + k - 1 <= lj && po + k - 1 <= lo && pi + k - 1 <= li)
+        {
+            int fi = vj[pj];
+            int lst = vi[pi + k - 1];
+            ans = min(ans, (lst - fi + 1) - 3 * k);
+        }
+        pj++;
+    }
+    if (ans == n + 1) cout << -1;
+    else cout << ans;
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section id="teorie">
+      <h2>Observații</h2>
+      <p>La exemplul cu suma S, de ce nu pierdem nicio pereche? Dacă <code>a[st] + a[dr] &gt; S</code>, atunci <code>a[dr]</code> adunat cu orice element dintre st și dr dă tot o sumă mai mare decât S, pentru că toate aceste elemente sunt cel puțin <code>a[st]</code>. Deci <code>a[dr]</code> nu poate face parte din soluție și îl putem elimina. La fel, dacă suma e prea mică, eliminăm <code>a[st]</code>.</p>
+      <p>De ce este O(n) chiar dacă avem un <code>while</code> în alt <code>while</code>? Pentru că pointerii doar avansează și fiecare face cel mult n pași, deci în total buclele fac cel mult 2n pași.</p>
+      <p>Fereastra glisantă merge atunci când, dacă o secvență este „bună”, orice secvență din interiorul ei este tot bună (suma cel mult x cu numere pozitive, valori distincte, cel mult K biți în OR). Atunci, pentru fiecare <code>dr</code>, toate secvențele bune care se termină în <code>dr</code> sunt [st, dr], [st+1, dr], …, [dr, dr], adică <code>dr − st + 1</code> secvențe, și le putem număra așa:</p>
+<div class="pseudo"><span class="lv">st</span> = 1;  ans = 0
+<span class="k">pentru</span> <span class="rv">dr</span> = 1..n:
+    adaugă v[<span class="rv">dr</span>]
+    <span class="k">cât timp</span> secvența [<span class="lv">st</span>, <span class="rv">dr</span>] nu e bună:
+        scoate v[<span class="lv">st</span>];  <span class="lv">st++</span>
+    ans += <span class="rv">dr</span> - <span class="lv">st</span> + 1</div>
+      <p>Dacă apar și numere negative, suma nu mai crește când extindem secvența și tehnica nu mai funcționează. Atunci folosim sumele parțiale, ca la extinderea de la sumainsecv (vezi și <a href="https://cses.fi/problemset/task/1661" target="_blank" rel="noopener">Subarray Sums II</a> pe CSES).</p>
+    </section>
+
+    <section id="probleme">
+      <h2>Tema</h2>
+      <p>Toate problemele din lecție și cele pentru acasă. Le puteți bifa pe cele rezolvate.</p>
+      <div class="filters" role="group" aria-label="Filtrează" id="filters">
+        <button type="button" data-f="all" aria-pressed="true">Toate</button>
+        <button type="button" data-f="lectie" aria-pressed="false">Din lecție</button>
+        <button type="button" data-f="1" aria-pressed="false">Ușoare</button>
+        <button type="button" data-f="2" aria-pressed="false">Medii</button>
+        <button type="button" data-f="3" aria-pressed="false">Grele</button>
+      </div>
+      <div class="tbl"><table class="bank"><thead><tr><th></th><th>Problema</th><th>Sursa</th><th>Dificultate</th><th>Idee</th></tr></thead><tbody id="bank"></tbody></table></div>
+      <p class="bank-ct" id="bankCt"></p>
+
+      <h3>Liste de probleme și cursuri</h3>
+      <ul>
+        <li><a href="https://www.pbinfo.ro/?pagina=probleme-lista&amp;eticheta=144&amp;id_clasa=12618&amp;start=0" target="_blank" rel="noopener">Problemele cu eticheta Two pointers pe pbinfo</a></li>
+        <li><a href="https://kilonova.ro/tags/291" target="_blank" rel="noopener">Categoria Two pointers pe Kilonova</a></li>
+        <li><a href="https://codeforces.com/problemset?tags=two%2Bpointers" target="_blank" rel="noopener">Categoria two pointers pe Codeforces</a></li>
+        <li><a href="https://codeforces.com/edu/course/2/lesson/9" target="_blank" rel="noopener">Cursul Two pointers pe Codeforces</a> (necesită înregistrare; include 19 probleme)</li>
+        <li><a href="https://cses.fi/problemset/" target="_blank" rel="noopener">CSES Problem Set</a>, secțiunea Sorting and Searching</li>
+      </ul>
+    </section>
+  
+  </main>
+</div>
+
+<script src="../assets/catalog.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="../assets/site.js"></script>
+<script>
+const palIn = document.getElementById('palIn');
+const pal = Stepper(document.getElementById('demoPal'), () => {
+  const s = (palIn.value.trim() || 'a').slice(0, 14).split('');
+  const frames = []; let l = 0, r = s.length - 1;
+  const doneF = (L, R) => k => k < L || k > R;
+  frames.push({ l, r, done: () => false, msg: `Pornim cu <b>st = ${l}</b> și <b>dr = ${r}</b>.` });
+  while (l < r) {
+    if (s[l] !== s[r]) {
+      frames.push({ l, r, bad: [l, r], done: doneF(l, r), msg: `s[${l}] = <b>${s[l]}</b> ≠ s[${r}] = <b>${s[r]}</b>. <span class="bad">Nepotrivire: șirul nu este palindrom.</span>` });
+      return { arr: s, frames };
+    }
+    frames.push({ l, r, done: doneF(l, r), msg: `s[${l}] = <b>${s[l]}</b> și s[${r}] = <b>${s[r]}</b> sunt egale. Facem st++ și dr--.` });
+    l++; r--;
+  }
+  frames.push({ l: -1, r: -1, done: () => false, win: [0, s.length - 1], msg: `Pointerii s-au întâlnit (st ≥ dr). <span class="ok">Toate perechile se potrivesc: șirul este palindrom.</span>` });
+  return { arr: s, frames };
+});
+palIn.addEventListener('input', () => pal.reset());
+
+const sumS = document.getElementById('sumS');
+const sum = Stepper(document.getElementById('demoSum'), () => {
+  const a = [1, 2, 4, 6, 8, 9, 14, 15], S = Number(sumS.value) || 0;
+  const frames = []; let l = 0, r = a.length - 1;
+  const st = s => `<div><span>S =</span> <b>${S}</b></div><div><span>a[st] + a[dr] =</span> <b>${s ?? '–'}</b></div>`;
+  const doneF = (L, R) => k => k < L || k > R;
+  while (l < r) {
+    const s = a[l] + a[r];
+    if (s === S) { frames.push({ base1: true, l, r, good: [l, r], done: doneF(l, r), stats: st(s), msg: `${a[l]} + ${a[r]} = <b>${s}</b> = S. <span class="ok">Am găsit perechea (${a[l]}, ${a[r]}).</span>` }); return { arr: a, frames }; }
+    if (s > S) { frames.push({ base1: true, l, r, done: doneF(l, r), stats: st(s), msg: `${a[l]} + ${a[r]} = <b>${s}</b> &gt; ${S}. Suma e prea mare: <b style="color:var(--r)">dr--</b>.` }); r--; }
+    else { frames.push({ base1: true, l, r, done: doneF(l, r), stats: st(s), msg: `${a[l]} + ${a[r]} = <b>${s}</b> &lt; ${S}. Suma e prea mică: <b style="color:var(--l)">st++</b>.` }); l++; }
+  }
+  frames.push({ base1: true, l, r, done: doneF(l, r), stats: st(null), msg: `Pointerii s-au întâlnit. <span class="bad">Nu există nicio pereche cu suma ${S}.</span>` });
+  return { arr: a, frames };
+});
+sumS.addEventListener('input', () => sum.reset());
+
+Stepper(document.getElementById('demoWin'), () => {
+  const v = [2, 4, 1, 2, 7], x = 7, n = v.length, frames = [];
+  let st = 0, dr = 0, s = 0, ans = 0;
+  const stats = () => `<div><span>x =</span> <b>${x}</b></div><div><span>sum =</span> <b>${s}</b></div><div><span>ans =</span> <b>${ans}</b></div>`;
+  const push = (msg, hit) => frames.push({ base1: true, l: st < n ? st : -1, r: dr - 1 >= st ? dr - 1 : -1, win: hit ? [st, dr - 1] : null, done: k => k < st, stats: stats(), msg });
+  push('Pornim cu fereastra goală: st = 1, sum = 0.');
+  while (st < n) {
+    while (dr < n && s < x) { s += v[dr]; dr++; push(`sum &lt; x, extindem la dreapta: adăugăm v[${dr}] = ${v[dr - 1]}, sum = <b>${s}</b>.`); }
+    if (s === x) { ans++; push(`Fereastra [${st + 1}, ${dr}] are suma exact ${x}. <span class="ok">ans = ${ans}.</span>`, true); }
+    else push(`Fereastra [${st + 1}, ${dr}] are suma ${s} ≠ ${x}. Nu o numărăm.`);
+    s -= v[st]; st++;
+    if (st < n) push(`Scoatem v[${st}] = ${v[st - 1]} din sumă și mutăm st: sum = <b>${s}</b>.`);
+  }
+  frames.push({ base1: true, l: -1, r: -1, done: () => true, stats: stats(), msg: `st a trecut de n. <span class="ok">Răspuns: ${ans} subsecvențe.</span>` });
+  return { arr: v, frames };
+});
+
+/* problem bank */
+const LV = { 1: 'ușoară', 2: 'medie', 3: 'grea' };
+const BANK = [
+  // din lecție
+  { id:'cses1640', n:'Sum of Two Values', s:'CSES #1640', u:'https://cses.fi/problemset/task/1640', lv:2, lectie:1, i:'Sortare cu poziții salvate + convergent' },
+  { id:'pb300', n:'sumainsecv', s:'pbinfo #300', u:'https://www.pbinfo.ro/probleme/300/sumainsecv', lv:2, lectie:1, i:'Fereastră cu suma exact K' },
+  { id:'cses1660', n:'Subarray Sums I', s:'CSES #1660', u:'https://cses.fi/problemset/task/1660', lv:2, lectie:1, i:'Numărare cu fereastră glisantă' },
+  { id:'nane', n:'Nane', s:'infoarena', u:'https://www.infoarena.ro/problema/nane', lv:3, lectie:1, i:'Fereastră + frecvență pe biți' },
+  { id:'produs', n:'Produs', s:'infoarena', u:'https://infoarena.ro/problema/produs', lv:3, lectie:1, i:'Logaritmare + fereastră' },
+  { id:'maru', n:'Maru', s:'pbinfo #2943', u:'https://www.pbinfo.ro/probleme/2943/maru', lv:3, lectie:1, i:'Fixăm două linii + Kadane' },
+  { id:'jjooii', n:'JJOOII', s:'oj.uz · JOI 2020', u:'https://oj.uz/problem/view/JOI20_ho_t2', lv:3, lectie:1, i:'Trei pointeri pe poziții' },
+  // exersare
+  { id:'pb1222', n:'TV', s:'pbinfo #1222', u:'https://www.pbinfo.ro/probleme/1222/tv', lv:1, i:'' },
+  { id:'pb1233', n:'Paint', s:'pbinfo #1233', u:'https://www.pbinfo.ro/probleme/1233/paint', lv:1, i:'' },
+  { id:'lc1', n:'Two Sum', s:'LeetCode #1', u:'https://leetcode.com/problems/two-sum/', lv:1, i:'Varianta nesortată: unordered_set' },
+  { id:'lc11', n:'Container With Most Water', s:'LeetCode #11', u:'https://leetcode.com/problems/container-with-most-water/', lv:1, i:'Convergent: mutăm peretele mai mic' },
+  { id:'cses1084', n:'Apartments', s:'CSES #1084', u:'https://cses.fi/problemset/task/1084', lv:1, i:'Două șiruri sortate, câte un pointer' },
+  { id:'cses1090', n:'Ferris Wheel', s:'CSES #1090', u:'https://cses.fi/problemset/task/1090', lv:1, i:'Convergent: cel mai ușor + cel mai greu' },
+  // OJI
+  { id:'cses1141', n:'Playlist', s:'CSES #1141', u:'https://cses.fi/problemset/task/1141', lv:2, i:'Cea mai lungă fereastră cu valori distincte' },
+  { id:'cses2428', n:'Subarray Distinct Values', s:'CSES #2428', u:'https://cses.fi/problemset/task/2428', lv:2, i:'Numărare: ans += dr − st + 1' },
+  { id:'cses1643', n:'Maximum Subarray Sum', s:'CSES #1643', u:'https://cses.fi/problemset/task/1643', lv:2, i:'Kadane, pregătire pentru Maru' },
+  { id:'cses1641', n:'Sum of Three Values', s:'CSES #1641', u:'https://cses.fi/problemset/task/1641', lv:2, i:'Fixăm un element + Two Sum' },
+  { id:'lc15', n:'3Sum', s:'LeetCode #15', u:'https://leetcode.com/problems/3sum/', lv:2, i:'Fixăm un element + convergent' },
+  { id:'cses1661', n:'Subarray Sums II', s:'CSES #1661', u:'https://cses.fi/problemset/task/1661', lv:2, i:'Cu negative: sume parțiale' },
+  { id:'sirbun', n:'Șirbun', s:'Kilonova #556', u:'https://kilonova.ro/problems/556', lv:2, i:'' },
+  // aprofundare
+  { id:'3secv', n:'3secv', s:'infoarena', u:'https://infoarena.ro/problema/3secv', lv:3, i:'' },
+  { id:'gw', n:'Global Warming', s:'oj.uz · NOI 2013', u:'https://oj.uz/problem/view/NOI13_gw', lv:3, i:'' },
+  { id:'cses1642', n:'Sum of Four Values', s:'CSES #1642', u:'https://cses.fi/problemset/task/1642', lv:3, i:'Fixăm două elemente + Two Sum' },
+  { id:'u1038', n:'Social Distancing', s:'USACO', u:'http://www.usaco.org/index.php?page=viewproblem2&cpid=1038', lv:3, i:'' },
+  { id:'u789', n:'MooTube', s:'USACO', u:'http://www.usaco.org/index.php?page=viewproblem2&cpid=789', lv:3, i:'' },
+  { id:'u992', n:'Wormhole Sort', s:'USACO', u:'http://www.usaco.org/index.php?page=viewproblem2&cpid=992', lv:3, i:'' },
+  { id:'u794', n:'Sprinklers', s:'USACO', u:'http://usaco.org/index.php?page=viewproblem2&cpid=794', lv:3, i:'' },
+  { id:'u924', n:'Cow Dating', s:'USACO', u:'http://usaco.org/index.php?page=viewproblem2&cpid=924', lv:3, i:'' },
+];
+BANK.forEach(p => { if (p.id === 'nane' || p.id === 'jjooii') delete p.lectie; });
+const bankEl = document.getElementById('bank'), bankCt = document.getElementById('bankCt');
+let solved = {}; try { solved = JSON.parse(store.get('tp-solved') || '{}') || {}; } catch (e) { solved = {}; }
+let filter = 'all';
+function drawBank() {
+  bankEl.innerHTML = '';
+  const rows = BANK.filter(p => filter === 'all' || (filter === 'lectie' ? p.lectie : String(p.lv) === filter));
+  rows.forEach(p => {
+    const tr = document.createElement('tr'); if (solved[p.id]) tr.className = 'solved';
+    const cb = document.createElement('input'); cb.type = 'checkbox'; cb.id = 'cb-' + p.id; cb.checked = !!solved[p.id];
+    cb.setAttribute('aria-label', 'Rezolvat: ' + p.n);
+    cb.addEventListener('change', () => { if (cb.checked) solved[p.id] = 1; else delete solved[p.id]; store.set('tp-solved', JSON.stringify(solved)); tr.classList.toggle('solved', cb.checked); count(); });
+    const td0 = document.createElement('td'); td0.appendChild(cb);
+    const td1 = document.createElement('td'); td1.className = 'name';
+    const a = document.createElement('a'); a.href = p.u; a.target = '_blank'; a.rel = 'noopener'; a.textContent = p.n; td1.appendChild(a);
+    const td2 = document.createElement('td'); td2.className = 'src'; td2.textContent = p.s;
+    const td3 = document.createElement('td'); td3.innerHTML = `<span class="chip lv-${p.lv}">${LV[p.lv]}</span>`;
+    const td4 = document.createElement('td'); td4.className = 'idea'; td4.textContent = p.i || '';
+    tr.append(td0, td1, td2, td3, td4); bankEl.appendChild(tr);
+  });
+  count();
+}
+function count() { const n = BANK.filter(p => solved[p.id]).length; bankCt.textContent = `${BANK.length} probleme · ${n} rezolvate`; }
+document.querySelectorAll('#filters button').forEach(b => b.addEventListener('click', () => {
+  filter = b.dataset.f;
+  document.querySelectorAll('#filters button').forEach(x => x.setAttribute('aria-pressed', x === b));
+  drawBank();
+}));
+drawBank();
+
+
+</script>
+</body>
+</html>
