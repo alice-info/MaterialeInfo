@@ -1,0 +1,711 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Vectori STL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body data-root="../" data-id="vectori-stl">
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow"></div>
+    <h1>Vectori <span class="pr">STL</span></h1>
+    <p class="lede">Lecția aceasta o parcurgeți singuri, acasă. Citiți în ordine, scrieți și rulați exemplele în CodeBlocks (sau ce folosiți voi), iar la exerciții încercați întâi singuri și abia apoi deschideți soluția.</p>
+  </div>
+</header>
+
+<div class="wrap layout">
+  <nav class="toc" data-auto aria-label="Cuprins"></nav>
+  <main class="prose">
+    <section id="v-de-ce">
+      <h2>De ce vector?</h2>
+      <p>Până acum am lucrat cu tablouri declarate așa:</p>
+      <script type="text/x-cpp" class="cod">
+int a[100001];   // „cât să ajungă”
+int n;           // câte elemente folosim de fapt
+</script>
+      <p>Problema este că dimensiunea trebuie stabilită dinainte. Dacă nu știm câte numere vom citi, declarăm „cât să ajungă” și irosim memorie, iar dacă greșim limita, programul iese din tablou.</p>
+      <p>Biblioteca standard a limbajului C++ (STL, de la <em>Standard Template Library</em>) ne oferă <strong>containere</strong>: structuri de date gata făcute în care păstrăm mai multe valori. Cel mai folosit container este <code>vector</code>, un tablou care își schimbă singur dimensiunea: putem adăuga elemente la final oricând, iar el ține minte câte elemente are.</p>
+      <p>Pentru a-l folosi includem biblioteca <code>&lt;vector&gt;</code>. Primul exemplu: citim n numere și le afișăm.</p>
+      <script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main()
+{
+    int n, x;
+    vector<int> v;          // un vector gol de numere întregi
+
+    cin >> n;
+    for (int i = 0; i < n; i++)
+    {
+        cin >> x;
+        v.push_back(x);     // adăugăm x la sfârșitul vectorului
+    }
+
+    cout << "Am citit " << v.size() << " numere: ";
+    for (int i = 0; i < v.size(); i++)
+        cout << v[i] << ' ';
+    return 0;
+}
+</script>
+      <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th></tr></thead><tbody><tr><td class="m">4
+3 8 1 5</td><td class="m">Am citit 4 numere: 3 8 1 5</td></tr></tbody></table></div>
+      <div class="note r"><p>Elementele unui vector sunt numerotate <strong>de la 0</strong>. Un vector cu n elemente are pozițiile 0, 1, …, n − 1. Primul element este <code>v[0]</code>, ultimul este <code>v[n - 1]</code>.</p></div>
+    </section>
+
+    <section id="v-declarare">
+      <h2>Declarare</h2>
+      <p>Între <code>&lt; &gt;</code> scriem tipul elementelor. Un vector poate fi creat în mai multe feluri:</p>
+      <script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main()
+{
+    vector<int> a;                 // gol, 0 elemente
+    vector<int> b(5);              // 5 elemente, toate 0
+    vector<int> c(4, 7);           // 4 elemente, toate 7
+    vector<int> d = {3, 1, 4, 1};  // elementele date direct
+    vector<char> e = {'a', 'b'};   // poate avea și alt tip
+
+    cout << a.size() << ' ' << b.size() << ' ' << c.size() << ' ' << d.size() << '\n';
+    cout << b[2] << ' ' << c[0] << ' ' << d[2] << ' ' << e[1] << '\n';
+    return 0;
+}
+</script>
+      <p>Programul afișează:</p>
+      <div class="pseudo">0 5 4 4
+0 7 4 b</div>
+      <p>Observați că <code>vector&lt;int&gt; b(5)</code> creează 5 elemente egale cu 0. Asta e diferit de tablourile obișnuite declarate în <code>main</code>, care pot conține „gunoi” dacă nu le inițializăm.</p>
+    </section>
+
+    <section id="v-operatii">
+      <h2>Operații</h2>
+      <p>Un vector are funcții proprii, pe care le apelăm cu punct: <code>v.size()</code>, <code>v.push_back(x)</code> și așa mai departe.</p>
+      <div class="tbl"><table class="io ops"><thead><tr><th>Funcția</th><th>Ce face</th></tr></thead><tbody>
+        <tr><td class="m">v.size()</td><td>numărul de elemente</td></tr>
+        <tr><td class="m">v.empty()</td><td>adevărat dacă vectorul nu are niciun element</td></tr>
+        <tr><td class="m">v[i]</td><td>elementul de pe poziția i (de la 0 la size() − 1)</td></tr>
+        <tr><td class="m">v.push_back(x)</td><td>adaugă x la sfârșit</td></tr>
+        <tr><td class="m">v.pop_back()</td><td>șterge ultimul element</td></tr>
+        <tr><td class="m">v.front()</td><td>primul element, la fel ca v[0]</td></tr>
+        <tr><td class="m">v.back()</td><td>ultimul element, la fel ca v[v.size() − 1]</td></tr>
+        <tr><td class="m">v.clear()</td><td>șterge toate elementele</td></tr>
+        <tr><td class="m">v.resize(k)</td><td>schimbă dimensiunea la k (elementele noi sunt 0)</td></tr>
+        <tr><td class="m">v.insert(v.begin() + i, x)</td><td>inserează x pe poziția i</td></tr>
+        <tr><td class="m">v.erase(v.begin() + i)</td><td>șterge elementul de pe poziția i</td></tr>
+      </tbody></table></div>
+      <p>Rulați programul de mai jos și urmăriți, linie cu linie, cum se schimbă vectorul:</p>
+      <script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <vector>
+using namespace std;
+
+void afis(const vector<int> &v)
+{
+    for (int i = 0; i < v.size(); i++) cout << v[i] << ' ';
+    cout << "(size = " << v.size() << ")\n";
+}
+
+int main()
+{
+    vector<int> v = {10, 20, 30};
+    afis(v);                    // 10 20 30
+
+    v.push_back(40);            // adaugă la sfârșit
+    afis(v);                    // 10 20 30 40
+
+    v.pop_back();               // șterge ultimul element
+    afis(v);                    // 10 20 30
+
+    cout << v.front() << ' ' << v.back() << '\n'; // primul și ultimul: 10 30
+
+    v[1] = 25;                  // modificăm elementul de pe poziția 1
+    afis(v);                    // 10 25 30
+
+    v.insert(v.begin() + 1, 15); // inserează 15 pe poziția 1
+    afis(v);                    // 10 15 25 30
+
+    v.erase(v.begin() + 2);     // șterge elementul de pe poziția 2
+    afis(v);                    // 10 15 30
+
+    v.resize(5);                // acum are 5 elemente, cele noi sunt 0
+    afis(v);                    // 10 15 30 0 0
+
+    v.clear();                  // golește vectorul
+    cout << v.empty() << '\n';  // 1 (adevărat, e gol)
+    return 0;
+}
+</script>
+      <p><code>push_back</code> și <code>pop_back</code> sunt foarte rapide. <code>insert</code> și <code>erase</code> în mijlocul vectorului sunt lente, pentru că toate elementele de după poziția respectivă trebuie mutate cu un loc. Dacă le folosiți într-o buclă pe un vector mare, programul poate depăși timpul.</p>
+      <p>Despre <code>v.begin()</code> din <code>insert</code> și <code>erase</code> vorbim mai jos, la iteratori.</p>
+    </section>
+
+    <section id="v-indici">
+      <h2>Parcurgerea cu indici</h2>
+      <p>Cel mai simplu mod de a parcurge un vector este exact ca la tablouri, cu un indice de la 0 la <code>v.size() - 1</code>:</p>
+      <script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main()
+{
+    int n;
+    cin >> n;
+    vector<int> v(n);           // vector cu n elemente, pozițiile 0, 1, ..., n-1
+
+    for (int i = 0; i < n; i++)
+        cin >> v[i];
+
+    int s = 0;
+    for (int i = 0; i < v.size(); i++)
+        s += v[i];
+
+    cout << "Suma: " << s << '\n';
+    cout << "Primul: " << v[0] << ", ultimul: " << v[n - 1] << '\n';
+    return 0;
+}
+</script>
+      <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th></tr></thead><tbody><tr><td class="m">4
+3 8 1 5</td><td class="m">Suma: 17
+Primul: 3, ultimul: 5</td></tr></tbody></table></div>
+      <p>Aici am creat vectorul direct cu n elemente (<code>vector&lt;int&gt; v(n)</code>) și am citit în <code>v[i]</code>. Varianta cu <code>push_back</code> din primul exemplu face același lucru. Nu le amestecați: dacă vectorul are deja n elemente și mai faceți <code>push_back</code>, el va avea 2n elemente.</p>
+    </section>
+
+    <section id="v-iteratori">
+      <h2>Parcurgerea cu iteratori</h2>
+      <p>Un <strong>iterator</strong> este un „indicator” care arată spre un element al vectorului. Ne putem gândi la el ca la un deget pe care îl punem pe o căsuță. Cu un iterator <code>it</code> putem face:</p>
+      <ul>
+        <li><code>*it</code>: valoarea din căsuța spre care arată;</li>
+        <li><code>++it</code>: mută degetul pe căsuța următoare;</li>
+        <li><code>--it</code>: îl mută pe căsuța anterioară;</li>
+        <li><code>it + k</code>: iteratorul aflat cu k căsuțe mai la dreapta.</li>
+      </ul>
+      <p>Fiecare vector are doi iteratori speciali:</p>
+      <ul>
+        <li><code>v.begin()</code> arată spre <strong>primul</strong> element;</li>
+        <li><code>v.end()</code> arată spre poziția <strong>de după ultimul</strong> element. Acolo nu există niciun element, deci nu avem voie să scriem <code>*v.end()</code>. Îl folosim doar ca să știm când să ne oprim.</li>
+      </ul>
+      <p>Urmăriți în simularea de mai jos cum se mișcă iteratorul și cum se calculează suma:</p>
+
+      <div class="demo" id="demoIt">
+        <div class="pseudo" style="margin-bottom:6px">for (auto it = v.begin(); it != v.end(); ++it)
+    s += *it;</div>
+        <div class="stats" data-stats></div>
+        <div class="cells" data-cells></div>
+        <p class="status" data-status aria-live="polite"></p>
+        <div class="ctrl">
+          <button class="btn" type="button" data-prev>Înapoi</button>
+          <button class="btn pri" type="button" data-next>Pasul următor</button>
+          <button class="btn" type="button" data-play>Rulează</button>
+          <span class="step-ct" data-ct></span>
+        </div>
+      </div>
+
+      <p>În cod, tipul complet al unui iterator este <code>vector&lt;int&gt;::iterator</code>. E lung, așa că de obicei scriem <code>auto</code> și compilatorul deduce singur tipul.</p>
+      <script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main()
+{
+    vector<int> v = {5, 2, 8, 1, 9};
+
+    // scrierea completă
+    vector<int>::iterator it;
+    for (it = v.begin(); it != v.end(); ++it)
+        cout << *it << ' ';         // *it = valoarea spre care arată it
+    cout << '\n';
+
+    // același lucru, cu auto (compilatorul deduce singur tipul)
+    int s = 0;
+    for (auto it = v.begin(); it != v.end(); ++it)
+        s += *it;
+    cout << "Suma: " << s << '\n';
+
+    // prin iterator putem și modifica elementul
+    for (auto it = v.begin(); it != v.end(); ++it)
+        *it = *it * 2;
+    for (auto it = v.begin(); it != v.end(); ++it)
+        cout << *it << ' ';
+    cout << '\n';
+
+    // poziția unui iterator = diferența față de begin()
+    auto p = v.begin() + 3;
+    cout << "Pe pozitia " << (p - v.begin()) << " este " << *p << '\n';
+    return 0;
+}
+</script>
+      <p>Programul afișează:</p>
+      <div class="pseudo">5 2 8 1 9
+Suma: 25
+10 4 16 2 18
+Pe pozitia 3 este 2</div>
+      <p>Ultimele rânduri arată două lucruri utile. Prin <code>*it = ...</code> putem modifica elementul. Iar diferența <code>it - v.begin()</code> ne dă poziția (indicele) elementului spre care arată <code>it</code>.</p>
+
+      <h3>Parcurgerea de la sfârșit spre început</h3>
+      <p>Pentru parcurgerea inversă există <code>v.rbegin()</code>, care arată spre ultimul element, și <code>v.rend()</code>, care arată „înaintea” primului. Cu <code>++it</code> mergem spre stânga.</p>
+      <script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main()
+{
+    vector<int> v = {5, 2, 8, 1, 9};
+
+    // de la ultimul la primul
+    for (auto it = v.rbegin(); it != v.rend(); ++it)
+        cout << *it << ' ';     // 9 1 8 2 5
+    cout << '\n';
+
+    // același lucru cu indici
+    for (int i = v.size() - 1; i >= 0; i--)
+        cout << v[i] << ' ';
+    return 0;
+}
+</script>
+    </section>
+
+    <section id="v-range">
+      <h2>Parcurgerea cu for (x : v)</h2>
+      <p>Când vrem doar să trecem prin toate elementele, în ordine, există o scriere și mai scurtă:</p>
+      <script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main()
+{
+    vector<int> v = {5, 2, 8, 1, 9};
+
+    for (int x : v)        // x ia pe rând fiecare valoare din v
+        cout << x << ' ';
+    cout << '\n';
+
+    for (int x : v)        // x este o COPIE: v nu se modifică
+        x = 0;
+
+    for (int &x : v)       // cu & lucrăm direct pe elementele lui v
+        x = x + 1;
+
+    for (int x : v)
+        cout << x << ' ';  // 6 3 9 2 10
+    return 0;
+}
+</script>
+      <p>În <code>for (int x : v)</code>, variabila x primește pe rând <em>o copie</em> a fiecărui element. Dacă modificăm x, vectorul rămâne neschimbat. Ca să modificăm elementele, scriem <code>int &amp;x</code>: atunci x este chiar elementul din vector, nu o copie.</p>
+      <p>Cu această scriere nu știm poziția elementului. Dacă avem nevoie de indice (de exemplu, comparăm <code>v[i]</code> cu <code>v[i - 1]</code>), folosim parcurgerea cu indici.</p>
+    </section>
+
+    <section id="v-algorithm">
+      <h2>Funcții din algorithm</h2>
+      <p>Biblioteca <code>&lt;algorithm&gt;</code> are funcții care primesc un interval dat prin doi iteratori: de unde începe și unde se termină (capătul din dreapta nu este inclus). Pentru tot vectorul, intervalul este <code>v.begin(), v.end()</code>.</p>
+      <script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+void afis(const vector<int> &v)
+{
+    for (int x : v) cout << x << ' ';
+    cout << '\n';
+}
+
+int main()
+{
+    vector<int> v = {7, 3, 9, 3, 1};
+
+    sort(v.begin(), v.end());                   // crescător
+    afis(v);                                    // 1 3 3 7 9
+
+    sort(v.begin(), v.end(), greater<int>());   // descrescător
+    afis(v);                                    // 9 7 3 3 1
+
+    reverse(v.begin(), v.end());                // inversează ordinea
+    afis(v);                                    // 1 3 3 7 9
+
+    // max_element și min_element întorc un ITERATOR, deci folosim *
+    cout << *max_element(v.begin(), v.end()) << ' '
+         << *min_element(v.begin(), v.end()) << '\n';   // 9 1
+
+    // count numără aparițiile unei valori
+    cout << count(v.begin(), v.end(), 3) << '\n';       // 2
+
+    // find întoarce un iterator spre prima apariție, sau v.end() dacă nu există
+    auto it = find(v.begin(), v.end(), 7);
+    if (it != v.end())
+        cout << "7 este pe pozitia " << it - v.begin() << '\n';  // 3
+    else
+        cout << "7 nu apare\n";
+
+    // le putem aplica și doar pe o bucată: primele 3 elemente
+    sort(v.begin(), v.begin() + 3, greater<int>());
+    afis(v);                                    // 3 3 1 7 9
+    return 0;
+}
+</script>
+      <p>Pe scurt:</p>
+      <ul>
+        <li><code>sort(v.begin(), v.end())</code> sortează crescător; cu <code>greater&lt;int&gt;()</code> sortează descrescător;</li>
+        <li><code>reverse</code> inversează ordinea elementelor;</li>
+        <li><code>max_element</code> și <code>min_element</code> întorc un iterator, deci pentru valoare scriem <code>*</code> în față;</li>
+        <li><code>count(v.begin(), v.end(), x)</code> numără de câte ori apare x;</li>
+        <li><code>find(v.begin(), v.end(), x)</code> întoarce un iterator spre prima apariție a lui x, sau <code>v.end()</code> dacă x nu apare.</li>
+      </ul>
+      <p>Ultimul exemplu din program sortează doar primele 3 elemente: intervalul este <code>v.begin(), v.begin() + 3</code>, adică pozițiile 0, 1 și 2.</p>
+    </section>
+
+    <section id="v-matrice">
+      <h2>Vector de vectori</h2>
+      <p>Un vector poate conține alți vectori. Așa obținem o matrice: <code>a[i]</code> este linia i, iar <code>a[i][j]</code> este elementul de pe linia i și coloana j.</p>
+      <script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main()
+{
+    int n = 3, m = 4;
+    // n linii, fiecare linie este un vector de m elemente egale cu 0
+    vector<vector<int>> a(n, vector<int>(m, 0));
+
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
+            a[i][j] = i * m + j;
+
+    for (int i = 0; i < a.size(); i++)
+    {
+        for (int j = 0; j < a[i].size(); j++)
+            cout << a[i][j] << ' ';
+        cout << '\n';
+    }
+
+    // liniile pot avea lungimi diferite
+    vector<vector<int>> t(3);
+    t[0].push_back(1);
+    t[2].push_back(5);
+    t[2].push_back(6);
+    cout << t[0].size() << ' ' << t[1].size() << ' ' << t[2].size() << '\n';  // 1 0 2
+    return 0;
+}
+</script>
+      <p>Spre deosebire de o matrice obișnuită, liniile pot avea lungimi diferite. Asta ne va fi foarte util mai târziu, la grafuri.</p>
+    </section>
+
+    <section id="v-two">
+      <h2>Legătura cu Two Pointers</h2>
+      <p>Iteratorii se comportă ca niște pointeri, deci <a href="two-pointers.html">tehnica Two Pointers</a> se poate scrie direct cu ei. Iată exemplul cu perechea de sumă S, de data aceasta cu doi iteratori:</p>
+      <script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main()
+{
+    vector<int> v = {1, 2, 4, 6, 8, 9, 14, 15};   // vector sortat
+    int S = 13;
+
+    auto st = v.begin();       // primul element
+    auto dr = v.end() - 1;     // ultimul element (end() este DUPĂ ultimul)
+    bool gasit = false;
+
+    while (st < dr)
+    {
+        int suma = *st + *dr;
+        if (suma == S)
+        {
+            gasit = true;
+            break;
+        }
+        if (suma > S) --dr;    // suma prea mare: mutăm dreapta
+        else ++st;             // suma prea mică: mutăm stânga
+    }
+
+    if (gasit)
+        cout << *st << " + " << *dr << " = " << S << '\n';
+    else
+        cout << "Nu exista\n";
+    return 0;
+}
+</script>
+      <p>Atenție la <code>dr = v.end() - 1</code>: <code>v.end()</code> este după ultimul element, deci ultimul element este cu o poziție mai la stânga. Iteratorii unui vector se pot compara cu <code>&lt;</code>, ca indicii.</p>
+    </section>
+
+    <section id="v-atentie">
+      <h2>La ce să fiți atenți</h2>
+      <p><code>v[i]</code> nu verifică dacă poziția există. Dacă scrieți <code>v[10]</code> într-un vector cu 5 elemente, programul nu dă eroare la compilare, dar va citi sau scrie în memorie străină și se poate bloca sau poate da rezultate greșite. La fel pentru <code>*v.end()</code> sau pentru <code>v.back()</code> și <code>v.front()</code> pe un vector gol.</p>
+      <p><code>v.size()</code> întoarce un număr fără semn. Dacă vectorul este gol, <code>v.size() - 1</code> nu este −1, ci un număr uriaș. De aceea bucla de mai jos este greșită pentru un vector gol:</p>
+      <script type="text/x-cpp" class="cod">
+vector<int> v;                              // vector gol
+for (int i = 0; i <= v.size() - 1; i++)     // GREȘIT: v.size() - 1 este un număr uriaș
+    cout << v[i] << ' ';
+</script>
+      <p>Scrieți condiția ca <code>i &lt; v.size()</code>, sau, la parcurgerea inversă, puneți întâi dimensiunea într-o variabilă <code>int</code>, ca în exemplul de parcurgere inversă.</p>
+      <p>Un vector transmis unei funcții se copiază în întregime. Dacă nu vreți copierea (un vector mare, funcție apelată de multe ori), transmiteți-l prin referință: <code>void afis(vector&lt;int&gt; &amp;v)</code>, sau <code>const vector&lt;int&gt; &amp;v</code> dacă funcția doar citește din el.</p>
+      <p>Dacă adăugați elemente cu <code>push_back</code> în timp ce parcurgeți vectorul cu iteratori, iteratorii pot deveni invalizi. Nu modificați dimensiunea vectorului în timpul parcurgerii.</p>
+    </section>
+
+    <section id="v-test">
+      <h2>Verifică-te</h2>
+      <p>Răspundeți la întrebări înainte de exerciții. Dacă greșiți, recitiți secțiunea respectivă și încercați din nou; explicația apare după răspunsul corect.</p>
+      <div id="quiz"></div>
+      <p class="bank-ct" id="quizScore"></p>
+    </section>
+
+    <section id="v-exercitii">
+      <h2>Exerciții</h2>
+      <p>Rezolvați-le în ordine. Încercați fiecare exercițiu singuri; deschideți indiciul doar dacă v-ați blocat, iar soluția doar după ce ați scris și ați testat programul vostru.</p>
+
+      <div class="prob" id="v-e1">
+        <h3>Exercițiul 1. Invers</h3>
+        <p>Se citesc n și apoi n numere întregi. Afișați numerele în ordine inversă, folosind iteratori.</p>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th></tr></thead><tbody><tr><td class="m">5
+1 2 3 4 5</td><td class="m">5 4 3 2 1</td></tr></tbody></table></div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Folosiți <code>rbegin()</code> și <code>rend()</code>.</p></div></details>
+        <details class="sol"><summary>Soluție <span class="arr"></span></summary><div class="body"><script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main()
+{
+    int n;
+    cin >> n;
+    vector<int> v(n);
+    for (int i = 0; i < n; i++)
+        cin >> v[i];
+
+    for (auto it = v.rbegin(); it != v.rend(); ++it)
+        cout << *it << ' ';
+    return 0;
+}
+</script></div></details>
+      </div>
+
+      <div class="prob" id="v-e2">
+        <h3>Exercițiul 2. Până la 0</h3>
+        <p>Se citesc numere naturale nenule până la întâlnirea lui 0 (care nu face parte din șir). Afișați câte numere s-au citit și câte dintre ele sunt mai mari decât media lor aritmetică.</p>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th><th>Explicație</th></tr></thead><tbody><tr><td class="m">4 7 1 8 0</td><td class="m">4 2</td><td>Media este 5; 7 și 8 sunt mai mari.</td></tr></tbody></table></div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Nu știm dinainte câte numere sunt, deci folosim <code>push_back</code>. Media o putem afla abia după ce am citit tot, așa că parcurgem vectorul a doua oară.</p></div></details>
+        <details class="hint"><summary>Încă un indiciu</summary><div><p>Ca să evitați numerele reale: x &gt; suma / nr este același lucru cu x · nr &gt; suma.</p></div></details>
+        <details class="sol"><summary>Soluție <span class="arr"></span></summary><div class="body"><script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main()
+{
+    vector<int> v;
+    int x;
+    long long s = 0;
+    cin >> x;
+    while (x != 0)
+    {
+        v.push_back(x);
+        s += x;
+        cin >> x;
+    }
+
+    // x > media  <=>  x * nr > suma  (așa evităm numerele reale)
+    int cnt = 0;
+    for (int y : v)
+        if ((long long)y * v.size() > s)
+            cnt++;
+
+    cout << v.size() << ' ' << cnt << '\n';
+    return 0;
+}
+</script></div></details>
+      </div>
+
+      <div class="prob" id="v-e3">
+        <h3>Exercițiul 3. Numerele pare</h3>
+        <p>Se citesc n și apoi n numere naturale. Construiți un al doilea vector care conține doar numerele pare, în ordinea în care apar, și afișați-l. Dacă nu există numere pare, afișați −1.</p>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th></tr></thead><tbody>
+          <tr><td class="m">6
+3 8 5 2 7 10</td><td class="m">8 2 10</td></tr>
+          <tr><td class="m">3
+1 3 5</td><td class="m">-1</td></tr></tbody></table></div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Porniți cu un vector gol și folosiți <code>push_back</code>. La final, <code>empty()</code> vă spune dacă a rămas gol.</p></div></details>
+        <details class="sol"><summary>Soluție <span class="arr"></span></summary><div class="body"><script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main()
+{
+    int n;
+    cin >> n;
+    vector<int> v(n), pare;
+    for (int i = 0; i < n; i++)
+        cin >> v[i];
+
+    for (int x : v)
+        if (x % 2 == 0)
+            pare.push_back(x);
+
+    if (pare.empty())
+        cout << -1;
+    else
+        for (int x : pare)
+            cout << x << ' ';
+    return 0;
+}
+</script></div></details>
+      </div>
+
+      <div class="prob" id="v-e4">
+        <h3>Exercițiul 4. Valori distincte</h3>
+        <p>Se citesc n și apoi n numere întregi. Afișați în ordine crescătoare valorile distincte (fiecare valoare o singură dată).</p>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th></tr></thead><tbody><tr><td class="m">7
+4 2 4 9 2 2 1</td><td class="m">1 2 4 9</td></tr></tbody></table></div>
+        <details class="hint"><summary>Indiciu</summary><div><p>După <code>sort</code>, valorile egale ajung una lângă alta. Afișați un element doar dacă este diferit de cel dinaintea lui.</p></div></details>
+        <details class="sol"><summary>Soluție <span class="arr"></span></summary><div class="body"><script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int main()
+{
+    int n;
+    cin >> n;
+    vector<int> v(n);
+    for (int i = 0; i < n; i++)
+        cin >> v[i];
+
+    sort(v.begin(), v.end());
+
+    // după sortare, valorile egale sunt una lângă alta
+    for (int i = 0; i < v.size(); i++)
+        if (i == 0 || v[i] != v[i - 1])
+            cout << v[i] << ' ';
+    return 0;
+}
+</script></div></details>
+      </div>
+
+      <div class="prob" id="v-e5">
+        <h3>Exercițiul 5. Vector palindrom</h3>
+        <p>Se citesc n și apoi n numere întregi. Verificați, cu doi iteratori, dacă vectorul este palindrom (se citește la fel de la stânga la dreapta și de la dreapta la stânga). Afișați DA sau NU.</p>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th></tr></thead><tbody>
+          <tr><td class="m">5
+1 3 7 3 1</td><td class="m">DA</td></tr>
+          <tr><td class="m">4
+2 5 5 3</td><td class="m">NU</td></tr></tbody></table></div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Este exemplul 1 din <a href="two-pointers.html#ex-pal">lecția de Two Pointers</a>. Puneți un iterator pe primul element și unul pe ultimul (<code>v.end() - 1</code>) și apropiați-i.</p></div></details>
+        <details class="sol"><summary>Soluție <span class="arr"></span></summary><div class="body"><script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main()
+{
+    int n;
+    cin >> n;
+    vector<int> v(n);
+    for (int i = 0; i < n; i++)
+        cin >> v[i];
+
+    auto st = v.begin(), dr = v.end() - 1;
+    bool ok = true;
+    while (st < dr)
+    {
+        if (*st != *dr)
+        {
+            ok = false;
+            break;
+        }
+        ++st;
+        --dr;
+    }
+
+    if (ok) cout << "DA";
+    else cout << "NU";
+    return 0;
+}
+</script></div></details>
+      </div>
+
+      <p style="margin-top:40px">Dacă vreți să citiți mai mult, toate funcțiile unui vector sunt descrise (în engleză) pe <a href="https://en.cppreference.com/w/cpp/container/vector" target="_blank" rel="noopener">cppreference</a>.</p>
+    </section>
+  
+  </main>
+</div>
+
+<script src="../assets/catalog.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="../assets/site.js"></script>
+<script>
+/* iterator demo */
+(() => {
+  const root = document.getElementById('demoIt'); if (!root) return;
+  Stepper(root, () => {
+    const v = [5, 2, 8, 1, 9], arr = v.concat([null]), frames = [];
+    let s = 0;
+    const stats = () => `<div><span>s =</span> <b>${s}</b></div>`;
+    frames.push({ l: 0, ln: 'it', msg: 'Pornim cu <b>it = v.begin()</b>, care arată spre primul element. Suma este s = 0.', stats: stats() });
+    for (let k = 0; k < v.length; k++) {
+      s += v[k];
+      frames.push({ l: k, ln: 'it', done: j => j < k, msg: `it != v.end(), deci intrăm în buclă: <b>*it = ${v[k]}</b>, iar s devine ${s}.`, stats: stats() });
+      frames.push({ l: k + 1, ln: 'it', done: j => j <= k, msg: k + 1 < v.length ? `<b>++it</b>: iteratorul trece la elementul următor.` : `<b>++it</b>: iteratorul a ajuns la <b>v.end()</b>, poziția de după ultimul element.`, stats: stats() });
+    }
+    frames.push({ l: v.length, ln: 'it', done: j => j < v.length, msg: `it == v.end(), deci bucla se oprește. <span class="ok">Suma este ${s}.</span> Observați că nu am citit niciodată <b>*v.end()</b>.`, stats: stats() });
+    return { arr, frames };
+  });
+})();
+
+/* quiz */
+(() => {
+  const host = document.getElementById('quiz'); if (!host) return;
+  const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const Q = [
+    { q: 'Ce afișează codul?', code: 'vector<int> v = {4, 7, 1};\nv.push_back(3);\ncout << v.size();', o: ['3', '4', '7', '1'], c: 1, e: 'Vectorul avea 3 elemente, push_back a adăugat încă unul, deci size() este 4.' },
+    { q: 'Spre ce arată v.end()?', o: ['spre ultimul element', 'spre poziția de după ultimul element', 'spre primul element', 'spre elementul de pe poziția size()-1'], c: 1, e: 'v.end() arată după ultimul element. Acolo nu există niciun element, de aceea nu scriem *v.end().' },
+    { q: 'Ce afișează codul?', code: 'vector<int> v(5);\ncout << v[2];', o: ['5', '2', '0', 'o valoare oarecare („gunoi”)'], c: 2, e: 'vector<int> v(5) creează 5 elemente egale cu 0.' },
+    { q: 'Ce afișează codul?', code: 'vector<int> v = {5, 3, 9, 1};\nsort(v.begin(), v.end());\ncout << v[0] << " " << v.back();', o: ['5 1', '1 9', '9 1', '1 5'], c: 1, e: 'După sortare vectorul este 1 3 5 9: primul element este 1, ultimul este 9.' },
+    { q: 'După bucla de mai jos, ce conține v?', code: 'vector<int> v = {1, 2, 3};\nfor (int x : v)\n    x = x * 10;', o: ['10 20 30', '1 2 3', '0 0 0', 'programul nu se compilează'], c: 1, e: 'x este o copie a fiecărui element, deci v nu se modifică. Pentru modificare trebuia scris int &x.' },
+    { q: 'Cum aflăm poziția (indicele) spre care arată un iterator it?', o: ['*it', 'it - v.begin()', 'v.end() - it', 'it + 1'], c: 1, e: 'Diferența dintre doi iteratori este numărul de poziții dintre ei, deci it - v.begin() este indicele.' },
+    { q: 'Ce afișează codul?', code: 'vector<int> v = {6, 2, 8};\nauto it = max_element(v.begin(), v.end());\ncout << *it << " " << it - v.begin();', o: ['8 2', '8 3', '2 8', '6 0'], c: 0, e: 'Maximul este 8, aflat pe poziția 2 (numărăm de la 0).' },
+  ];
+  const answered = {};
+  const score = () => {
+    const done = Object.keys(answered).length, ok = Object.values(answered).filter(Boolean).length;
+    document.getElementById('quizScore').textContent = done ? `Răspunsuri corecte: ${ok} din ${Q.length}` : '';
+  };
+  Q.forEach((it, qi) => {
+    const box = document.createElement('div'); box.className = 'qz';
+    let html = `<p class="qz-q"><span class="qz-n">${qi + 1}.</span> ${esc(it.q)}</p>`;
+    if (it.code) html += `<pre class="qz-code">${esc(it.code)}</pre>`;
+    html += '<div class="qz-opts">' + it.o.map((t, oi) => `<label for="q${qi}o${oi}"><input type="radio" name="q${qi}" id="q${qi}o${oi}" value="${oi}"> <span>${esc(t)}</span></label>`).join('') + '</div>';
+    html += `<p class="qz-fb" aria-live="polite"></p>`;
+    box.innerHTML = html;
+    const fb = box.querySelector('.qz-fb');
+    box.querySelectorAll('input').forEach(inp => inp.addEventListener('change', () => {
+      const ok = Number(inp.value) === it.c;
+      answered[qi] = ok;
+      box.querySelectorAll('label').forEach((lb, li) => { lb.classList.toggle('right', li === it.c && ok); lb.classList.toggle('wrong', !ok && li === Number(inp.value)); });
+      fb.innerHTML = ok ? '<b class="ok">Corect.</b> ' + esc(it.e) : '<b class="bad">Nu chiar.</b> Mai încercați.';
+      score();
+    }));
+    host.appendChild(box);
+  });
+})();
+
+
+</script>
+</body>
+</html>
