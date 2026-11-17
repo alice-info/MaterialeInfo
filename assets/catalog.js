@@ -55,11 +55,11 @@ window.MATERIALE = [
     descriere: 'Votul Boyer-Moore: de ce funcționează, variante și probleme de discuție.'
   },
    {
-    id: 'algoritmi-tablouri',
-    titlu: 'Algoritmi Esentiali Tablouri',
-    clasa: 7,
-    capitol: 'Tablouri',
-    tip: 'Predare',
-    descriere: 'Tablouri.'
+    id: 'algoritmi-esentiali-pentru-tablouri',
+    titlu: 'Algoritmi esențiali pentru tablouri',
+    clasa: 10,
+    capitol: 'Tablouri 1D și 2D',
+    tip: 'Olimpiadă',
+    descriere: 'Sume parțiale 1D/2D, Șmenul lui Mars, fereastră glisantă, permutări, optimizarea memoriei și numere mari.'
   }
 ];
