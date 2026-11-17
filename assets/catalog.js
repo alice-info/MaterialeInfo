@@ -55,7 +55,7 @@ window.MATERIALE = [
     descriere: 'Votul Boyer-Moore: de ce funcționează, variante și probleme de discuție.'
   },
    {
-    id: 'tablouri',
+    id: 'algoritmi-tablouri',
     titlu: 'Algoritmi Esentiali Tablouri',
     clasa: 7,
     capitol: 'Tablouri',
