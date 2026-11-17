@@ -1,0 +1,1255 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Algoritmi esențiali pentru tablouri</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body data-root="../" data-id="algoritmi-esentiali-pentru-tablouri">
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow"></div>
+    <h1>Algoritmi <span class="pr">esențiali</span> pentru tablouri</h1>
+    <p class="lede">Prelucrări de tablouri 1D și 2D, sume parțiale, tehnici de optimizare a memoriei, numere mari și probleme de olimpiadă.</p>
+  </div>
+</header>
+
+<div class="wrap layout">
+  <nav class="toc" data-auto aria-label="Cuprins"></nav>
+  <main class="prose">
+
+    <!-- ==================== CAPITOLUL 1 ==================== -->
+    <section id="sume-1d" data-toc="1. Sume parțiale 1D &amp; Mars">
+      <h2>1. Sume parțiale 1D și Șmenul lui Mars</h2>
+      <p>În problemele de concurs apar frecvent două tipuri de operații pe un vector <code>a[1..n]</code>: <strong>interogări de sumă</strong> pe subsecvențe <code>[st, dr]</code> și <strong>actualizări pe interval</strong> (adăugarea unei valori <code>x</code> tuturor elementelor dintre <code>st</code> și <code>dr</code>). Rezolvarea naivă necesită <span class="cx slow">O(n)</span> per operație, ceea ce duce la <span class="cx slow">O(n · q)</span> pentru <code>q</code> operații.</p>
+
+      <h3>Sume parțiale în 1D (Prefix Sums)</h3>
+      <p>Definim vectorul <code>S[0..n]</code>, unde <code>S[0] = 0</code>, iar <code>S[i]</code> reține suma primelor <code>i</code> elemente: <code>S[i] = a[1] + a[2] + ... + a[i]</code>. Precalcularea durează <span class="cx">O(n)</span>, iar orice interogare se răspunde în <span class="cx">O(1)</span>:</p>
+
+      <div class="note r"><p class="big">S[i] = S[i − 1] + a[i] &nbsp;&nbsp;|&nbsp;&nbsp; Suma(st, dr) = S[dr] − S[st − 1]</p></div>
+      <div class="note"><p><strong>Atenție la depășirea de tip:</strong> chiar dacă elementele <code>a[i]</code> încap în <code>int</code> (de exemplu <code>|a[i]| ≤ 10⁹</code>), suma a <code>n = 10⁵</code> elemente poate ajunge la <code>10¹⁴</code>. Declarați întotdeauna vectorul <code>S[]</code> de tip <code>long long</code>.</p></div>
+
+      <div class="demo" id="demoSume1D">
+        <div class="stats" data-stats></div>
+        <div class="cells" data-cells></div>
+        <p class="status" data-status aria-live="polite"></p>
+        <div class="ctrl">
+          <button class="btn" type="button" data-prev>Înapoi</button>
+          <button class="btn pri" type="button" data-next>Pasul următor</button>
+          <button class="btn" type="button" data-play>Rulează</button>
+          <span class="step-ct" data-ct></span>
+        </div>
+      </div>
+
+      <h3>Tehnica diferențelor — Șmenul lui Mars (1D)</h3>
+      <p>Când avem <code>m</code> operații de forma <code>ADUNA(st, dr, x)</code> și trebuie să afișăm vectorul final după toate modificările, construim un vector auxiliar de diferențe <code>B[1..n + 1]</code> inițializat cu <code>0</code> (sau cu <code>B[i] = a[i] − a[i − 1]</code>). Fiecare operație modifică doar două poziții în <span class="cx">O(1)</span>:</p>
+
+      <div class="pseudo"><span class="k">pentru fiecare</span> operație ADUNA(<span class="lv">st</span>, <span class="rv">dr</span>, x):
+    B[<span class="lv">st</span>] = B[<span class="lv">st</span>] + x
+    B[<span class="rv">dr</span> + 1] = B[<span class="rv">dr</span> + 1] − x
+
+<span class="k">pentru</span> i = 1 <span class="k">până la</span> n:
+    B[i] = B[i − 1] + B[i]
+    a[i] = a[i] + B[i]</div>
+
+      <div class="note"><p>Metoda lui Mars este optimă (<span class="cx">O(m + n)</span>) atunci când toate actualizările au loc <strong>înainte</strong> de interogări. Dacă interogările alternează cu actualizările, sunt necesare structuri dinamice (Arbori Indexați Binar sau Arbori de Intervale).</p></div>
+
+      <div class="demo" id="demoMars1D">
+        <div class="stats" data-stats></div>
+        <div class="cells" data-cells></div>
+        <p class="status" data-status aria-live="polite"></p>
+        <div class="ctrl">
+          <button class="btn" type="button" data-prev>Înapoi</button>
+          <button class="btn pri" type="button" data-next>Pasul următor</button>
+          <button class="btn" type="button" data-play>Rulează</button>
+          <span class="step-ct" data-ct></span>
+        </div>
+      </div>
+
+      <div class="prob" id="p-xor-subsecvente">
+        <h3>Problema <a href="https://www.geeksforgeeks.org/xor-subarray-xors/" target="_blank" rel="noopener">XOR-ul tuturor subsecvențelor</a> <span class="src">Tehnica contribuției</span></h3>
+        <p>Se dă un vector <code>a</code> cu <code>n</code> numere naturale. Să se calculeze valoarea obținută prin aplicarea operației <code>XOR</code> (<code>^</code>) asupra sumelor XOR ale tuturor celor <code>n(n + 1) / 2</code> subsecvențe nevide ale vectorului.</p>
+        <h4>Date de intrare</h4>
+        <p>Pe prima linie se află <code>n</code>, iar pe a doua linie <code>n</code> numere naturale.</p>
+        <h4>Restricții și precizări</h4>
+        <p class="mono">1 ≤ n ≤ 2·10⁵, 0 ≤ a[i] ≤ 10⁹</p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io">
+          <thead><tr><th>Intrare</th><th>Ieșire</th><th>Explicație</th></tr></thead>
+          <tbody><tr><td class="m">5
+3 5 2 4 6</td><td class="m">7</td><td>(3)^(5)^(2)^(4)^(6)^(3^5)^...^(3^5^2^4^6) = 3 ^ 2 ^ 6 = 7</td></tr></tbody>
+        </table></div>
+
+        <div class="think">
+          <p class="q">Gândiți-vă: de câte ori apare elementul a[i] (indexat de la 0) în totalul celor n(n + 1)/2 subsecvențe și ce se întâmplă când numărul de apariții este par?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>O subsecvență <code>[st, dr]</code> îl conține pe <code>a[i]</code> dacă și numai dacă <code>0 ≤ st ≤ i</code> și <code>i ≤ dr ≤ n − 1</code>. Sunt <code>(i + 1)</code> alegeri pentru <code>st</code> și <code>(n − i)</code> alegeri pentru <code>dr</code>. Deoarece <code>x ^ x = 0</code>, contează doar elementele cu frecvență impară!</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>Numărul total de subsecvențe care îl conțin pe <code>a[i]</code> (în indexare de la <code>0</code>) este <code>freq(i) = (i + 1) · (n − i)</code>. Dacă <code>n</code> este par, unul dintre factorii <code>(i + 1)</code> și <code>(n − i)</code> este mereu par, deci rezultatul este automat <code>0</code>! Dacă <code>n</code> este impar, <code>freq(i)</code> este impar doar pentru indicii pari <code>i = 0, 2, 4, ...</code>. Complexitate: <span class="cx">O(n)</span> față de <span class="cx slow">O(n³)</span>.</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main()
+{
+    int n;
+    cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; i++)
+        cin >> a[i];
+
+    if (n % 2 == 0)
+    {
+        cout << 0 << '\n';
+        return 0;
+    }
+
+    int ans = 0;
+    for (int i = 0; i < n; i += 2)
+        ans ^= a[i];
+
+    cout << ans << '\n';
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ==================== CAPITOLUL 2 ==================== -->
+    <section id="sume-2d" data-toc="2. Sume parțiale 2D &amp; Mars 2D">
+      <h2>2. Sume parțiale 2D și Șmenul lui Mars în matrice</h2>
+      <p>Extinderea sumelor parțiale în două dimensiuni folosește <strong>principiul includerii și excluderii</strong>. Fie <code>S[i][j]</code> suma tuturor elementelor din submatricea cu colțul stânga-sus <code>(1, 1)</code> și colțul dreapta-jos <code>(i, j)</code> (cu linia <code>0</code> și coloana <code>0</code> bordate cu <code>0</code>).</p>
+
+      <div class="note r"><p class="big">S[i][j] = S[i − 1][j] + S[i][j − 1] − S[i − 1][j − 1] + a[i][j]</p></div>
+      <div class="note r"><p class="big">Suma(x1, y1, x2, y2) = S[x2][y2] − S[x1 − 1][y2] − S[x2][y1 − 1] + S[x1 − 1][y1 − 1]</p></div>
+
+      <p>Precalcularea durează <span class="cx">O(n · m)</span>, iar suma oricărui dreptunghi <code>(x1, y1) .. (x2, y2)</code> se obține în <span class="cx">O(1)</span> față de <span class="cx slow">O(n · m)</span>.</p>
+
+      <h3>Șmenul lui Mars în 2D</h3>
+      <p>Pentru a adăuga o valoare <code>v</code> tuturor elementelor din submatricea <code>(x1, y1) .. (x2, y2)</code> în <span class="cx">O(1)</span>, marcăm doar cele 4 colțuri într-o matrice auxiliară <code>B</code> (inițial plină cu <code>0</code>), apoi calculăm sumele parțiale 2D pe <code>B</code> la final:</p>
+
+      <div class="pseudo"><span class="k">pentru fiecare</span> operație ADUNA_2D(<span class="lv">x1</span>, <span class="lv">y1</span>, <span class="rv">x2</span>, <span class="rv">y2</span>, v):
+    B[<span class="lv">x1</span>][<span class="lv">y1</span>]         += v
+    B[<span class="lv">x1</span>][<span class="rv">y2</span> + 1]     −= v
+    B[<span class="rv">x2</span> + 1][<span class="lv">y1</span>]     −= v
+    B[<span class="rv">x2</span> + 1][<span class="rv">y2</span> + 1] += v
+
+<span class="k">pentru</span> i = 1 <span class="k">până la</span> n:
+    <span class="k">pentru</span> j = 1 <span class="k">până la</span> m:
+        B[i][j] += B[i − 1][j] + B[i][j − 1] − B[i − 1][j − 1]
+        a[i][j] += B[i][j]</div>
+
+      <div class="prob" id="p-suma-submatrici">
+        <h3>Problema <a href="https://www.geeksforgeeks.org/sum-of-all-submatrices-of-a-given-matrix/" target="_blank" rel="noopener">Suma tuturor submatricilor</a> <span class="src">Combinatorică 2D</span></h3>
+        <p>Se dă o matrice cu <code>n</code> linii și <code>m</code> coloane. Să se calculeze suma elementelor din toate submatricile dreptunghiulare posibile ale matricei date.</p>
+        <h4>Date de intrare</h4>
+        <p>Pe prima linie se află <code>n</code> și <code>m</code>, iar pe următoarele <code>n</code> linii câte <code>m</code> numere întregi.</p>
+        <h4>Restricții și precizări</h4>
+        <p class="mono">1 ≤ n, m ≤ 500, |a[i][j]| ≤ 100</p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io">
+          <thead><tr><th>Intrare</th><th>Ieșire</th><th>Explicație</th></tr></thead>
+          <tbody><tr><td class="m">2 2
+1 1
+1 1</td><td class="m">16</td><td>4 submatrici de 1 elem (sumă 4) + 4 de 2 elem (sumă 8) + 1 de 4 elem (sumă 4) = 16</td></tr></tbody>
+        </table></div>
+
+        <div class="think">
+          <p class="q">Gândiți-vă: un dreptunghi este unic determinat de colțul stânga-sus (x1, y1) și colțul dreapta-jos (x2, y2). În câte dreptunghiuri este inclusă celula (i, j)?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>În indexare de la <code>0</code>, colțul stânga-sus poate fi ales în <code>(i + 1) · (j + 1)</code> moduri, iar colțul dreapta-jos în <code>(n − i) · (m − j)</code> moduri.</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>În loc să generăm toate submatricile în <span class="cx slow">O(n³ · m³)</span>, adunăm contribuția fiecărei celule <code>a[i][j]</code> în <span class="cx">O(n · m)</span>: numărul de submatrici care conțin celula <code>(i, j)</code> (indexată de la <code>0</code>) este <code>(i + 1) · (j + 1) · (n − i) · (m − j)</code>.</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+using namespace std;
+
+int main()
+{
+    int n, m;
+    cin >> n >> m;
+    long long total = 0;
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < m; j++)
+        {
+            long long val;
+            cin >> val;
+            long long stangaSus = 1LL * (i + 1) * (j + 1);
+            long long dreaptaJos = 1LL * (n - i) * (m - j);
+            total += val * stangaSus * dreaptaJos;
+        }
+    }
+    cout << total << '\n';
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+
+      <div class="prob" id="p-submatrice-div-k">
+        <h3>Problema <a href="https://www.geeksforgeeks.org/largest-rectangular-sub-matrix-having-sum-divisible-by-k/" target="_blank" rel="noopener">Submatrice de arie maximă cu suma divizibilă cu K</a> <span class="src">Reducere 2D → 1D</span></h3>
+        <p>Se dă o matrice cu <code>n</code> linii și <code>m</code> coloane cu numere întregi (pozitive, negative sau nule) și un număr natural <code>K</code>. Să se determine aria maximă a unei submatrici a cărei sumă a elementelor este divizibilă cu <code>K</code>.</p>
+        <h4>Date de intrare</h4>
+        <p>Pe prima linie se află <code>n</code>, <code>m</code> și <code>K</code>, apoi matricea de <code>n × m</code> elemente.</p>
+        <h4>Restricții și precizări</h4>
+        <p class="mono">1 ≤ n, m ≤ 250, 1 ≤ K ≤ 10⁵</p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io">
+          <thead><tr><th>Intrare</th><th>Ieșire</th><th>Explicație</th></tr></thead>
+          <tbody><tr><td class="m">4 4 5
+1 2 -1 -4
+-8 -3 4 2
+3 8 10 1
+-4 -1 1 7</td><td class="m">12</td><td>Submatricea (0,0)..(2,3) are suma 15 (divizibilă cu 5) și aria 3 × 4 = 12.</td></tr></tbody>
+        </table></div>
+
+        <div class="think">
+          <p class="q">Gândiți-vă: dacă fixăm coloana din stânga c1 și coloana din dreapta c2, cum putem comprima liniile într-un singur vector 1D?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Menținem un vector <code>temp[0..n-1]</code> unde <code>temp[i]</code> este suma elementelor de pe linia <code>i</code> între coloanele <code>c1</code> și <code>c2</code>. Problema se reduce la găsirea celei mai lungi subsecvențe din <code>temp</code> cu suma divizibilă cu <code>K</code> (două sume parțiale cu același rest modulo <code>K</code>).</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>Fixăm perechea de coloane <code>(c1, c2)</code> în <span class="cx">O(m²)</span> și actualizăm incremental <code>temp[i] += a[i][c2]</code>. Pe vectorul <code>temp</code> calculăm sumele parțiale modulo <code>K</code>: <code>rest = ((sum % K) + K) % K</code> (pentru a gestiona sumele negative) și reținem prima poziție la care apare fiecare rest într-un <code>unordered_map</code>. Complexitate totală: <span class="cx">O(m² · n)</span> față de <span class="cx slow">O(n² · m²)</span>.</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <vector>
+#include <unordered_map>
+#include <algorithm>
+using namespace std;
+
+int ceaMaiLungaDivK(const vector<long long>& temp, int k)
+{
+    unordered_map<int, int> primaAparitie;
+    primaAparitie[0] = -1;
+    long long sum = 0;
+    int maxLen = 0;
+
+    for (int i = 0; i < (int)temp.size(); i++)
+    {
+        sum += temp[i];
+        int rest = (int)(((sum % k) + k) % k);
+        if (primaAparitie.count(rest))
+            maxLen = max(maxLen, i - primaAparitie[rest]);
+        else
+            primaAparitie[rest] = i;
+    }
+    return maxLen;
+}
+
+int main()
+{
+    int n, m, k;
+    cin >> n >> m >> k;
+    vector<vector<int>> a(n, vector<int>(m));
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
+            cin >> a[i][j];
+
+    int maxAria = 0;
+    for (int c1 = 0; c1 < m; c1++)
+    {
+        vector<long long> temp(n, 0);
+        for (int c2 = c1; c2 < m; c2++)
+        {
+            for (int i = 0; i < n; i++)
+                temp[i] += a[i][c2];
+
+            int inaltime = ceaMaiLungaDivK(temp, k);
+            maxAria = max(maxAria, inaltime * (c2 - c1 + 1));
+        }
+    }
+
+    cout << maxAria << '\n';
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ==================== CAPITOLUL 3 ==================== -->
+    <section id="tehnici-1d" data-toc="3. Fereastră glisantă, permutări &amp; biți">
+      <h2>3. Fereastră glisantă, permutări și operații pe biți</h2>
+
+      <h3>Maximum în fereastră glisantă (Deque monoton)</h3>
+      <p>Dându-se un șir de <code>n</code> numere și o lungime <code>k</code>, se cere maximul fiecăreia dintre cele <code>n − k + 1</code> ferestre consecutive de lungime <code>k</code>. Recalcularea naivă durează <span class="cx slow">O(n · k)</span>. Folosind o coadă dublă (<code>std::deque</code>) în care păstrăm <strong>indicii</strong> elementelor candidate în ordine strict descrescătoare a valorilor lor, obținem <span class="cx">O(n)</span> timp și <span class="cx">O(k)</span> memorie:</p>
+
+      <div class="pseudo"><span class="k">pentru</span> <span class="rv">i</span> = 0 <span class="k">până la</span> n − 1:
+    <span class="k">cât timp</span> !dq.empty() <span class="k">și</span> dq.front() ≤ <span class="rv">i</span> − k:
+        dq.pop_front()                 <span class="c">// eliminăm elementul ieșit din fereastră</span>
+    <span class="k">cât timp</span> !dq.empty() <span class="k">și</span> a[dq.back()] ≤ a[<span class="rv">i</span>]:
+        dq.pop_back()                  <span class="c">// noul element domină maximele mai mici din urmă</span>
+    dq.push_back(<span class="rv">i</span>)
+    <span class="k">dacă</span> <span class="rv">i</span> ≥ k − 1:
+        afișează a[dq.front()]         <span class="c">// capul cozii este maximul ferestrei curente</span></div>
+
+      <div class="demo" id="demoFereastra">
+        <div class="stats" data-stats></div>
+        <div class="cells" data-cells></div>
+        <p class="status" data-status aria-live="polite"></p>
+        <div class="ctrl">
+          <button class="btn" type="button" data-prev>Înapoi</button>
+          <button class="btn pri" type="button" data-next>Pasul următor</button>
+          <button class="btn" type="button" data-play>Rulează</button>
+          <span class="step-ct" data-ct></span>
+        </div>
+      </div>
+
+      <h3>Permutări și cicluri disjuncte</h3>
+      <p>Orice permutare <code>P</code> a mulțimii <code>{1, 2, ..., n}</code> se descompune unic în <strong>cicluri disjuncte</strong>. Dacă urmărim traseul <code>i → P[i] → P[P[i]] → ... → i</code>, ne întoarcem garantat la poziția de plecare. Această proprietate rezolvă două probleme clasice:</p>
+      <ul>
+        <li><strong>Verificarea unei permutări în <span class="cx">O(1)</span> memorie suplimentară:</strong> parcurgem fiecare ciclu și marcăm elementele vizitate cu <code>0</code> (sau cu semn schimbat). Dacă ajungem pe un element deja marcat care nu este începutul ciclului curent, șirul nu este permutare.</li>
+        <li><strong>Ordinul unei permutări:</strong> numărul minim de aplicări <code>k ≥ 1</code> astfel încât <code>Pᵏ = permutarea identică</code> este egal cu <code>cmmmc(L₁, L₂, ..., Lₘ)</code>, unde <code>Lᵢ</code> sunt lungimile ciclurilor elementare.</li>
+      </ul>
+
+      <div class="demo" id="demoCicluri">
+        <div class="stats" data-stats></div>
+        <div class="cells" data-cells></div>
+        <p class="status" data-status aria-live="polite"></p>
+        <div class="ctrl">
+          <button class="btn" type="button" data-prev>Înapoi</button>
+          <button class="btn pri" type="button" data-next>Pasul următor</button>
+          <button class="btn" type="button" data-play>Rulează</button>
+          <span class="step-ct" data-ct></span>
+        </div>
+      </div>
+
+      <h3>Optimizări pe biți: <code>n &amp; (n − 1)</code> și <code>std::bitset</code></h3>
+      <p>Operația <code>n = n &amp; (n − 1)</code> stinge cel mai puțin semnificativ bit egal cu <code>1</code> din reprezentarea binară a lui <code>n</code>, permițând numărarea biților de <code>1</code> în <code>O(număr_biți_1)</code>. Pentru mulțimi mari de boleani, <code>std::bitset&lt;MAX&gt;</code> execută operații pe 64 de biți simultan în <span class="cx">O(MAX / 64)</span> — de exemplu, toate sumele posibile ale submulțimilor unui vector se obțin prin <code>bit |= (bit &lt;&lt; a[i])</code>.</p>
+
+      <div class="prob" id="p-kth-missing">
+        <h3>Problema <a href="https://www.geeksforgeeks.org/k-th-missing-element-in-an-unsorted-array/" target="_blank" rel="noopener">Al K-lea element lipsă într-un vector nesortat</a> <span class="src">unordered_set</span></h3>
+        <p>Se dă un vector nesortat <code>a</code> cu <code>n</code> elemente distincte și un număr natural <code>K</code>. Considerând elementele ordonate crescător între minimul și maximul vectorului, să se afișeze al <code>K</code>-lea număr întreg care lipsește din șir, sau <code>-1</code> dacă nu există.</p>
+        <h4>Date de intrare</h4>
+        <p>Pe prima linie se află <code>n</code> și <code>K</code>, iar pe a doua linie cele <code>n</code> elemente ale vectorului.</p>
+        <h4>Restricții și precizări</h4>
+        <p class="mono">1 ≤ n ≤ 10⁵, 1 ≤ K ≤ 10⁵, 1 ≤ a[i] ≤ 10⁶</p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io">
+          <thead><tr><th>Intrare</th><th>Ieșire</th><th>Explicație</th></tr></thead>
+          <tbody><tr><td class="m">4 5
+2 4 10 7</td><td class="m">9</td><td>Numerele lipsă între 2 și 10 sunt: 3, 5, 6, 8, 9. Al 5-lea este 9.</td></tr></tbody>
+        </table></div>
+
+        <div class="think">
+          <p class="q">Gândiți-vă: cum putem evita sortarea în O(n log n) folosind un tabel de dispersie (unordered_set)?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Inserăm toate elementele în <code>unordered_set&lt;int&gt;</code>, aflăm <code>minm</code> și <code>maxm</code>, apoi parcurgem valorile <code>x</code> de la <code>minm</code> la <code>maxm</code> și incrementăm un contor ori de câte ori <code>x</code> nu se află în mulțime.</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>Inserarea celor <code>n</code> elemente și interogările în <code>unordered_set</code> au complexitate medie <span class="cx">O(1)</span>, obținând un timp total <span class="cx">O(n + maxm − minm)</span>.</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <vector>
+#include <unordered_set>
+#include <algorithm>
+using namespace std;
+
+int main()
+{
+    int n, k;
+    cin >> n >> k;
+    vector<int> a(n);
+    unordered_set<int> prezente;
+
+    for (int i = 0; i < n; i++)
+    {
+        cin >> a[i];
+        prezente.insert(a[i]);
+    }
+
+    int minm = *min_element(a.begin(), a.end());
+    int maxm = *max_element(a.begin(), a.end());
+
+    int lipsa = 0;
+    for (int val = minm; val <= maxm; val++)
+    {
+        if (prezente.find(val) == prezente.end())
+        {
+            lipsa++;
+            if (lipsa == k)
+            {
+                cout << val << '\n';
+                return 0;
+            }
+        }
+    }
+
+    cout << -1 << '\n';
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ==================== CAPITOLUL 4 ==================== -->
+    <section id="matrici-2d" data-toc="4. Parcurgeri &amp; transformări 2D">
+      <h2>4. Parcurgeri speciale, rotații in-place și bordare 2D</h2>
+
+      <h3>Invarianții diagonalelor într-o matrice</h3>
+      <p>Într-o matrice pătratică de dimensiune <code>n × n</code> (indexată de la <code>0</code>):</p>
+      <ul>
+        <li><strong>Diagonale paralele cu diagonala principală:</strong> diferența <code>j − i</code> este constantă (de la <code>-(n − 1)</code> în colțul stânga-jos până la <code>+(n − 1)</code> în colțul dreapta-sus). Adunând <code>n − 1</code> obținem un indice pozitiv <code>d = n − 1 + j − i ∈ [0, 2n − 2]</code>.</li>
+        <li><strong>Diagonale paralele cu diagonala secundară:</strong> suma <code>i + j</code> este constantă (de la <code>0</code> în colțul stânga-sus până la <code>2n − 2</code> în colțul dreapta-jos).</li>
+      </ul>
+
+      <h3>Rotația cu 90° fără memorie suplimentară — <span class="cx">O(1)</span> spațiu</h3>
+      <p>Pentru a roti o matrice pătratică <code>a[n][n]</code> cu 90° fără un tablou auxiliar, combinăm <strong>transpunerea</strong> (<code>swap(a[i][j], a[j][i])</code> pentru <code>i &lt; j</code>) cu inversarea liniilor sau a coloanelor:</p>
+      <ul>
+        <li><strong>90° în sens orar (dreapta):</strong> transpunem matricea, apoi inversăm fiecare linie (<code>reverse(a[i], a[i] + n)</code>).</li>
+        <li><strong>90° în sens antiorar (stânga):</strong> transpunem matricea, apoi inversăm fiecare coloană (<code>swap(a[j][i], a[n - 1 - j][i])</code>).</li>
+      </ul>
+
+      <h3>Tehnica bordării și vectorii de direcție</h3>
+      <p>Când explorăm vecinii unei celule <code>(i, j)</code> într-o matrice <code>1..n × 1..m</code>, în loc să scriem patru condiții de margine (<code>i &gt;= 1 &amp;&amp; i &lt;= n ...</code>), <strong>bordăm</strong> conturul matricei (liniile <code>0</code> și <code>n + 1</code>, coloanele <code>0</code> și <code>m + 1</code>) cu o valoare santinelă (de ex. <code>-1</code>) și folosim vectorii de deplasare:</p>
+
+      <div class="pseudo"><span class="c">// 4 direcții ortogonale: Nord, Est, Sud, Vest</span>
+dl[4] = {-1, 0, 1,  0}
+dc[4] = { 0, 1, 0, -1}
+
+<span class="c">// 8 direcții (inclusiv diagonalele)</span>
+dl8[8] = {-1, -1, -1,  0, 0,  1, 1, 1}
+dc8[8] = {-1,  0,  1, -1, 1, -1, 0, 1}</div>
+
+      <div class="prob" id="p-nearest-one">
+        <h3>Problema <a href="https://www.geeksforgeeks.org/distance-nearest-cell-1-binary-matrix/" target="_blank" rel="noopener">Distanța până la cel mai apropiat 1</a> <span class="src">Lee multi-sursă</span></h3>
+        <p>Se dă o matrice binară cu <code>n</code> linii și <code>m</code> coloane care conține cel puțin o valoare <code>1</code>. Pentru fiecare celulă <code>(i, j)</code>, să se calculeze distanța Manhattan minimă <code>|i − i₁| + |j − j₁|</code> până la o celulă <code>(i₁, j₁)</code> cu valoarea <code>1</code>.</p>
+        <h4>Date de intrare</h4>
+        <p>Pe prima linie se află <code>n</code> și <code>m</code>, apoi matricea binară <code>n × m</code>.</p>
+        <h4>Restricții și precizări</h4>
+        <p class="mono">1 ≤ n, m ≤ 1000</p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io">
+          <thead><tr><th>Intrare</th><th>Ieșire</th><th>Explicație</th></tr></thead>
+          <tbody><tr><td class="m">3 4
+0 0 0 1
+0 0 1 1
+0 1 1 0</td><td class="m">3 2 1 0
+2 1 0 0
+1 0 0 1</td><td>Celula (0,0) se află la distanța |0−0| + |0−3| = 3 de cel mai apropiat 1.</td></tr></tbody>
+        </table></div>
+
+        <div class="think">
+          <p class="q">Gândiți-vă: în loc să pornim câte un Lee din fiecare celulă 0, ce se întâmplă dacă introducem toate celulele 1 simultan în coadă la pasul 0?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Algoritmul lui Lee (BFS) pornit simultan din toate sursele <code>1</code> (cu <code>dist[i][j] = 0</code>) vizitează fiecare celulă exact o singură dată, pe drumul cel mai scurt față de cea mai apropiată sursă.</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>Inițializăm <code>dist[i][j] = -1</code> pentru celulele <code>0</code> și <code>dist[i][j] = 0</code> pentru celulele <code>1</code>, pe care le inserăm în coadă. Extragem pe rând din coadă și relaxăm cei 4 vecini nevizitați. Complexitate: <span class="cx">O(n · m)</span> față de <span class="cx slow">O(n² · m²)</span>.</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <vector>
+#include <queue>
+using namespace std;
+
+int main()
+{
+    int n, m;
+    cin >> n >> m;
+    vector<vector<int>> dist(n, vector<int>(m, -1));
+    queue<pair<int, int>> q;
+
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < m; j++)
+        {
+            int x;
+            cin >> x;
+            if (x == 1)
+            {
+                dist[i][j] = 0;
+                q.push({i, j});
+            }
+        }
+    }
+
+    int dl[4] = {-1, 0, 1, 0};
+    int dc[4] = {0, 1, 0, -1};
+
+    while (!q.empty())
+    {
+        auto [i, j] = q.front();
+        q.pop();
+
+        for (int d = 0; d < 4; d++)
+        {
+            int ni = i + dl[d], nj = j + dc[d];
+            if (ni >= 0 && ni < n && nj >= 0 && nj < m && dist[ni][nj] == -1)
+            {
+                dist[ni][nj] = dist[i][j] + 1;
+                q.push({ni, nj});
+            }
+        }
+    }
+
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < m; j++)
+            cout << dist[i][j] << ' ';
+        cout << '\n';
+    }
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+
+      <div class="prob" id="p-subsquare-x">
+        <h3>Problema <a href="https://www.geeksforgeeks.org/given-matrix-o-x-find-largest-subsquare-surrounded-x/" target="_blank" rel="noopener">Cel mai mare pătrat înconjurat de 'X'</a> <span class="src">Precalculare 2D</span></h3>
+        <p>Se dă o matrice pătratică de dimensiune <code>n × n</code> cu caractere <code>'X'</code> și <code>'O'</code>. Să se determine latura maximă a unei submatrici pătratice al cărei contur (toate cele 4 laturi) este format exclusiv din caractere <code>'X'</code>.</p>
+        <h4>Date de intrare</h4>
+        <p>Pe prima linie se află <code>n</code>, apoi <code>n</code> linii cu câte <code>n</code> caractere (<code>'X'</code> sau <code>'O'</code>).</p>
+        <h4>Restricții și precizări</h4>
+        <p class="mono">1 ≤ n ≤ 500</p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io">
+          <thead><tr><th>Intrare</th><th>Ieșire</th><th>Explicație</th></tr></thead>
+          <tbody><tr><td class="m">5
+XOXXX
+XXXXX
+XXOXO
+XXXXX
+XXXOO</td><td class="m">3</td><td>Submatricea 3 × 3 cu colțul stânga-sus la (1, 1) are tot conturul format din 'X'.</td></tr></tbody>
+        </table></div>
+
+        <div class="think">
+          <p class="q">Gândiți-vă: dacă știm câți 'X' consecutivi există la stânga și în sus față de fiecare celulă (i, j), cum verificăm un pătrat de latură L în O(1)?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Precalculăm <code>hor[i][j]</code> (numărul de <code>'X'</code> consecutivi pe linia <code>i</code> până la <code>j</code>) și <code>ver[i][j]</code> (numărul de <code>'X'</code> consecutivi pe coloana <code>j</code> până la <code>i</code>). Un pătrat cu colțul dreapta-jos în <code>(i, j)</code> și latură <code>L</code> există dacă latura de sus <code>hor[i - L + 1][j] ≥ L</code> și latura din stânga <code>ver[i][j - L + 1] ≥ L</code>.</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>Precalculăm <code>hor[][]</code> și <code>ver[][]</code> în <span class="cx">O(n²)</span>. Parcurgem apoi matricea de la dreapta-jos spre stânga-sus: pentru celula <code>(i, j)</code>, latura maximă candidată este <code>L = min(hor[i][j], ver[i][j])</code>, pe care o decrementăm cât timp <code>L &gt; ans</code> până găsim prima valoare care satisface ambele condiții de margine. Complexitate totală: <span class="cx">O(n³)</span> în cel mai defavorabil caz, față de <span class="cx slow">O(n⁴)</span>.</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int main()
+{
+    int n;
+    cin >> n;
+    vector<string> mat(n);
+    for (int i = 0; i < n; i++)
+        cin >> mat[i];
+
+    vector<vector<int>> hor(n, vector<int>(n, 0));
+    vector<vector<int>> ver(n, vector<int>(n, 0));
+
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            if (mat[i][j] == 'X')
+            {
+                hor[i][j] = (j == 0) ? 1 : hor[i][j - 1] + 1;
+                ver[i][j] = (i == 0) ? 1 : ver[i - 1][j] + 1;
+            }
+        }
+    }
+
+    int ans = 0;
+    for (int i = n - 1; i >= 0; i--)
+    {
+        for (int j = n - 1; j >= 0; j--)
+        {
+            int lat = min(hor[i][j], ver[i][j]);
+            while (lat > ans)
+            {
+                if (ver[i][j - lat + 1] >= lat && hor[i - lat + 1][j] >= lat)
+                    ans = lat;
+                lat--;
+            }
+        }
+    }
+
+    cout << ans << '\n';
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ==================== CAPITOLUL 5 ==================== -->
+    <section id="fara-matrici" data-toc="5. Optimizarea memoriei">
+      <h2>5. Optimizarea memoriei: Matrici fără matrici</h2>
+      <p>La olimpiadă, multe probleme descriu o matrice de dimensiune <code>N × N</code>, dar impun o limită de memorie foarte strânsă (de exemplu <code>3 MB</code> pentru <code>N = 1000</code>, unde <code>int a[1000][1000]</code> ar ocupa <code>4 MB</code>) sau un <code>N = 10⁹</code> care nu încape deloc în memorie. În aceste cazuri folosim două strategii:</p>
+      <ul>
+        <li><strong>Procesarea „on-the-fly”:</strong> generăm elementele matricei în ordinea parcurgerii și distribuim fiecare valoare direct în vectorul de răspunsuri, fără a stoca tabloul 2D (<span class="cx">O(n)</span> memorie).</li>
+        <li><strong>Deducerea matematică directă:</strong> calculăm valoarea elementului de la poziția <code>(L, C)</code> printr-o formulă algebrică în <span class="cx">O(1)</span> timp și <span class="cx">O(1)</span> memorie.</li>
+      </ul>
+
+      <div class="prob" id="p-suml-sumd">
+        <h3>Problema <a href="https://www.varena.ro/problema/suml" target="_blank" rel="noopener">sumL &amp; sumD (Sume pe L-uri și diagonale)</a> <span class="src">Varena</span></h3>
+        <p>Elementele unei matrice <code>N × N</code> (indexată de la <code>0</code>) se generează recurent pe linii (de la <code>0</code> la <code>N − 1</code>) după regula <code>p = (p · p + 1) % 1000000</code>. Se cere suma elementelor de pe fiecare dintre cele <code>N</code> forme „L” (problema <code>sumL</code>) sau de pe fiecare dintre cele <code>2N − 1</code> diagonale paralele cu diagonala principală (problema <code>sumD</code>), având la dispoziție doar <strong>3 MB de memorie</strong>.</p>
+        <h4>Date de intrare</h4>
+        <p>Pe prima linie se află <code>N</code> și valoarea inițială <code>p</code>.</p>
+        <h4>Restricții și precizări</h4>
+        <p class="mono">1 ≤ N ≤ 1000, Limita de memorie: 3 MB</p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io">
+          <thead><tr><th>Intrare</th><th>Ieșire</th><th>Explicație</th></tr></thead>
+          <tbody><tr><td class="m">3 1</td><td class="m">31 15 10</td><td>Pentru sumD, cele 2N − 1 = 5 diagonale sunt acumulate direct în suma[N − 1 + c − l].</td></tr></tbody>
+        </table></div>
+
+        <div class="think">
+          <p class="q">Gândiți-vă: când generăm elementul de pe linia l și coloana c, din a câta diagonală sau din al câtelea „L” face parte el?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Pentru <code>sumD</code>, fiecare diagonală paralelă cu diagonala principală are invariantul <code>c − l</code> constant. Adunând <code>N − 1</code>, elementul <code>(l, c)</code> se adună direct la <code>suma[N − 1 + c − l]</code>.</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>Nu declarăm matricea <code>a[1000][1000]</code>! Generăm elementul curent <code>p</code> în două bucle <code>for</code> și îl adunăm imediat în vectorul <code>suma[2 * N - 1]</code> (care ocupă sub <code>8 KB</code>). Atenție la conversia <code>(long long)p * p</code> pentru a evita depășirea de tip.</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main()
+{
+    int n;
+    long long p;
+    cin >> n >> p;
+    const int MOD = 1000000;
+
+    vector<long long> suma(2 * n - 1, 0);
+    for (int l = 0; l < n; l++)
+    {
+        for (int c = 0; c < n; c++)
+        {
+            suma[n - 1 + c - l] += p;
+            p = (p * p + 1) % MOD;
+        }
+    }
+
+    for (int i = 0; i < 2 * n - 1; i++)
+        cout << suma[i] << (i + 1 < 2 * n - 1 ? ' ' : '\n');
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+
+      <div class="prob" id="p-matsp">
+        <h3>Problema <a href="https://www.varena.ro/problema/matsp" target="_blank" rel="noopener">Matrice spirală din centru (matsp)</a> <span class="src">Varena</span></h3>
+        <p>Într-o matrice pătratică de dimensiune impară <code>N × N</code>, numerele naturale de la <code>1</code> la <code>N²</code> sunt așezate în spirală pornind din centru cu <code>1</code>, continuând în dreapta cu <code>2</code>, în sus cu <code>3</code>, în stânga cu <code>4, 5</code> și așa mai departe. Pentru cerința <code>t = 2</code>, dându-se <code>N</code>, linia <code>L</code> și coloana <code>C</code> (indexate de la <code>1</code>), să se afișeze numărul de la poziția <code>(L, C)</code>.</p>
+        <h4>Date de intrare</h4>
+        <p>Pe prima linie se află <code>N</code>, <code>L</code> și <code>C</code>.</p>
+        <h4>Restricții și precizări</h4>
+        <p class="mono">1 ≤ N ≤ 10⁹ (N impar), 1 ≤ L, C ≤ N</p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io">
+          <thead><tr><th>Intrare</th><th>Ieșire</th><th>Explicație</th></tr></thead>
+          <tbody><tr><td class="m">7 7 5</td><td class="m">47</td><td>Pe inelul P = 3 (ultimul element 7² = 49 în colțul dreapta-jos), poziția (7, 5) este 49 − 2 = 47.</td></tr></tbody>
+        </table></div>
+
+        <div class="think">
+          <p class="q">Gândiți-vă: dacă mutăm originea coordonatelor în centrul matricei (N + 1) / 2, cum aflăm numărul inelului pătratic P pe care se află celula (l, c)?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Scădem coordonatele centrului: <code>l = L − (N + 1) / 2</code>, <code>c = C − (N + 1) / 2</code>. Celula se află pe pătratul concentric <code>P = max(|l|, |c|)</code>, al cărui ultim număr este <code>(2P + 1)²</code> în colțul dreapta-jos <code>(P, P)</code>.</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>În coordonate relative la centru, pătratul <code>P = max(|l|, |c|)</code> are latura <code>2P + 1</code> și se încheie cu valoarea <code>U = (2P + 1)²</code> în colțul dreapta-jos <code>(P, P)</code>. Scădem distanța parcursă în sens invers acelor de ceasornic pe cele 4 laturi ale pătratului <code>P</code> în <span class="cx">O(1)</span> timp și <span class="cx">O(1)</span> memorie.</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <cmath>
+#include <algorithm>
+using namespace std;
+
+int main()
+{
+    long long n, L, C;
+    cin >> n >> L >> C;
+
+    long long l = L - (n + 1) / 2;
+    long long c = C - (n + 1) / 2;
+    long long P = max(llabs(l), llabs(c));
+    long long lat = 2 * P;
+    long long dif = 0;
+
+    if (l == P)
+        dif = P - c;                  // latura de jos
+    else if (c == -P)
+        dif = lat + (P - l);          // latura din stânga
+    else if (l == -P)
+        dif = 2 * lat + (P + c);      // latura de sus
+    else
+        dif = 3 * lat + (P + l);      // latura din dreapta
+
+    long long ans = (lat + 1) * (lat + 1) - dif;
+    cout << ans << '\n';
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+
+      <div class="prob" id="p-matrice-rara">
+        <h3>Problema <a href="https://www.pbinfo.ro/probleme/1323/matrice-rara" target="_blank" rel="noopener">Matrice Rară</a> <span class="src">pbinfo #1323</span></h3>
+        <p>Se dau două matrice rare <code>A</code> și <code>B</code> de dimensiune <code>N × M</code> (<code>N, M ≤ 10⁵</code>), fiecare dată prin lista tripletelor nenule <code>(linie, coloană, valoare)</code> ordonate lexicografic. Să se determine matricea sumă <code>C = A + B</code> în aceeași reprezentare compactă.</p>
+        <h4>Date de intrare</h4>
+        <p>Pe prima linie se află <code>N</code>, <code>M</code>, <code>T_A</code> și <code>T_B</code>, apoi cele <code>T_A</code> triplete ale lui <code>A</code> și cele <code>T_B</code> triplete ale lui <code>B</code>.</p>
+        <h4>Restricții și precizări</h4>
+        <p class="mono">1 ≤ N, M ≤ 10⁵, 1 ≤ T_A, T_B ≤ 3·10⁵</p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io">
+          <thead><tr><th>Intrare</th><th>Ieșire</th><th>Explicație</th></tr></thead>
+          <tbody><tr><td class="m">5 6 3 3
+1 1 2
+3 4 3
+4 6 1
+1 2 3
+3 4 -2
+4 6 2</td><td class="m">4
+1 1 2
+1 2 3
+3 4 1
+4 6 3</td><td>Tripletele sunt interclasate în O(T_A + T_B); la (3, 4) s-a calculat 3 + (−2) = 1.</td></tr></tbody>
+        </table></div>
+
+        <div class="think">
+          <p class="q">Gândiți-vă: deoarece ambele liste de triplete sunt deja sortate lexicografic după (linie, coloană), ce algoritm clasic de pe vectori le combină într-o singură trecere?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Folosim <strong>interclasarea</strong> cu doi indici <code>i</code> și <code>j</code>. Dacă pozițiile <code>(linie, coloană)</code> coincid, adunăm valorile și inserăm tripletul în <code>C</code> doar dacă suma este nenulă!</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>Reprezentăm fiecare triplet printr-o structură <code>{int l, c, val;}</code> și interclasăm cei doi vectori de structuri în <span class="cx">O(T_A + T_B)</span> timp și spațiu, evitând complet alocarea unei matrici 2D.</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <vector>
+using namespace std;
+
+struct Triplet {
+    int l, c, val;
+};
+
+bool maiMic(const Triplet& a, const Triplet& b)
+{
+    return a.l < b.l || (a.l == b.l && a.c < b.c);
+}
+
+int main()
+{
+    int n, m, ta, tb;
+    cin >> n >> m >> ta >> tb;
+    vector<Triplet> a(ta), b(tb), c;
+    for (int i = 0; i < ta; i++) cin >> a[i].l >> a[i].c >> a[i].val;
+    for (int i = 0; i < tb; i++) cin >> b[i].l >> b[i].c >> b[i].val;
+
+    int i = 0, j = 0;
+    while (i < ta && j < tb)
+    {
+        if (maiMic(a[i], b[j]))
+            c.push_back(a[i++]);
+        else if (maiMic(b[j], a[i]))
+            c.push_back(b[j++]);
+        else
+        {
+            int s = a[i].val + b[j].val;
+            if (s != 0)
+                c.push_back({a[i].l, a[i].c, s});
+            i++;
+            j++;
+        }
+    }
+    while (i < ta) c.push_back(a[i++]);
+    while (j < tb) c.push_back(b[j++]);
+
+    cout << c.size() << '\n';
+    for (const auto& t : c)
+        cout << t.l << ' ' << t.c << ' ' << t.val << '\n';
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ==================== CAPITOLUL 6 ==================== -->
+    <section id="numere-mari" data-toc="6. Numere mari">
+      <h2>6. Aritmetica numerelor mari (BigInt)</h2>
+      <p>Tipurile predefinite <code>long long</code> și <code>unsigned long long</code> pot stoca numere de cel mult 19–20 de cifre (până la <code>2⁶⁴ − 1</code>). Când o problemă cere calcule exacte cu sute sau mii de cifre, reprezentăm un număr mare printr-un vector <code>NrMare</code> în care:</p>
+      <ul>
+        <li><code>A[0]</code> memorează <strong>numărul de cifre</strong> ale numărului;</li>
+        <li><code>A[1], A[2], ..., A[A[0]]</code> memorează cifrele în <strong>ordine inversă</strong> (<code>A[1]</code> este cifra unităților, <code>A[2]</code> cifra zecilor etc.), astfel încât transportul la adunare și înmulțire să se propage natural spre dreapta.</li>
+      </ul>
+
+      <div class="note"><p>După orice operație de scădere, înmulțire sau împărțire, eliminați eventualele zerouri nesemnificative de la sfârșitul vectorului: <code>while (A[0] &gt; 1 &amp;&amp; A[A[0]] == 0) A[0]--;</code>.</p></div>
+
+      <div class="prob" id="p-factorial">
+        <h3>Problema <a href="https://www.pbinfo.ro/probleme/534/factorial" target="_blank" rel="noopener">Factorial (N!)</a> <span class="src">pbinfo #534</span></h3>
+        <p>Se citește un număr natural <code>n</code> (<code>0 ≤ n ≤ 1000</code>). Să se calculeze și să se afișeze valoarea exactă a lui <code>n! = 1 · 2 · ... · n</code> (prin definiție, <code>0! = 1</code>).</p>
+        <h4>Date de intrare</h4>
+        <p>Pe prima linie se află numărul natural <code>n</code>.</p>
+        <h4>Restricții și precizări</h4>
+        <p class="mono">0 ≤ n ≤ 1000 (1000! are 2568 de cifre)</p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io">
+          <thead><tr><th>Intrare</th><th>Ieșire</th><th>Explicație</th></tr></thead>
+          <tbody><tr><td class="m">25</td><td class="m">15511210043330985984000000</td><td>25! are 26 de cifre și depășește unsigned long long.</td></tr></tbody>
+        </table></div>
+
+        <div class="think">
+          <p class="q">Gândiți-vă: cum înmulțim un număr mare memorat invers în vectorul X cu un număr mic k (1 ≤ k ≤ 1000) într-o singură parcurgere?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Menținem o variabilă de transport <code>T = 0</code>. La fiecare pas <code>i</code> de la <code>1</code> la <code>X[0]</code>, calculăm <code>T = T + X[i] * k</code>, reținem <code>X[i] = T % 10</code> și actualizăm <code>T /= 10</code>. La final, cât timp <code>T &gt; 0</code>, adăugăm cifrele rămase pe pozițiile <code>++X[0]</code>.</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>Inițializăm <code>X[0] = 1, X[1] = 1</code> (valoarea <code>1</code>) și înmulțim succesiv cu <code>k = 2, 3, ..., n</code> folosind funcția <code>produsMic</code>. Complexitate: <span class="cx">O(n² log n)</span>.</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+using namespace std;
+
+const int MAX_CIFRE = 3005;
+typedef int NrMare[MAX_CIFRE];
+
+void produsMic(NrMare A, int x)
+{
+    int T = 0;
+    for (int i = 1; i <= A[0]; i++)
+    {
+        T += A[i] * x;
+        A[i] = T % 10;
+        T /= 10;
+    }
+    while (T > 0)
+    {
+        A[++A[0]] = T % 10;
+        T /= 10;
+    }
+}
+
+void afisare(const NrMare A)
+{
+    for (int i = A[0]; i >= 1; i--)
+        cout << A[i];
+    cout << '\n';
+}
+
+int main()
+{
+    int n;
+    cin >> n;
+    NrMare X = {0};
+    X[0] = 1;
+    X[1] = 1;
+
+    for (int k = 2; k <= n; k++)
+        produsMic(X, k);
+
+    afisare(X);
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ==================== CAPITOLUL 7 ==================== -->
+    <section id="concurs" data-toc="7. Probleme de concurs">
+      <h2>7. Probleme de concurs și antrenament</h2>
+
+      <div class="prob" id="p-joc1">
+        <h3>Problema <a href="https://www.pbinfo.ro/" target="_blank" rel="noopener">Joc1 (Potrivire de șabloane 3 × 3)</a> <span class="src">ONI 2011 · Clasa a VII-a</span></h3>
+        <p>Se dă o matrice binară cu <code>n</code> linii și <code>m</code> coloane. Se consideră 12 forme fixe de dimensiune <code>3 × 3</code> (litere L, T și colțuri formate din <code>1</code> și <code>0</code>). O formă se potrivește peste o submatrice <code>3 × 3</code> a tablei dacă oriunde forma are <code>1</code>, și tabla are <code>1</code> (unde forma are <code>0</code>, tabla poate avea orice). Să se numere câte potriviri totale există.</p>
+        <h4>Date de intrare</h4>
+        <p>Pe prima linie se află <code>n</code> și <code>m</code>, apoi matricea binară <code>n × m</code>.</p>
+        <h4>Restricții și precizări</h4>
+        <p class="mono">3 ≤ n, m ≤ 100</p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io">
+          <thead><tr><th>Intrare</th><th>Ieșire</th><th>Explicație</th></tr></thead>
+          <tbody><tr><td class="m">3 3
+1 1 1
+1 1 1
+1 1 1</td><td class="m">12</td><td>O submatrice 3 × 3 plină cu 1 se potrivește cu toate cele 12 șabloane.</td></tr></tbody>
+        </table></div>
+
+        <div class="think">
+          <p class="q">Gândiți-vă: cum putem evita scrierea a 12 funcții separate de verificare a șabloanelor?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Memorăm cele 12 șabloane într-un tablou tridimensional preinițializat <code>char forme[12][3][3]</code>. Condiția de potrivire pentru o celulă <code>(l, c)</code> din șablon este <code>forme[k][l][c] == 0 || a[lin + l][col + c] == 1</code>.</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>Folosim tabloul 3D <code>forme[12][3][3]</code> și testăm fiecare poziție de start <code>(lin, col)</code> din <code>[0..n-3] × [0..m-3]</code> împotriva celor 12 șabloane. Complexitate: <span class="cx">O(12 · 9 · n · m) = O(n · m)</span>.</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+using namespace std;
+
+int a[105][105];
+int forme[12][3][3] = {
+    {{1,0,0},{1,0,0},{1,1,1}}, {{1,1,1},{1,0,0},{1,0,0}},
+    {{1,1,1},{0,0,1},{0,0,1}}, {{0,0,1},{0,0,1},{1,1,1}},
+    {{1,0,0},{1,1,1},{1,0,0}}, {{1,1,1},{0,1,0},{0,1,0}},
+    {{0,0,1},{1,1,1},{0,0,1}}, {{0,1,0},{0,1,0},{1,1,1}},
+    {{0,1,1},{1,1,0},{0,1,0}}, {{0,1,0},{1,1,1},{0,0,1}},
+    {{0,1,0},{0,1,1},{1,1,0}}, {{1,0,0},{1,1,1},{0,1,0}}
+};
+
+int main()
+{
+    int n, m;
+    cin >> n >> m;
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
+            cin >> a[i][j];
+
+    int nrap = 0;
+    for (int lin = 0; lin <= n - 3; lin++)
+    {
+        for (int col = 0; col <= m - 3; col++)
+        {
+            for (int k = 0; k < 12; k++)
+            {
+                bool ok = true;
+                for (int l = 0; l < 3 && ok; l++)
+                    for (int c = 0; c < 3 && ok; c++)
+                        if (forme[k][l][c] == 1 && a[lin + l][col + c] == 0)
+                            ok = false;
+                if (ok)
+                    nrap++;
+            }
+        }
+    }
+
+    cout << nrap << '\n';
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+
+      <div class="prob" id="p-matzeb">
+        <h3>Problema <a href="https://www.varena.ro/problema/matzeb" target="_blank" rel="noopener">Matrice zebră (matzeb)</a> <span class="src">Varena</span></h3>
+        <p>O matrice pătratică de dimensiune <code>N × N</code> se completează cu numerele de la <code>1</code> la <code>N²</code> pe cadre în formă de „L” întors, alternând sensul de parcurgere la fiecare strat <code>k = 0, 1, ..., N − 1</code>. Dându-se <code>N</code> și coordonatele <code>(L, C)</code> (indexate de la <code>1</code>), să se afle valoarea elementului de pe linia <code>L</code> și coloana <code>C</code> fără a construi matricea.</p>
+        <h4>Date de intrare</h4>
+        <p>Pe prima linie se află <code>N</code>, <code>L</code> și <code>C</code>.</p>
+        <h4>Restricții și precizări</h4>
+        <p class="mono">1 ≤ N ≤ 10⁹, 1 ≤ L, C ≤ N</p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io">
+          <thead><tr><th>Intrare</th><th>Ieșire</th><th>Explicație</th></tr></thead>
+          <tbody><tr><td class="m">4 3 2</td><td class="m">8</td><td>Stratul k = max(2, 1) = 2 conține numerele 5..9; pentru l > c și l par, valoarea este 8.</td></tr></tbody>
+        </table></div>
+
+        <div class="think">
+          <p class="q">Gândiți-vă: primele k straturi în formă de „L” conțin exact k² numere (de la 1 la k²). Pe ce strat k se află celula (l, c) indexată de la 0?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>În indexare de la <code>0</code> (<code>l = L − 1, c = C − 1</code>), celula se află pe stratul <code>k = max(l, c)</code>, care conține numerele din intervalul <code>[k² + 1, (k + 1)²]</code>. Analizați separat cazurile <code>l &gt; c</code> și <code>l ≤ c</code> în funcție de paritatea lui <code>k</code>.</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>Fie <code>l = L − 1</code> și <code>c = C − 1</code>. Stratul <code>k = max(l, c)</code> are <code>2k + 1</code> elemente începând de la <code>k² + 1</code> până la <code>(k + 1)²</code>. Formula de mai jos determină elementul în <span class="cx">O(1)</span> timp și <span class="cx">O(1)</span> memorie.</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+using namespace std;
+
+int main()
+{
+    long long n, L, C;
+    cin >> n >> L >> C;
+    long long l = L - 1, c = C - 1;
+    long long el;
+
+    if (l > c)
+    {
+        long long r = l % 2;
+        el = (1 - r) + (r + l) * (r + l) + (1 - 2 * r) * c;
+    }
+    else
+    {
+        long long r = (c + 1) % 2;
+        el = (1 - r) + (r + c) * (r + c) + (1 - 2 * r) * l;
+    }
+
+    cout << el << '\n';
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+
+      <div class="prob" id="p-distinct-islands">
+        <h3>Problema <a href="https://www.geeksforgeeks.org/find-the-number-of-distinct-islands-in-a-2d-matrix/" target="_blank" rel="noopener">Numărul de insule distincte</a> <span class="src">Fill &amp; Normalizare</span></h3>
+        <p>Se dă o matrice booleană <code>n × m</code> (<code>1</code> = uscat, <code>0</code> = apă). O insulă este o componentă conexă de celule <code>1</code> conectate pe orizontală sau verticală. Două insule sunt considerate <strong>identice</strong> dacă una poate fi obținută din cealaltă prin translație (fără rotații sau reflexii). Să se determine numărul de insule distincte.</p>
+        <h4>Date de intrare</h4>
+        <p>Pe prima linie se află <code>n</code> și <code>m</code>, apoi matricea booleană <code>n × m</code>.</p>
+        <h4>Restricții și precizări</h4>
+        <p class="mono">1 ≤ n, m ≤ 500</p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io">
+          <thead><tr><th>Intrare</th><th>Ieșire</th><th>Explicație</th></tr></thead>
+          <tbody><tr><td class="m">4 5
+1 1 0 1 1
+1 0 0 0 0
+0 0 0 0 1
+1 1 0 1 1</td><td class="m">3</td><td>Insula din dreapta-sus și cea din stânga-jos au aceeași formă (două celule orizontale).</td></tr></tbody>
+        </table></div>
+
+        <div class="think">
+          <p class="q">Gândiți-vă: cum putem codifica unic forma unei insule astfel încât două insule translatate să producă aceeași semnătură?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Scădem coordonatele primei celule descoperite <code>(x0, y0)</code> din coordonatele fiecărei celule <code>(i, j)</code> vizitate în Fill/DFS, obținând lista perechilor relative <code>(i − x0, j − y0)</code>, pe care o inserăm într-un <code>std::set</code>.</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>Parcurgem matricea în ordine lexicografică. Când întâlnim o celulă <code>1</code> nevizitată, pornim un DFS în aceeași ordine fixă a celor 4 direcții și memorăm vectorul coordonatelor relative <code>{i - x0, j - y0}</code> într-un <code>set&lt;vector&lt;pair&lt;int, int&gt;&gt;&gt;</code>. Dimensiunea mulțimii la final este răspunsul. Complexitate: <span class="cx">O(n · m · log(n · m))</span>.</p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <vector>
+#include <set>
+using namespace std;
+
+int n, m;
+vector<vector<int>> grid;
+int dl[4] = {-1, 0, 1, 0};
+int dc[4] = {0, 1, 0, -1};
+
+void dfs(int x0, int y0, int i, int j, vector<pair<int, int>>& forma)
+{
+    if (i < 0 || i >= n || j < 0 || j >= m || grid[i][j] != 1)
+        return;
+    grid[i][j] = -1;
+    forma.push_back({i - x0, j - y0});
+    for (int d = 0; d < 4; d++)
+        dfs(x0, y0, i + dl[d], j + dc[d], forma);
+}
+
+int main()
+{
+    cin >> n >> m;
+    grid.assign(n, vector<int>(m));
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
+            cin >> grid[i][j];
+
+    set<vector<pair<int, int>>> insuleDistincte;
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < m; j++)
+        {
+            if (grid[i][j] == 1)
+            {
+                vector<pair<int, int>> forma;
+                dfs(i, j, i, j, forma);
+                insuleDistincte.insert(forma);
+            }
+        }
+    }
+
+    cout << insuleDistincte.size() << '\n';
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ==================== CAPITOLUL 8 ==================== -->
+    <section id="tema" data-toc="8. Temă">
+      <h2>8. Temă și probleme propuse</h2>
+      <ul>
+        <li><a href="https://cses.fi/problemset/task/1646" target="_blank" rel="noopener">Static Range Sum Queries</a> (CSES — Sume parțiale 1D)</li>
+        <li><a href="https://cses.fi/problemset/task/1652" target="_blank" rel="noopener">Forest Queries</a> (CSES — Sume parțiale 2D)</li>
+        <li><a href="https://www.pbinfo.ro/probleme/1323/matrice-rara" target="_blank" rel="noopener">Matrice Rară</a> (pbinfo #1323 — Interclasare triplete)</li>
+        <li><a href="https://www.pbinfo.ro/probleme/1697/divizori4" target="_blank" rel="noopener">Numere mari — aplicații și divizibilitate</a> (pbinfo #1697, #1706, #2229, #2777)</li>
+        <li><a href="https://www.varena.ro/problema/suml" target="_blank" rel="noopener">sumL &amp; sumD</a> (Varena — Optimizarea memoriei pe matrici)</li>
+        <li><a href="https://www.varena.ro/problema/matsp" target="_blank" rel="noopener">matsp &amp; matzeb</a> (Varena — Matrici calculate în O(1))</li>
+      </ul>
+    </section>
+
+  </main>
+</div>
+
+<script src="../assets/catalog.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="../assets/site.js"></script>
+<script>
+if (typeof Stepper === 'function') {
+  // 1. Simulare Sume Partial 1D
+  Stepper(document.getElementById('demoSume1D'), () => {
+    const a = [4, 2, 7, 1, 5, 3];
+    const S = [0];
+    const frames = [];
+    for (let i = 0; i < a.length; i++) {
+      S.push(S[i] + a[i]);
+      frames.push({
+        l: i,
+        ln: 'i',
+        done: k => k < i,
+        stats: `<div><span>S[${i + 1}] =</span> <b>${S[i + 1]}</b></div><div><span>Vector S:</span> <b>[${S.join(', ')}]</b></div>`,
+        msg: `Pasul ${i + 1}: S[${i + 1}] = S[${i}] + a[${i + 1}] = ${S[i]} + ${a[i]} = ${S[i + 1]}.`
+      });
+    }
+    frames.push({
+      l: 1,
+      ln: 'st=2',
+      r: 4,
+      rn: 'dr=5',
+      win: [1, 4],
+      stats: `<div><span>Suma(2, 5) =</span> <b>S[5] − S[1] = ${S[5]} − ${S[1]} = ${S[5] - S[1]}</b></div>`,
+      msg: `Interogare pe intervalul [2, 5]: 2 + 7 + 1 + 5 = ${S[5] - S[1]} calculată în O(1)!`
+    });
+    return { arr: a, frames };
+  });
+
+  // 2. Simulare Smenul lui Mars 1D
+  Stepper(document.getElementById('demoMars1D'), () => {
+    const ops = [
+      { st: 0, dr: 2, x: 5 },
+      { st: 1, dr: 4, x: 3 },
+      { st: 2, dr: 3, x: -2 }
+    ];
+    const B = [0, 0, 0, 0, 0, 0];
+    const frames = [];
+
+    for (const op of ops) {
+      B[op.st] += op.x;
+      B[op.dr + 1] -= op.x;
+      frames.push({
+        l: op.st,
+        ln: 'st',
+        r: op.dr + 1,
+        rn: 'dr+1',
+        good: [op.st],
+        bad: [op.dr + 1],
+        stats: `<div><span>Operație:</span> <b>ADUNA(${op.st + 1}, ${op.dr + 1}, ${op.x > 0 ? '+' + op.x : op.x})</b></div>`,
+        msg: `Marcăm capetele în B: B[${op.st + 1}] += ${op.x} și B[${op.dr + 2}] -= ${op.x} în O(1).`
+      });
+    }
+
+    const res = [...B];
+    for (let i = 1; i < res.length; i++) {
+      res[i] += res[i - 1];
+      frames.push({
+        l: i,
+        ln: 'i',
+        done: k => k < i,
+        stats: `<div><span>Sume parțiale B:</span> <b>[${res.slice(0, 5).join(', ')}]</b></div>`,
+        msg: `Reconstrucție: B[${i + 1}] = B[${i}] + B[${i + 1}] = ${res[i]}.`
+      });
+    }
+    return { arr: B, frames };
+  });
+
+  // 3. Simulare Maximum in fereastra glisanta (k = 3)
+  Stepper(document.getElementById('demoFereastra'), () => {
+    const a = [4, 2, 7, 5, 8, 3];
+    const k = 3;
+    const dq = [];
+    const rez = [];
+    const frames = [];
+
+    for (let i = 0; i < a.length; i++) {
+      const eliminati = [];
+      while (dq.length && dq[0] <= i - k) {
+        eliminati.push(dq.shift());
+      }
+      while (dq.length && a[dq[dq.length - 1]] <= a[i]) {
+        eliminati.push(dq.pop());
+      }
+      dq.push(i);
+      if (i >= k - 1) rez.push(a[dq[0]]);
+
+      const st = Math.max(0, i - k + 1);
+      frames.push({
+        l: st,
+        ln: 'st',
+        r: i,
+        rn: 'i',
+        win: [st, i],
+        good: [...dq],
+        bad: eliminati,
+        stats: `<div><span>Deque valori:</span> <b>[${dq.map(idx => a[idx]).join(', ')}]</b></div><div><span>Maxime:</span> <b>[${rez.join(', ')}]</b></div>`,
+        msg: i >= k - 1
+          ? `Fereastra [${st + 1}..${i + 1}]: maximul este capul cozii a[${dq[0] + 1}] = ${a[dq[0]]}.`
+          : `Construim prima fereastră: adăugăm indicele lui ${a[i]} în deque-ul monoton.`
+      });
+    }
+    return { arr: a, frames };
+  });
+
+  // 4. Simulare Permutari si cicluri disjuncte
+  Stepper(document.getElementById('demoCicluri'), () => {
+    const p = [2, 5, 4, 3, 1];
+    const viz = [false, false, false, false, false];
+    const frames = [];
+    let nrCicluri = 0;
+
+    for (let start = 0; start < p.length; start++) {
+      if (viz[start]) continue;
+      nrCicluri++;
+      const ciclu = [];
+      let cur = start;
+      while (!viz[cur]) {
+        viz[cur] = true;
+        ciclu.push(p[cur]);
+        const urm = p[cur] - 1;
+        frames.push({
+          l: cur,
+          ln: 'cur',
+          r: urm,
+          rn: 'P[cur]',
+          good: [cur],
+          done: idx => viz[idx] && idx !== cur,
+          stats: `<div><span>Ciclu #${nrCicluri}:</span> <b>(${ciclu.join(' → ')})</b></div><div><span>Lungime:</span> <b>${ciclu.length}</b></div>`,
+          msg: `Poziția ${cur + 1} trimite către P[${cur + 1}] = ${p[cur]}.`
+        });
+        cur = urm;
+      }
+    }
+    return { arr: p, frames };
+  });
+}
+</script>
+</body>
+</html>
