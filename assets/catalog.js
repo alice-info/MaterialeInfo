@@ -53,5 +53,13 @@ window.MATERIALE = [
     capitol: 'Tablouri',
     tip: 'Predare',
     descriere: 'Votul Boyer-Moore: de ce funcționează, variante și probleme de discuție.'
+  },
+   {
+    id: 'tablouri',
+    titlu: 'Algoritmi Esentiali Tablouri',
+    clasa: 7,
+    capitol: 'Tablouri',
+    tip: 'Predare',
+    descriere: 'Tablouri.'
   }
 ];
