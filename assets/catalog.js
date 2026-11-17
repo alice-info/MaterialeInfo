@@ -57,7 +57,7 @@ window.MATERIALE = [
    {
     id: 'algoritmi-esentiali-pentru-tablouri',
     titlu: 'Algoritmi esențiali pentru tablouri',
-    clasa: 10,
+    clasa: 7,
     capitol: 'Tablouri 1D și 2D',
     tip: 'Olimpiadă',
     descriere: 'Sume parțiale 1D/2D, Șmenul lui Mars, fereastră glisantă, permutări, optimizarea memoriei și numere mari.'
