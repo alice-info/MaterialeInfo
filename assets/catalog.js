@@ -13,7 +13,7 @@
 window.SITE = {
   nume: 'Materiale de informatică',
   descriere: 'Lecții, probleme rezolvate și teme pentru pregătirea de olimpiadă.',
-  autor: 'CEX Prahova'
+  autor: ''
 };
 
 window.CLASE = {
