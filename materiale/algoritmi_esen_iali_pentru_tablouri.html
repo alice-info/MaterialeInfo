@@ -1,0 +1,3377 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<!-- 1. Titlul din fila browserului -->
+<title>Algoritmi esențiali pentru tablouri</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/site.css" onerror="this.dataset.missing='1'; document.documentElement.classList.add('standalone-preview');">
+<style>
+  /* ==========================================================================
+     1. STILURI IZOLATE PENTRU SIMULATOARELE INTERACTIVE (.algo-sim-*)
+        Folosesc variabilele CSS ale site-ului cu valori implicite calde,
+        editoriale, astfel încât să arate impecabil atât integrate în
+        ../assets/site.css, cât și în previzualizare autonomă.
+     ========================================================================== */
+  .algo-sim-card {
+    --sim-bg: var(--surface, #ffffff);
+    --sim-bg-alt: var(--bg-soft, #faf7f2);
+    --sim-ink: var(--ink, #1c1917);
+    --sim-muted: var(--muted, #57534e);
+    --sim-accent: var(--accent, #b45309);
+    --sim-accent-soft: var(--accent-soft, #fef3c7);
+    --sim-border: var(--border, #e7e2d8);
+    --sim-emerald: #047857;
+    --sim-emerald-bg: #ecfdf5;
+    --sim-rose: #be123c;
+    --sim-rose-bg: #fff1f2;
+    --sim-sky: #0369a1;
+    --sim-sky-bg: #f0f9ff;
+    --sim-mono: var(--mono, 'JetBrains Mono', ui-monospace, monospace);
+    --sim-sans: var(--sans, 'Bricolage Grotesque', system-ui, sans-serif);
+
+    background: var(--sim-bg);
+    border: 1px solid var(--sim-border);
+    border-left: 4px solid var(--sim-accent);
+    border-radius: 12px;
+    padding: 1.25rem 1.35rem;
+    margin: 1.5rem 0;
+    box-shadow: 0 2px 10px rgba(28, 25, 23, 0.04);
+    font-family: var(--sim-sans);
+    color: var(--sim-ink);
+  }
+
+  .algo-sim-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.95rem;
+    border-bottom: 1px solid var(--sim-border);
+  }
+
+  .algo-sim-title {
+    font-family: var(--sim-sans);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--sim-ink);
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin: 0;
+  }
+
+  .algo-sim-badge {
+    font-family: var(--sim-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    background: var(--sim-accent-soft);
+    color: var(--sim-accent);
+    border: 1px solid rgba(180, 83, 9, 0.25);
+  }
+
+  .algo-sim-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.55rem;
+    margin-bottom: 0.95rem;
+  }
+
+  .algo-sim-field {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: var(--sim-bg-alt);
+    border: 1px solid var(--sim-border);
+    border-radius: 8px;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.84rem;
+  }
+
+  .algo-sim-field label {
+    font-family: var(--sim-mono);
+    font-weight: 600;
+    font-size: 0.78rem;
+    color: var(--sim-muted);
+  }
+
+  .algo-sim-field input {
+    width: 64px;
+    padding: 0.22rem 0.4rem;
+    border: 1px solid var(--sim-border);
+    border-radius: 5px;
+    background: var(--sim-bg);
+    color: var(--sim-ink);
+    font-family: var(--sim-mono);
+    font-size: 0.84rem;
+    font-weight: 600;
+  }
+
+  .algo-sim-field input.algo-sim-wide {
+    width: 220px;
+    max-width: 100%;
+  }
+
+  .algo-sim-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    padding: 0.42rem 0.82rem;
+    border-radius: 8px;
+    border: 1px solid var(--sim-border);
+    background: var(--sim-bg-alt);
+    color: var(--sim-ink);
+    font-family: var(--sim-sans);
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .algo-sim-btn:hover:not(:disabled) {
+    border-color: var(--sim-accent);
+    background: var(--sim-accent-soft);
+    color: var(--sim-accent);
+  }
+
+  .algo-sim-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .algo-sim-btn-primary {
+    background: var(--sim-accent);
+    border-color: var(--sim-accent);
+    color: #ffffff;
+  }
+
+  .algo-sim-btn-primary:hover:not(:disabled) {
+    filter: brightness(1.08);
+    background: var(--sim-accent);
+    color: #ffffff;
+  }
+
+  .algo-sim-btn-emerald {
+    background: var(--sim-emerald);
+    border-color: var(--sim-emerald);
+    color: #ffffff;
+  }
+
+  .algo-sim-btn-emerald:hover:not(:disabled) {
+    filter: brightness(1.08);
+    background: var(--sim-emerald);
+    color: #ffffff;
+  }
+
+  .algo-sim-status {
+    background: var(--sim-bg-alt);
+    border: 1px solid var(--sim-border);
+    border-radius: 8px;
+    padding: 0.65rem 0.85rem;
+    font-size: 0.86rem;
+    line-height: 1.5;
+    margin-bottom: 0.9rem;
+    color: var(--sim-ink);
+  }
+
+  .algo-sim-status code {
+    font-family: var(--sim-mono);
+    font-size: 0.82rem;
+    background: rgba(180, 83, 9, 0.08);
+    padding: 0.1rem 0.3rem;
+    border-radius: 4px;
+    color: var(--sim-accent);
+  }
+
+  .algo-sim-row-wrap {
+    margin: 0.7rem 0;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+  }
+
+  .algo-sim-row-label {
+    font-family: var(--sim-mono);
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--sim-muted);
+    margin-bottom: 0.32rem;
+  }
+
+  .algo-sim-cells {
+    display: flex;
+    gap: 0.38rem;
+    min-width: max-content;
+  }
+
+  .algo-sim-cell {
+    width: 54px;
+    border: 1px solid var(--sim-border);
+    border-radius: 7px;
+    background: var(--sim-bg-alt);
+    text-align: center;
+    overflow: hidden;
+    transition: transform 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+  }
+
+  .algo-sim-cell-idx {
+    font-family: var(--sim-mono);
+    font-size: 0.66rem;
+    padding: 0.12rem 0;
+    background: rgba(87, 83, 78, 0.08);
+    color: var(--sim-muted);
+    border-bottom: 1px solid var(--sim-border);
+  }
+
+  .algo-sim-cell-val {
+    font-family: var(--sim-mono);
+    font-size: 0.9rem;
+    font-weight: 700;
+    padding: 0.38rem 0.15rem;
+  }
+
+  .algo-sim-cell-val input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    text-align: center;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    color: inherit;
+    outline: none;
+  }
+
+  .algo-sim-cell.is-range {
+    background: var(--sim-accent-soft);
+    border-color: var(--sim-accent);
+  }
+
+  .algo-sim-cell.is-start {
+    background: var(--sim-emerald-bg);
+    border-color: var(--sim-emerald);
+    color: var(--sim-emerald);
+    transform: translateY(-2px);
+  }
+
+  .algo-sim-cell.is-end {
+    background: var(--sim-rose-bg);
+    border-color: var(--sim-rose);
+    color: var(--sim-rose);
+    transform: translateY(-2px);
+  }
+
+  .algo-sim-cell.is-sentinel {
+    border-style: dashed;
+    opacity: 0.85;
+  }
+
+  /* 2D Matrix Grid */
+  .algo-sim-split {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    align-items: start;
+  }
+
+  @media (max-width: 820px) {
+    .algo-sim-split {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .algo-sim-panel {
+    background: var(--sim-bg-alt);
+    border: 1px solid var(--sim-border);
+    border-radius: 10px;
+    padding: 0.85rem;
+    overflow-x: auto;
+  }
+
+  .algo-sim-grid {
+    display: grid;
+    gap: 4px;
+    width: max-content;
+    margin-top: 0.45rem;
+  }
+
+  .algo-sim-mcell {
+    width: 44px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--sim-mono);
+    font-size: 0.82rem;
+    font-weight: 600;
+    border-radius: 6px;
+    border: 1px solid var(--sim-border);
+    background: var(--sim-bg);
+    cursor: pointer;
+    position: relative;
+    transition: all 0.15s ease;
+  }
+
+  .algo-sim-mcell.is-head {
+    background: transparent;
+    border-color: transparent;
+    color: var(--sim-muted);
+    font-size: 0.7rem;
+    cursor: default;
+    height: 24px;
+  }
+
+  .algo-sim-mcell.is-pad {
+    opacity: 0.55;
+    cursor: default;
+    font-size: 0.75rem;
+  }
+
+  .algo-sim-mcell input {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: transparent;
+    text-align: center;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    color: inherit;
+    outline: none;
+  }
+
+  .algo-sim-mcell.in-rect {
+    background: var(--sim-accent-soft);
+    border-color: var(--sim-accent);
+  }
+
+  .algo-sim-mcell.corner-mark {
+    box-shadow: 0 0 0 2px var(--sim-sky);
+  }
+
+  /* 4 Culori Distincte pentru Formula de Includere-Excludere 2D */
+  .algo-sim-mcell.term-main {
+    background: var(--sim-emerald-bg);
+    border: 2px solid var(--sim-emerald);
+    color: var(--sim-emerald);
+    font-weight: 700;
+  }
+
+  .algo-sim-mcell.term-top {
+    background: var(--sim-rose-bg);
+    border: 2px solid var(--sim-rose);
+    color: var(--sim-rose);
+    font-weight: 700;
+  }
+
+  .algo-sim-mcell.term-left {
+    background: #fef2f2;
+    border: 2px dashed var(--sim-rose);
+    color: #9f1239;
+    font-weight: 700;
+  }
+
+  .algo-sim-mcell.term-overlap {
+    background: var(--sim-sky-bg);
+    border: 2px solid var(--sim-sky);
+    color: var(--sim-sky);
+    font-weight: 700;
+  }
+
+  /* Visualizer 2D Traversal */
+  .algo-sim-mcell.vis-done {
+    background: var(--sim-accent-soft);
+    border-color: var(--sim-accent);
+    color: var(--sim-ink);
+  }
+
+  .algo-sim-mcell.vis-now {
+    background: var(--sim-emerald);
+    border-color: var(--sim-emerald);
+    color: #ffffff;
+    transform: scale(1.07);
+    z-index: 2;
+  }
+
+  .algo-sim-step-num {
+    position: absolute;
+    top: 1px;
+    right: 3px;
+    font-size: 0.58rem;
+    opacity: 0.8;
+  }
+
+  /* Quiz Items */
+  .algo-sim-quiz-q {
+    background: var(--sim-bg-alt);
+    border: 1px solid var(--sim-border);
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+    margin-bottom: 0.9rem;
+  }
+
+  .algo-sim-quiz-prompt {
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 0.65rem;
+    line-height: 1.45;
+  }
+
+  .algo-sim-quiz-opts {
+    display: flex;
+    flex-direction: column;
+    gap: 0.42rem;
+  }
+
+  .algo-sim-quiz-opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.55rem;
+    padding: 0.55rem 0.8rem;
+    border-radius: 7px;
+    border: 1px solid var(--sim-border);
+    background: var(--sim-bg);
+    color: var(--sim-ink);
+    font-family: var(--sim-sans);
+    font-size: 0.88rem;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.14s ease;
+  }
+
+  .algo-sim-quiz-opt:hover {
+    border-color: var(--sim-accent);
+  }
+
+  .algo-sim-quiz-opt.is-selected {
+    border-color: var(--sim-accent);
+    background: var(--sim-accent-soft);
+    font-weight: 600;
+  }
+
+  .algo-sim-quiz-opt.is-correct {
+    border-color: var(--sim-emerald);
+    background: var(--sim-emerald-bg);
+    color: var(--sim-emerald);
+    font-weight: 700;
+  }
+
+  .algo-sim-quiz-opt.is-wrong {
+    border-color: var(--sim-rose);
+    background: var(--sim-rose-bg);
+    color: var(--sim-rose);
+  }
+
+  .algo-sim-quiz-expl {
+    display: none;
+    margin-top: 0.65rem;
+    padding: 0.65rem 0.85rem;
+    border-radius: 7px;
+    background: var(--sim-bg);
+    border-left: 3px solid var(--sim-sky);
+    font-size: 0.84rem;
+    color: var(--sim-muted);
+    line-height: 1.5;
+  }
+
+  .algo-sim-quiz-expl.is-visible {
+    display: block;
+  }
+
+  /* ==========================================================================
+     2. FALLBACK EDITORIAL COMPLET PENTRU PREVIZUALIZARE STANDALONE
+        Activ DOAR când ../assets/site.css lipsește (html.standalone-preview).
+     ========================================================================== */
+  html.standalone-preview {
+    --bg: #faf8f5;
+    --bg-soft: #f4efe6;
+    --surface: #ffffff;
+    --ink: #1c1917;
+    --muted: #57534e;
+    --accent: #b45309;
+    --accent-soft: #fef3c7;
+    --border: #e6dfd3;
+    --sans: 'Bricolage Grotesque', -apple-system, BlinkMacSystemFont, sans-serif;
+    --serif: 'Source Serif 4', Georgia, serif;
+    --mono: 'JetBrains Mono', ui-monospace, monospace;
+    scroll-behavior: smooth;
+  }
+
+  html.standalone-preview body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.72;
+  }
+
+  html.standalone-preview .wrap {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+  }
+
+  html.standalone-preview .hero {
+    background: linear-gradient(180deg, #f5efe4 0%, var(--bg) 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 3rem 0 2.4rem;
+    margin-bottom: 2rem;
+  }
+
+  html.standalone-preview .hero .eyebrow {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin-bottom: 0.55rem;
+  }
+
+  html.standalone-preview .hero h1 {
+    font-family: var(--sans);
+    font-size: clamp(2rem, 4vw, 2.85rem);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    margin: 0 0 0.75rem;
+  }
+
+  html.standalone-preview .hero h1 .pr {
+    color: var(--accent);
+  }
+
+  html.standalone-preview .hero .lede {
+    font-size: 1.12rem;
+    color: var(--muted);
+    max-width: 760px;
+    margin: 0;
+  }
+
+  html.standalone-preview .layout {
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr);
+    gap: 2.25rem;
+    align-items: start;
+    padding-bottom: 4.5rem;
+  }
+
+  @media (max-width: 900px) {
+    html.standalone-preview .layout {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  html.standalone-preview .toc {
+    position: sticky;
+    top: 1.25rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 1.1rem;
+    font-family: var(--sans);
+  }
+
+  @media (max-width: 900px) {
+    html.standalone-preview .toc {
+      position: static;
+    }
+  }
+
+  html.standalone-preview .toc-title {
+    font-size: 0.74rem;
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted);
+    font-weight: 600;
+    margin-bottom: 0.6rem;
+  }
+
+  html.standalone-preview .toc ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.32rem;
+  }
+
+  html.standalone-preview .toc a {
+    display: block;
+    text-decoration: none;
+    color: var(--muted);
+    font-size: 0.86rem;
+    line-height: 1.35;
+    padding: 0.28rem 0.5rem;
+    border-radius: 6px;
+    transition: all 0.15s ease;
+  }
+
+  html.standalone-preview .toc a:hover,
+  html.standalone-preview .toc a.active {
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  html.standalone-preview .prose section {
+    margin-bottom: 3.2rem;
+    scroll-margin-top: 1.2rem;
+  }
+
+  html.standalone-preview .prose h2 {
+    font-family: var(--sans);
+    font-size: 1.65rem;
+    font-weight: 800;
+    line-height: 1.25;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--border);
+    margin: 0 0 1.1rem;
+    letter-spacing: -0.015em;
+  }
+
+  html.standalone-preview .prose h3 {
+    font-family: var(--sans);
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0 0 0.65rem;
+  }
+
+  html.standalone-preview .prose h4 {
+    font-family: var(--sans);
+    font-size: 0.92rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    margin: 1rem 0 0.45rem;
+  }
+
+  html.standalone-preview .prose p {
+    margin: 0 0 0.95rem;
+  }
+
+  html.standalone-preview .prose ul,
+  html.standalone-preview .prose ol {
+    margin: 0 0 1rem;
+    padding-left: 1.4rem;
+  }
+
+  html.standalone-preview .prose li {
+    margin-bottom: 0.4rem;
+  }
+
+  html.standalone-preview .prose code {
+    font-family: var(--mono);
+    font-size: 0.86em;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    padding: 0.1rem 0.35rem;
+    border-radius: 5px;
+    color: #9a3412;
+  }
+
+  html.standalone-preview .prose a {
+    color: var(--accent);
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 2px;
+  }
+
+  html.standalone-preview .formula-note {
+    background: var(--bg-soft);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    padding: 0.85rem 1.05rem;
+    margin: 0.9rem 0 1.1rem;
+    font-family: var(--mono);
+    font-size: 0.88rem;
+    line-height: 1.6;
+    overflow-x: auto;
+  }
+
+  html.standalone-preview .prob {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.3rem 1.4rem;
+    margin: 1.4rem 0;
+    box-shadow: 0 2px 8px rgba(28, 25, 23, 0.03);
+  }
+
+  html.standalone-preview .prob h3 .src {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    font-weight: 600;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 0.14rem 0.5rem;
+    border-radius: 999px;
+    margin-left: 0.4rem;
+    vertical-align: middle;
+  }
+
+  html.standalone-preview .tbl {
+    overflow-x: auto;
+    margin: 0.65rem 0 1rem;
+  }
+
+  html.standalone-preview table.io {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    background: var(--bg-soft);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  html.standalone-preview table.io th,
+  html.standalone-preview table.io td {
+    border: 1px solid var(--border);
+    padding: 0.55rem 0.8rem;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  html.standalone-preview table.io th {
+    font-family: var(--sans);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    background: #efe8dc;
+  }
+
+  html.standalone-preview table.io td.m {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    white-space: pre;
+    line-height: 1.45;
+  }
+
+  html.standalone-preview .think {
+    background: var(--accent-soft);
+    border: 1px solid rgba(180, 83, 9, 0.25);
+    border-radius: 9px;
+    padding: 0.8rem 1rem;
+    margin: 0.9rem 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.65rem;
+  }
+
+  html.standalone-preview .think .q {
+    margin: 0;
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 0.94rem;
+    color: #78350f;
+  }
+
+  html.standalone-preview .timer button {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.32rem 0.68rem;
+    border-radius: 6px;
+    border: 1px solid rgba(180, 83, 9, 0.35);
+    background: #ffffff;
+    color: var(--accent);
+    cursor: pointer;
+  }
+
+  html.standalone-preview details.hint,
+  html.standalone-preview details.sol {
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    margin: 0.65rem 0;
+    background: var(--bg-soft);
+    overflow: hidden;
+  }
+
+  html.standalone-preview details.hint summary,
+  html.standalone-preview details.sol summary {
+    padding: 0.6rem 0.95rem;
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: 0.92rem;
+    cursor: pointer;
+    user-select: none;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  html.standalone-preview details.hint summary::-webkit-details-marker,
+  html.standalone-preview details.sol summary::-webkit-details-marker {
+    display: none;
+  }
+
+  html.standalone-preview details.hint > div,
+  html.standalone-preview details.sol > .body {
+    padding: 0.85rem 1rem;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  html.standalone-preview .cod-wrap {
+    position: relative;
+    margin-top: 0.75rem;
+  }
+
+  html.standalone-preview .cod-copy {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    padding: 0.25rem 0.55rem;
+    border-radius: 5px;
+    border: 1px solid #44403c;
+    background: #292524;
+    color: #fafaf9;
+    cursor: pointer;
+  }
+
+  html.standalone-preview pre.cod-block {
+    margin: 0;
+    padding: 1rem 1.1rem;
+    border-radius: 8px;
+    background: #1c1917;
+    color: #f5f5f4;
+    font-family: var(--mono);
+    font-size: 0.83rem;
+    line-height: 1.55;
+    overflow-x: auto;
+  }
+</style>
+</head>
+<!-- 2. data-id = numele fișierului fără .html, exact ca în assets/catalog.js -->
+<body data-root="../" data-id="algoritmi-esentiali-pentru-tablouri">
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow"></div>  <!-- se completează singur: clasa și tipul lecției -->
+    <h1>Algoritmi esențiali <span class="pr">pentru tablouri</span></h1>
+    <p class="lede">Sume parțiale 1D și 2D, șmenul lui Mars, ferestre glisante, parcurgeri în matrice, optimizarea memoriei și aritmetica numerelor mari — ghid interactiv pentru olimpiadă.</p>
+  </div>
+</header>
+
+<div class="wrap layout">
+  <nav class="toc" data-auto aria-label="Cuprins"></nav>  <!-- cuprinsul se face singur -->
+  <main class="prose">
+
+    <!-- ======================================================================
+         CAPITOLUL 1: SUME PARȚIALE 1D ȘI ȘMENUL LUI MARS
+         ====================================================================== -->
+    <section id="sume-1d">
+      <h2>1. Sume parțiale 1D și Șmenul lui Mars</h2>
+      <p>
+        În problemele de concurs pe tablouri unidimensionale <code>A[1..N]</code> (indexate de la <strong>1</strong> pentru a elimina cazurile particulare la capătul din stânga), apar frecvent două tipuri de cerințe: interogări repetate de sumă pe subsecvențe și modificări uniforme pe intervale.
+      </p>
+
+      <h3>Vectorul de sume parțiale</h3>
+      <p>
+        Construim un tablou auxiliar <code>S[0..N]</code> cu <code>S[0] = 0</code>, în care fiecare element <code>S[i]</code> memorează suma prefixului <code>A[1..i]</code>. Preprocesarea durează <strong>O(N)</strong>, iar orice interogare de interval <code>[st, dr]</code> primește răspuns în <strong>O(1)</strong>:
+      </p>
+      <div class="formula-note">
+        S[i] = S[i - 1] + A[i], &nbsp; ∀ i ∈ {1, ..., N}<br>
+        Suma(st, dr) = S[dr] - S[st - 1]
+      </div>
+      <p>
+        <strong>Capcana depășirii de tip (Overflow):</strong> Dacă <code>N ≤ 10<sup>5</sup></code> și <code>|A[i]| ≤ 10<sup>9</sup></code>, suma maximă poate atinge <code>10<sup>14</sup></code>, depășind limita tipului <code>int</code> (<code>≈ 2.14 × 10<sup>9</sup></code>). Declarați întotdeauna <code>long long S[100005]</code>!
+      </p>
+
+      <h3>Șmenul lui Mars (Difference Array)</h3>
+      <p>
+        Când primim <code>M</code> operații de forma <code>ADUNA(st, dr, x)</code> (adăugăm <code>x</code> la toate elementele <code>A[st..dr]</code>) și la final trebuie să afișăm tabloul rezultat, folosim un vector auxiliar <code>B[1..N+1]</code> inițializat cu <code>0</code>:
+      </p>
+      <div class="formula-note">
+        // Actualizare pe interval [st, dr] în O(1):<br>
+        B[st] += x;<br>
+        B[dr + 1] -= x;<br><br>
+        // Reconstrucție finală în O(N):<br>
+        for (int i = 1; i &lt;= n; ++i) {<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;B[i] += B[i - 1];<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;A[i] += B[i];<br>
+        }
+      </div>
+
+      <!-- SIMULATOR INTERACTIV 1D -->
+      <div class="algo-sim-card" id="algoSim1D">
+        <div class="algo-sim-header">
+          <h3 class="algo-sim-title">Simulator Interactiv 1D — Mars &amp; Sume Parțiale</h3>
+          <span class="algo-sim-badge">Update O(1) • Query O(1)</span>
+        </div>
+
+        <div class="algo-sim-controls">
+          <div class="algo-sim-field">
+            <label for="sim1dSt">st:</label>
+            <input type="number" id="sim1dSt" min="1" max="10" value="2">
+          </div>
+          <div class="algo-sim-field">
+            <label for="sim1dDr">dr:</label>
+            <input type="number" id="sim1dDr" min="1" max="10" value="6">
+          </div>
+          <div class="algo-sim-field">
+            <label for="sim1dVal">x:</label>
+            <input type="number" id="sim1dVal" min="-50" max="50" value="5">
+          </div>
+          <button type="button" class="algo-sim-btn algo-sim-btn-primary" id="sim1dApplyBtn">+ ADUNA(st, dr, x)</button>
+          <button type="button" class="algo-sim-btn algo-sim-btn-emerald" id="sim1dQueryBtn">SUMA(st, dr)</button>
+          <button type="button" class="algo-sim-btn" id="sim1dPresetBtn">Exemplu curs</button>
+          <button type="button" class="algo-sim-btn" id="sim1dResetBtn">Reset</button>
+        </div>
+
+        <div class="algo-sim-status" id="sim1dStatus">
+          Poți edita direct valorile din vectorul inițial <code>A_init</code> sau poți aplica operații <code>ADUNA(st, dr, x)</code> și interogări <code>SUMA(st, dr)</code>.
+        </div>
+
+        <div class="algo-sim-row-wrap">
+          <div class="algo-sim-row-label">Vectorul inițial editabil A_init[1..10]:</div>
+          <div class="algo-sim-cells" id="sim1dInitRow"></div>
+        </div>
+
+        <div class="algo-sim-row-wrap">
+          <div class="algo-sim-row-label">Vectorul diferențelor B[1..11] (unde B[st] += x, B[dr + 1] -= x):</div>
+          <div class="algo-sim-cells" id="sim1dDiffRow"></div>
+        </div>
+
+        <div class="algo-sim-row-wrap">
+          <div class="algo-sim-row-label">Tabloul rezultat A_rez[i] = A_init[i] + ∑<sub>k=1..i</sub> B[k]:</div>
+          <div class="algo-sim-cells" id="sim1dResRow"></div>
+        </div>
+
+        <div class="algo-sim-row-wrap">
+          <div class="algo-sim-row-label">Sume parțiale S[0..10] calculate pe A_rez:</div>
+          <div class="algo-sim-cells" id="sim1dPrefRow"></div>
+        </div>
+      </div>
+
+      <!-- PROBLEMĂ EXPLICATĂ CAPITOLUL 1 -->
+      <div class="prob" id="p-xor-subsecvente">
+        <h3>Problema <a href="https://www.pbinfo.ro/" target="_blank" rel="noopener">XOR-ul tuturor subsecvențelor</a> <span class="src">O(N) • Combinatorică pe biți</span></h3>
+        <p>
+          Se dă un vector <code>A</code> cu <code>N</code> numere naturale (<code>1 ≤ N ≤ 10<sup>5</sup></code>). Pentru fiecare subsecvență contiguă <code>A[i..j]</code> (<code>0 ≤ i ≤ j &lt; N</code>) se calculează operația XOR (<code>^</code>) pe biți a elementelor sale. Să se determine XOR-ul tuturor acestor rezultate.
+        </p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th></tr></thead><tbody><tr><td class="m">5
+3 5 2 4 6</td><td class="m">7</td></tr></tbody></table></div>
+
+        <div class="think">
+          <p class="q">Gândiți-vă: De câte ori apare elementul A[i] (0-indexat) în totalul celor N(N+1)/2 subsecvențe ale vectorului?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>O subsecvență <code>[st, dr]</code> îl conține pe <code>i</code> dacă și numai dacă <code>0 ≤ st ≤ i</code> (<code>i + 1</code> alegeri pentru capătul stâng) și <code>i ≤ dr ≤ N - 1</code> (<code>N - i</code> alegeri pentru capătul drept). Folosiți proprietatea <code>x ^ x = 0</code>!</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>
+              Frecvența totală a elementului <code>A[i]</code> este <code>freq(i) = (i + 1) · (N - i)</code>. Deoarece <code>x ^ x = 0</code>, contribuie la rezultatul final doar elementele cu frecvență <strong>impară</strong>:
+            </p>
+            <ul>
+              <li>Dacă <strong>N este par</strong>, cel puțin unul dintre factorii <code>(i + 1)</code> sau <code>(N - i)</code> este par pentru orice <code>i</code>, deci rezultatul este întotdeauna <strong>0</strong>.</li>
+              <li>Dacă <strong>N este impar</strong>, produsul <code>(i + 1)(N - i)</code> este impar exact atunci când <code>i</code> este <strong>par</strong> (<code>0, 2, 4, ...</code>).</li>
+            </ul>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main()
+{
+    int n;
+    cin >> n;
+    vector<int> a(n);
+    for (int i = 0; i < n; ++i)
+        cin >> a[i];
+
+    // Daca N este par, fiecare element apare de un numar par de ori -> XOR = 0
+    if (n % 2 == 0)
+    {
+        cout << 0 << "\n";
+        return 0;
+    }
+
+    int ans = 0;
+    // Daca N este impar, contribuie doar elementele de pe pozitii pare (0, 2, 4...)
+    for (int i = 0; i < n; i += 2)
+        ans ^= a[i];
+
+    cout << ans << "\n";
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         CAPITOLUL 2: SUME PARȚIALE 2D ȘI MARS ÎN MATRICE
+         ====================================================================== -->
+    <section id="sume-2d">
+      <h2>2. Sume parțiale 2D și Mars în matrice</h2>
+      <p>
+        Extinzând sumele parțiale în două dimensiuni prin <strong>principiul includerii și excluderii</strong>, bordăm linia <code>0</code> și coloana <code>0</code> cu zerouri și definim <code>S[i][j]</code> ca suma elementelor din dreptunghiul cu colțurile <code>(1, 1)</code> și <code>(i, j)</code>.
+      </p>
+      <div class="formula-note">
+        // Construcție S[1..N][1..M] în O(N · M):<br>
+        S[i][j] = S[i - 1][j] + S[i][j - 1] - S[i - 1][j - 1] + A[i][j]<br><br>
+        // Suma submatricii (x1, y1) .. (x2, y2) în O(1):<br>
+        Suma = S[x2][y2] - S[x1 - 1][y2] - S[x2][y1 - 1] + S[x1 - 1][y1 - 1]
+      </div>
+
+      <h3>Șmenul lui Mars 2D</h3>
+      <p>
+        Pentru a aduna o valoare <code>v</code> la toate celulele submatricii <code>(x1, y1) .. (x2, y2)</code> în <strong>O(1)</strong>, actualizăm doar 4 colțuri într-o matrice auxiliară <code>B</code> dimensionată <code>(N + 2) × (M + 2)</code>:
+      </p>
+      <div class="formula-note">
+        B[x1][y1] += v;<br>
+        B[x1][y2 + 1] -= v;<br>
+        B[x2 + 1][y1] -= v;<br>
+        B[x2 + 1][y2 + 1] += v;
+      </div>
+      <p>
+        La final, efectuăm sume parțiale 2D pe matricea <code>B</code> și adunăm rezultatul peste matricea inițială <code>A</code>.
+      </p>
+
+      <!-- SIMULATOR INTERACTIV 2D -->
+      <div class="algo-sim-card" id="algoSim2D">
+        <div class="algo-sim-header">
+          <h3 class="algo-sim-title">Simulator Interactiv 2D — Includere-Excludere &amp; Mars 2D</h3>
+          <span class="algo-sim-badge">Matrice 5 × 5 • 4 Colțuri</span>
+        </div>
+
+        <div class="algo-sim-controls">
+          <div class="algo-sim-field">
+            <label for="sim2dMarsVal">v (Mars 2D):</label>
+            <input type="number" id="sim2dMarsVal" min="-50" max="50" value="3">
+          </div>
+          <button type="button" class="algo-sim-btn algo-sim-btn-primary" id="sim2dApplyMarsBtn">+ Aplică Mars 2D pe dreptunghi</button>
+          <button type="button" class="algo-sim-btn" id="sim2dRandBtn">Matrice aleatorie</button>
+          <button type="button" class="algo-sim-btn" id="sim2dResetBtn">Reset</button>
+        </div>
+
+        <div class="algo-sim-status" id="sim2dStatus">
+          Fă <strong>click pe 2 celule</strong> din matricea <code>A[1..5][1..5]</code> pentru a selecta colțurile <code>(x1, y1)</code> și <code>(x2, y2)</code>. În dreapta sunt evidențiați cei 4 termeni ai formulei.
+        </div>
+
+        <div class="algo-sim-split">
+          <div class="algo-sim-panel">
+            <div class="algo-sim-row-label">Matricea A[1..5][1..5] (Click 2 colțuri / Editabil):</div>
+            <div class="algo-sim-grid" id="sim2dGridA"></div>
+          </div>
+          <div class="algo-sim-panel">
+            <div class="algo-sim-row-label">Sume Parțiale S[0..5][0..5] (4 termeni colorați):</div>
+            <div class="algo-sim-grid" id="sim2dGridS"></div>
+          </div>
+        </div>
+
+        <div class="formula-note" id="sim2dFormula" style="margin-top:0.85rem; margin-bottom:0;"></div>
+      </div>
+
+      <!-- PROBLEMA 2A -->
+      <div class="prob" id="p-suma-submatrici">
+        <h3>Problema <a href="https://www.pbinfo.ro/" target="_blank" rel="noopener">Suma tuturor submatricilor unei matrici</a> <span class="src">O(N · M) • Contribuție</span></h3>
+        <p>
+          Se dă o matrice <code>A</code> cu <code>N</code> linii și <code>M</code> coloane. Să se calculeze suma elementelor din toate submatricile dreptunghiulare posibile ale lui <code>A</code>.
+        </p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th></tr></thead><tbody><tr><td class="m">2 2
+1 2
+3 4</td><td class="m">40</td></tr></tbody></table></div>
+
+        <div class="think">
+          <p class="q">Gândiți-vă: În loc să parcurgem toate cele O(N² · M²) submatrici, în câte submatrici este inclusă celula (i, j) (0-indexată)?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Un dreptunghi conține celula <code>(i, j)</code> dacă colțul său stânga-sus <code>(r1, c1)</code> are <code>0 ≤ r1 ≤ i</code> și <code>0 ≤ c1 ≤ j</code> (<code>(i + 1)(j + 1)</code> variante), iar colțul dreapta-jos <code>(r2, c2)</code> are <code>i ≤ r2 &lt; N</code> și <code>j ≤ c2 &lt; M</code> (<code>(N - i)(M - j)</code> variante).</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>
+              Fiecare element <code>A[i][j]</code> contribuie la suma totală cu <code>A[i][j] · (i + 1) · (j + 1) · (N - i) · (M - j)</code>, obținând astfel complexitatea optimă <strong>O(N · M)</strong> și <strong>O(1)</strong> memorie auxiliară.
+            </p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main()
+{
+    int n, m;
+    cin >> n >> m;
+    long long sumaTotala = 0;
+
+    for (int i = 0; i < n; ++i)
+    {
+        for (int j = 0; j < m; ++j)
+        {
+            long long val;
+            cin >> val;
+            long long stangaSus = 1LL * (i + 1) * (j + 1);
+            long long dreaptaJos = 1LL * (n - i) * (m - j);
+            sumaTotala += val * stangaSus * dreaptaJos;
+        }
+    }
+    cout << sumaTotala << "\n";
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+
+      <!-- PROBLEMA 2B -->
+      <div class="prob" id="p-submatrice-div-k">
+        <h3>Problema <a href="https://www.pbinfo.ro/" target="_blank" rel="noopener">Submatrice de arie maximă cu suma divizibilă cu K</a> <span class="src">O(M² · N) • Reducere 2D → 1D</span></h3>
+        <p>
+          Se dă o matrice <code>A</code> cu <code>N</code> linii și <code>M</code> coloane conținând numere întregi și un întreg pozitiv <code>K</code>. Să se determine aria maximă a unei submatrici dreptunghiulare a cărei sumă a elementelor este divizibilă cu <code>K</code>.
+        </p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th></tr></thead><tbody><tr><td class="m">3 3 5
+1 2 3
+4 1 2
+2 3 1</td><td class="m">4</td></tr></tbody></table></div>
+
+        <div class="think">
+          <p class="q">Gândiți-vă: Dacă fixăm perechea de coloane (left, right), cum reducem problema la un vector 1D cu N elemente?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Menținem <code>temp[i]</code> = suma elementelor din linia <code>i</code> între coloanele <code>left</code> și <code>right</code>. În vectorul <code>temp[]</code>, o subsecvență <code>[r1, r2]</code> are sumă divizibilă cu <code>K</code> dacă și numai dacă <code>S[r2] % K == S[r1 - 1] % K</code> (atenție la resturile negative în C++: folosiți <code>((pref % K) + K) % K</code>).</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>
+              Parcurgem toate perechile de coloane <code>0 ≤ left ≤ right &lt; M</code> în <code>O(M<sup>2</sup>)</code>. Pentru fiecare pereche, actualizăm sumele pe linii <code>temp[0..N-1]</code> în <code>O(N)</code> și reținem într-un tabel de dispersie / vector <code>primaAparitie[rest]</code> primul indice unde a apărut fiecare rest modulo <code>K</code>.
+            </p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <vector>
+#include <unordered_map>
+#include <algorithm>
+using namespace std;
+
+int main()
+{
+    int n, m, k;
+    cin >> n >> m >> k;
+    vector<vector<int>> a(n, vector<int>(m));
+    for (int i = 0; i < n; ++i)
+        for (int j = 0; j < m; ++j)
+            cin >> a[i][j];
+
+    int arieMax = 0;
+    for (int left = 0; left < m; ++left)
+    {
+        vector<long long> temp(n, 0);
+        for (int right = left; right < m; ++right)
+        {
+            for (int i = 0; i < n; ++i)
+                temp[i] += a[i][right];
+
+            unordered_map<int, int> firstMod;
+            firstMod[0] = -1; // Prefix vid de suma 0 inainte de linia 0
+            long long pref = 0;
+
+            for (int i = 0; i < n; ++i)
+            {
+                pref += temp[i];
+                int mod = (int)(((pref % k) + k) % k);
+                if (firstMod.count(mod))
+                {
+                    int inaltime = i - firstMod[mod];
+                    int latime = right - left + 1;
+                    arieMax = max(arieMax, inaltime * latime);
+                }
+                else
+                {
+                    firstMod[mod] = i;
+                }
+            }
+        }
+    }
+    cout << arieMax << "\n";
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         CAPITOLUL 3: TEHNICI AVANSATE PE VECTORI: DEQUE, PERMUTĂRI, BITSET
+         ====================================================================== -->
+    <section id="tehnici-vectori">
+      <h2>3. Tehnici avansate pe vectori: Deque, Permutări, Bitset</h2>
+      <ul>
+        <li>
+          <strong>Coada circulară pe vector static:</strong> Pentru a elimina deplasările <code>O(N)</code> la extragerea din față, folosim doi indici <code>primul</code> și <code>ultimul</code> actualizați modulo <code>N</code> (<code>idx = (idx + 1) % N</code>), sacrificând o poziție pentru a distinge coada goală (<code>primul == ultimul</code>) de coada plină (<code>(ultimul + 1) % N == primul</code>).
+        </li>
+        <li>
+          <strong>Fereastra glisantă (Sliding Window) cu <code>std::deque</code> monoton:</strong> Păstrăm în <code>deque&lt;int&gt;</code> <em>indicii</em> elementelor din fereastra curentă în ordine strict descrescătoare a valorilor lor. Un element mai vechi și mai mic sau egal cu elementul curent nu poate deveni niciodată maxim, deci este eliminat din spate (<code>pop_back()</code>). Fiecare element intră și iese cel mult o dată → <strong>O(N)</strong>.
+        </li>
+        <li>
+          <strong>Permutări ca reuniune de cicluri disjuncte:</strong> Orice permutare <code>P</code> se descompune în cicluri disjuncte de lungimi <code>l<sub>1</sub>, l<sub>2</sub>, ..., l<sub>m</sub></code>. <em>Ordinul permutării</em> (cel mai mic <code>k ≥ 1</code> pentru care <code>P<sup>k</sup> = I</code>) este <code>CMMMC(l<sub>1</sub>, l<sub>2</sub>, ..., l<sub>m</sub>)</code>.
+        </li>
+        <li>
+          <strong>Mulțimea maximală de intervale disjuncte:</strong> Sortăm intervalele <code>[a<sub>i</sub>, b<sub>i</sub>]</code> crescător după <strong>capătul din dreapta b<sub>i</sub></strong> (<code>O(N log N)</code>) și selectăm lacom (Greedy) fiecare interval compatibil cu ultimul ales.
+        </li>
+        <li>
+          <strong><code>std::bitset</code> și operații pe biți:</strong> Putem determina toate sumele realizabile cu un set de <code>N</code> numere până la <code>S</code> în <strong>O(N · S / 64)</strong> prin deplasare pe biți: <code>dp |= (dp &lt;&lt; x)</code>. De asemenea, expresia <code>n &amp; (n - 1)</code> stinge cel mai nesemnificativ bit de <code>1</code> al lui <code>n</code> (și testează dacă <code>n &gt; 0</code> este putere a lui 2 când rezultatul este <code>0</code>).
+        </li>
+      </ul>
+
+      <!-- SIMULATOR INTERACTIV DEQUE MONOTON -->
+      <div class="algo-sim-card" id="algoSimDeque">
+        <div class="algo-sim-header">
+          <h3 class="algo-sim-title">Simulator Pas-cu-Pas — Fereastră Glisantă cu Deque Monoton (K = 3)</h3>
+          <span class="algo-sim-badge">Complexitate O(N) amortizat</span>
+        </div>
+
+        <div class="algo-sim-controls">
+          <button type="button" class="algo-sim-btn" id="dqPrevBtn">← Pas anterior</button>
+          <button type="button" class="algo-sim-btn algo-sim-btn-primary" id="dqNextBtn">Pasul următor →</button>
+          <button type="button" class="algo-sim-btn" id="dqResetBtn">Reset</button>
+        </div>
+
+        <div class="algo-sim-status" id="dqStatus">
+          Apasă <strong>„Pasul următor →”</strong> pentru a vedea cum <code>std::deque</code> menține indicii candidaților la maxim pentru ferestre de lungime <code>K = 3</code>.
+        </div>
+
+        <div class="algo-sim-row-wrap">
+          <div class="algo-sim-row-label">Vectorul A[0..8] (fereastra curentă [i - K + 1 .. i] este evidențiată):</div>
+          <div class="algo-sim-cells" id="dqArrRow"></div>
+        </div>
+
+        <div class="algo-sim-split" style="margin-top:0.75rem;">
+          <div class="algo-sim-panel">
+            <div class="algo-sim-row-label">Conținutul <code>deque&lt;int&gt; dq</code> (Front = maximul ferestrei):</div>
+            <div class="algo-sim-cells" id="dqQueueRow" style="min-height:54px; align-items:center;"></div>
+          </div>
+          <div class="algo-sim-panel">
+            <div class="algo-sim-row-label">Vectorul maximelor rezultate:</div>
+            <div class="algo-sim-cells" id="dqOutRow" style="min-height:54px; align-items:center;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROBLEMA 3A -->
+      <div class="prob" id="p-max-fereastra">
+        <h3>Problema <a href="https://www.pbinfo.ro/" target="_blank" rel="noopener">Maximul în fereastră glisantă de lungime K</a> <span class="src">O(N) • std::deque</span></h3>
+        <p>
+          Se dă un vector cu <code>N</code> numere întregi și un întreg <code>K</code> (<code>1 ≤ K ≤ N ≤ 10<sup>6</sup></code>). Să se afișeze elementul maxim din fiecare subsecvență contiguă de lungime <code>K</code>.
+        </p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th></tr></thead><tbody><tr><td class="m">8 3
+1 3 -1 -3 5 3 6 7</td><td class="m">3 3 5 5 6 7</td></tr></tbody></table></div>
+
+        <div class="think">
+          <p class="q">Gândiți-vă: De ce stocăm în deque INDICI (i) în locul valorilor propriu-zise (A[i])?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Pentru a ști când un candidat din fața deque-ului a părăsit fereastra curentă <code>[i - K + 1, i]</code>, verificăm condiția <code>dq.front() &lt;= i - K</code>, care necesită cunoașterea poziției sale în vector.</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>
+              La fiecare pas <code>i</code>: (1) eliminăm din față indicii ieșiți din fereastră (<code>dq.front() &lt;= i - k</code>), (2) eliminăm din spate indicii cu valori <code>≤ a[i]</code>, (3) inserăm <code>i</code> la finalul deque-ului, iar dacă <code>i ≥ k - 1</code>, maximul ferestrei este <code>a[dq.front()]</code>.
+            </p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <vector>
+#include <deque>
+using namespace std;
+
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n, k;
+    cin >> n >> k;
+    vector<int> a(n);
+    for (int i = 0; i < n; ++i)
+        cin >> a[i];
+
+    deque<int> dq; // Memoreaza indici ordonati descrescator dupa valorile a[idx]
+    for (int i = 0; i < n; ++i)
+    {
+        while (!dq.empty() && dq.front() <= i - k)
+            dq.pop_front();
+        while (!dq.empty() && a[dq.back()] <= a[i])
+            dq.pop_back();
+
+        dq.push_back(i);
+
+        if (i >= k - 1)
+            cout << a[dq.front()] << " ";
+    }
+    cout << "\n";
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+
+      <!-- PROBLEMA 3B -->
+      <div class="prob" id="p-kth-lipsa">
+        <h3>Problema <a href="https://www.pbinfo.ro/" target="_blank" rel="noopener">Al K-lea element lipsă dintr-un șir nesortat</a> <span class="src">unordered_set • O(N + max - min)</span></h3>
+        <p>
+          Se dă un șir nesortat de <code>N</code> numere întregi și un număr natural <code>K</code>. Să se determine al <code>K</code>-lea număr întreg lipsă în ordine crescătoare din intervalul <code>[min(A), max(A)]</code>, sau <code>-1</code> dacă există mai puțin de <code>K</code> numere lipsă.
+        </p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th></tr></thead><tbody><tr><td class="m">4 5
+2 10 9 4</td><td class="m">8</td></tr></tbody></table></div>
+
+        <div class="think">
+          <p class="q">Gândiți-vă: Cum putem verifica în O(1) mediu dacă un număr din intervalul [min, max] apare în vector fără a-l sorta?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Inserăm toate elementele șirului într-un <code>std::unordered_set&lt;int&gt;</code> în <code>O(N)</code>, apoi parcurgem valorile întregi de la <code>minm</code> la <code>maxm</code> numărând elementele absente.</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>
+              În exemplul <code>[2, 10, 9, 4]</code>, intervalul este <code>[2, 10]</code>, iar valorile absente în ordine crescătoare sunt <code>3, 5, 6, 7, 8</code>; al 5-lea element lipsă este <code>8</code>.
+            </p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <vector>
+#include <unordered_set>
+#include <algorithm>
+using namespace std;
+
+int main()
+{
+    int n, k;
+    cin >> n >> k;
+    vector<int> arr(n);
+    for (int i = 0; i < n; ++i)
+        cin >> arr[i];
+
+    unordered_set<int> prezente(arr.begin(), arr.end());
+    int minm = *min_element(arr.begin(), arr.end());
+    int maxm = *max_element(arr.begin(), arr.end());
+
+    int lipsaCount = 0;
+    for (int val = minm; val <= maxm; ++val)
+    {
+        if (prezente.find(val) == prezente.end())
+        {
+            lipsaCount++;
+            if (lipsaCount == k)
+            {
+                cout << val << "\n";
+                return 0;
+            }
+        }
+    }
+    cout << -1 << "\n";
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         CAPITOLUL 4: PARCURGERI SPECIALE, ROTAȚII IN-PLACE ȘI BORDARE 2D
+         ====================================================================== -->
+    <section id="matrici-2d">
+      <h2>4. Parcurgeri speciale, rotații in-place și bordare 2D</h2>
+      <ul>
+        <li>
+          <strong>Invarianții diagonalelor:</strong> Pe orice paralelă la <em>diagonala principală</em>, diferența <code>j - i</code> este constantă (în <code>[-(N-1), N-1]</code>). Pe orice paralelă la <em>diagonala secundară</em>, suma <code>i + j</code> este constantă (în <code>[0, 2N - 2]</code>).
+        </li>
+        <li>
+          <strong>Rotația la 90° fără memorie suplimentară (O(1) extra space):</strong> Pentru o matrice pătratică <code>N × N</code>, rotația la <strong>90° orar</strong> se obține prin <em>transpunere</em> (<code>swap(a[i][j], a[j][i])</code> pentru <code>i &lt; j</code>) urmată de <em>inversarea fiecărei linii</em>. Rotația la <strong>90° antiorar</strong> se obține prin <em>transpunere</em> urmată de <em>inversarea fiecărei coloane</em>.
+        </li>
+        <li>
+          <strong>Bordarea matricii și vectorii de direcție:</strong> Bordând conturul (liniile <code>0</code> și <code>N + 1</code>, coloanele <code>0</code> și <code>M + 1</code>) cu o valoare santinelă (de exemplu <code>-1</code> sau <code>'#'</code>), eliminăm verificările de ieșire din matrice și deplasăm cursorul uniform cu <code>dl[] = {-1, 0, 1, 0}</code>, <code>dc[] = {0, 1, 0, -1}</code> în algoritmii <strong>Lee</strong> (BFS pe grilă) și <strong>Fill</strong> (DFS).
+        </li>
+      </ul>
+
+      <!-- VISUALIZER INTERACTIV 2D -->
+      <div class="algo-sim-card" id="algoVis2D">
+        <div class="algo-sim-header">
+          <h3 class="algo-sim-title">Visualizer Interactiv 2D — Parcurgeri &amp; Rotații In-Place (5 × 5)</h3>
+          <span class="algo-sim-badge">Animație pas cu pas</span>
+        </div>
+
+        <div class="algo-sim-controls">
+          <button type="button" class="algo-sim-btn algo-sim-btn-primary" data-vis-mode="diag-main">Diagonale principale</button>
+          <button type="button" class="algo-sim-btn algo-sim-btn-primary" data-vis-mode="diag-sec">Diagonale secundare</button>
+          <button type="button" class="algo-sim-btn algo-sim-btn-primary" data-vis-mode="spiral">Spirală</button>
+          <button type="button" class="algo-sim-btn algo-sim-btn-primary" data-vis-mode="snake">Șarpe</button>
+          <button type="button" class="algo-sim-btn algo-sim-btn-primary" data-vis-mode="zigzag">Zig-Zag</button>
+          <button type="button" class="algo-sim-btn algo-sim-btn-emerald" id="visRotCwBtn">↻ Rotație 90° Orar</button>
+          <button type="button" class="algo-sim-btn algo-sim-btn-emerald" id="visRotCcwBtn">↺ Rotație 90° Antiorar</button>
+          <button type="button" class="algo-sim-btn" id="visResetBtn">Reset</button>
+        </div>
+
+        <div class="algo-sim-split" style="align-items:center;">
+          <div class="algo-sim-panel" style="display:flex; justify-content:center;">
+            <div class="algo-sim-grid" id="visGrid"></div>
+          </div>
+          <div class="algo-sim-panel">
+            <div class="algo-sim-row-label" id="visLabel">Alege o parcurgere sau o rotație de mai sus:</div>
+            <div class="formula-note" id="visSeq" style="min-height:95px; margin-bottom:0; word-break:break-word;">
+              Ordinea elementelor vizitate va apărea aici...
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROBLEMA 4A -->
+      <div class="prob" id="p-distanta-1">
+        <h3>Problema <a href="https://www.pbinfo.ro/" target="_blank" rel="noopener">Distanța până la cel mai apropiat 1 într-o matrice binară</a> <span class="src">O(N · M) • Lee Multi-Sursă</span></h3>
+        <p>
+          Se dă o matrice binară cu <code>N</code> linii și <code>M</code> coloane care conține cel puțin o celulă cu valoarea <code>1</code>. Pentru fiecare celulă <code>(i, j)</code>, să se calculeze distanța Manhattan minimă (<code>|i - i'| + |j - j'|</code>) până la cea mai apropiată celulă cu valoarea <code>1</code>.
+        </p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th></tr></thead><tbody><tr><td class="m">3 4
+0 0 0 1
+0 0 1 1
+0 1 1 0</td><td class="m">3 2 1 0
+2 1 0 0
+1 0 0 1</td></tr></tbody></table></div>
+
+        <div class="think">
+          <p class="q">Gândiți-vă: De ce un BFS pornit din fiecare celulă 0 ar depăși timpul (O(N² · M²)), și cum rezolvăm problema într-un singur BFS?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Inversăm perspectiva (Lee multi-sursă): introducem simultan în coadă <strong>toate</strong> celulele care au valoarea <code>1</code> cu distanța <code>0</code>, apoi expandăm în cele 4 direcții ortogonale.</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>
+              Fiecare celulă intră în coadă o singură dată, garantând complexitatea optimă <strong>O(N · M)</strong>.
+            </p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <vector>
+#include <queue>
+using namespace std;
+
+const int dl[] = {-1, 0, 1, 0};
+const int dc[] = {0, 1, 0, -1};
+
+int main()
+{
+    int n, m;
+    cin >> n >> m;
+    vector<vector<int>> dist(n, vector<int>(m, -1));
+    queue<pair<int, int>> q;
+
+    for (int i = 0; i < n; ++i)
+    {
+        for (int j = 0; j < m; ++j)
+        {
+            int val;
+            cin >> val;
+            if (val == 1)
+            {
+                dist[i][j] = 0;
+                q.push({i, j});
+            }
+        }
+    }
+
+    while (!q.empty())
+    {
+        auto [r, c] = q.front();
+        q.pop();
+        for (int d = 0; d < 4; ++d)
+        {
+            int nr = r + dl[d], nc = c + dc[d];
+            if (nr >= 0 && nr < n && nc >= 0 && nc < m && dist[nr][nc] == -1)
+            {
+                dist[nr][nc] = dist[r][c] + 1;
+                q.push({nr, nc});
+            }
+        }
+    }
+
+    for (int i = 0; i < n; ++i)
+    {
+        for (int j = 0; j < m; ++j)
+            cout << dist[i][j] << " ";
+        cout << "\n";
+    }
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+
+      <!-- PROBLEMA 4B -->
+      <div class="prob" id="p-insule-distincte">
+        <h3>Problema <a href="https://www.pbinfo.ro/" target="_blank" rel="noopener">Numărul de insule distincte</a> <span class="src">O(N · M log(N · M)) • DFS Normalizat</span></h3>
+        <p>
+          Se dă o matrice binară <code>N × M</code> în care <code>1</code> reprezintă uscat, iar <code>0</code> apă. Două insule (componente conexe pe 4 direcții) sunt considerate identice dacă una se poate obține din cealaltă prin translație (fără rotație sau reflexie). Să se determine numărul de insule distincte.
+        </p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th></tr></thead><tbody><tr><td class="m">4 5
+1 1 0 0 0
+1 1 0 0 0
+0 0 0 1 1
+0 0 0 1 1</td><td class="m">1</td></tr></tbody></table></div>
+
+        <div class="think">
+          <p class="q">Gândiți-vă: Cum codificăm forma unei insule astfel încât două insule translatate să producă exact aceeași semnătură?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Parcurgem fiecare insulă prin DFS pornind din prima sa celulă <code>(x0, y0)</code> în aceeași ordine a vecinilor și salvăm coordonatele relative <code>(i - x0, j - y0)</code> într-un <code>vector&lt;pair&lt;int,int&gt;&gt;</code>, pe care îl inserăm într-un <code>std::set</code>.</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>
+              Scăzând coordonatele punctului de start <code>(x0, y0)</code> și respectând o ordine fixă a direcțiilor DFS, două insule identice prin translație generează vectori identici de coordonate relative.
+            </p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <vector>
+#include <set>
+using namespace std;
+
+const int dl[] = {-1, 0, 1, 0};
+const int dc[] = {0, 1, 0, -1};
+
+void dfs(vector<vector<int>>& g, int x0, int y0, int i, int j, vector<pair<int, int>>& forma)
+{
+    int n = (int)g.size(), m = (int)g[0].size();
+    if (i < 0 || i >= n || j < 0 || j >= m || g[i][j] != 1)
+        return;
+
+    g[i][j] = -1; // Marcam celula ca vizitata
+    forma.push_back({i - x0, j - y0});
+
+    for (int d = 0; d < 4; ++d)
+        dfs(g, x0, y0, i + dl[d], j + dc[d], forma);
+}
+
+int main()
+{
+    int n, m;
+    cin >> n >> m;
+    vector<vector<int>> g(n, vector<int>(m));
+    for (int i = 0; i < n; ++i)
+        for (int j = 0; j < m; ++j)
+            cin >> g[i][j];
+
+    set<vector<pair<int, int>>> formeUnice;
+    for (int i = 0; i < n; ++i)
+    {
+        for (int j = 0; j < m; ++j)
+        {
+            if (g[i][j] == 1)
+            {
+                vector<pair<int, int>> forma;
+                dfs(g, i, j, i, j, forma);
+                formeUnice.insert(forma);
+            }
+        }
+    }
+    cout << formeUnice.size() << "\n";
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+
+      <!-- PROBLEMA 4C -->
+      <div class="prob" id="p-subpatrat-x">
+        <h3>Problema <a href="https://www.pbinfo.ro/" target="_blank" rel="noopener">Cel mai mare subpătrat înconjurat de 'X'</a> <span class="src">O(N³) • Preprocesare hor/ver</span></h3>
+        <p>
+          Se dă o matrice pătratică <code>N × N</code> formată din caracterele <code>'X'</code> și <code>'O'</code>. Să se determine latura maximă a unui subpătrat ale cărui 4 laturi (conturul) sunt formate exclusiv din caractere <code>'X'</code>.
+        </p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th></tr></thead><tbody><tr><td class="m">4
+XXXX
+XOOX
+XOOX
+XXXX</td><td class="m">4</td></tr></tbody></table></div>
+
+        <div class="think">
+          <p class="q">Gândiți-vă: Dacă fixăm colțul dreapta-jos (i, j) al unui pătrat de latură L, ce condiții trebuie să satisfacă matricele de lungimi consecutive hor[][] și ver[][]?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Calculăm <code>hor[i][j]</code> (numărul de <code>'X'</code>-uri consecutive spre stânga) și <code>ver[i][j]</code> (numărul de <code>'X'</code>-uri consecutive în sus). Pentru un colț dreapta-jos <code>(i, j)</code>, latura candidată este cel mult <code>min(hor[i][j], ver[i][j])</code>, iar pentru a valida celelalte două laturi verificăm <code>ver[i][j - L + 1] ≥ L</code> și <code>hor[i - L + 1][j] ≥ L</code>.</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>
+              Preprocesarea durează <code>O(N<sup>2</sup>)</code>, iar verificarea tuturor colțurilor dreapta-jos durează <code>O(N<sup>3</sup>)</code> în cazul defavorabil, eliminând buclele interioare de verificare a laturilor.
+            </p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+
+int main()
+{
+    int n;
+    cin >> n;
+    vector<string> mat(n);
+    for (int i = 0; i < n; ++i)
+        cin >> mat[i];
+
+    vector<vector<int>> hor(n, vector<int>(n, 0)), ver(n, vector<int>(n, 0));
+    for (int i = 0; i < n; ++i)
+    {
+        for (int j = 0; j < n; ++j)
+        {
+            if (mat[i][j] == 'X')
+            {
+                hor[i][j] = (j == 0) ? 1 : hor[i][j - 1] + 1;
+                ver[i][j] = (i == 0) ? 1 : ver[i - 1][j] + 1;
+            }
+        }
+    }
+
+    int maxLat = 0;
+    for (int i = n - 1; i >= 0; --i)
+    {
+        for (int j = n - 1; j >= 0; --j)
+        {
+            int lat = min(hor[i][j], ver[i][j]);
+            while (lat > maxLat)
+            {
+                if (ver[i][j - lat + 1] >= lat && hor[i - lat + 1][j] >= lat)
+                    maxLat = lat;
+                lat--;
+            }
+        }
+    }
+    cout << maxLat << "\n";
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         CAPITOLUL 5: OPTIMIZAREA MEMORIEI: MATRICI FĂRĂ MATRICI
+         ====================================================================== -->
+    <section id="optimizare-memorie">
+      <h2>5. Optimizarea memoriei: Matrici fără matrici</h2>
+      <p>
+        La olimpiadă întâlnim frecvent limite de memorie foarte strânse (2–3 MB) sau dimensiuni uriașe (<code>N ≤ 10<sup>9</sup></code>) care interzic declararea unei matrici <code>int a[N][N]</code>. Folosim trei strategii esențiale:
+      </p>
+      <ol>
+        <li>
+          <strong>Acumularea sumelor „on-the-fly” în O(N) memorie:</strong> Când o matrice este generată element cu element și se cer doar sumele pe linii, coloane, <strong>L-uri (<code>sumL</code>)</strong> sau <strong>diagonale (<code>sumD</code>)</strong>, distribuim fiecare valoare direct în vectorul de sume:
+          <div class="formula-note">
+            // sumD: diagonale paralele cu diagonala principală (c - l ∈ [-(N-1), N-1]):<br>
+            suma[N - 1 + c - l] += val;<br><br>
+            // sumL: L-uri concentrice din colțul stânga-jos:<br>
+            if (c &lt; l) suma[l] += val; else suma[c] += val;
+          </div>
+        </li>
+        <li>
+          <strong>Formule matematice în O(1) memorie:</strong> Pentru matrici construite regulat (<code>matsp</code>, <code>matzeb</code>) cu <code>N ≤ 10<sup>9</sup></code>, determinăm inelul concentric și offset-ul pe latură direct din coordonatele <code>(L, C)</code>.
+        </li>
+        <li>
+          <strong>Matrici rare ca vector de triplete + interclasare:</strong> Dacă o matrice <code>N × M</code> are doar <code>T</code> elemente nenule, memorăm doar tripletele <code>&lt;linie, coloană, valoare&gt;</code> sortate lexicografic și le adunăm prin interclasare în <strong>O(T<sub>A</sub> + T<sub>B</sub>)</strong>.
+        </li>
+      </ol>
+
+      <!-- SIMULATOR INTERACTIV MATSP O(1) -->
+      <div class="algo-sim-card" id="algoSimMatsp">
+        <div class="algo-sim-header">
+          <h3 class="algo-sim-title">Calculator &amp; Visualizer în O(1) — Matricea Spirală din Centru (matsp)</h3>
+          <span class="algo-sim-badge">N impar ≤ 10⁹ • Memorie O(1)</span>
+        </div>
+
+        <div class="algo-sim-controls">
+          <div class="algo-sim-field">
+            <label for="spN">N (impar):</label>
+            <input type="number" id="spN" min="1" max="999999999" step="2" value="5" style="width:110px;">
+          </div>
+          <div class="algo-sim-field">
+            <label for="spL">Linia L:</label>
+            <input type="number" id="spL" min="1" max="999999999" value="1" style="width:92px;">
+          </div>
+          <div class="algo-sim-field">
+            <label for="spC">Coloana C:</label>
+            <input type="number" id="spC" min="1" max="999999999" value="1" style="width:92px;">
+          </div>
+          <button type="button" class="algo-sim-btn algo-sim-btn-primary" id="spCalcBtn">Calculează în O(1)</button>
+        </div>
+
+        <div class="algo-sim-split">
+          <div class="algo-sim-panel">
+            <div class="algo-sim-row-label">Deducție matematică în O(1):</div>
+            <div class="formula-note" id="spMathOut" style="margin-bottom:0;"></div>
+          </div>
+          <div class="algo-sim-panel" style="display:flex; flex-direction:column; align-items:center;">
+            <div class="algo-sim-row-label" id="spGridLabel">Previzualizare matrice (pentru N ≤ 9):</div>
+            <div class="algo-sim-grid" id="spMiniGrid"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROBLEMA 5A -->
+      <div class="prob" id="p-matsp">
+        <h3>Problema <a href="https://www.varena.ro/problema/matsp" target="_blank" rel="noopener">Matrice spirală (matsp)</a> <span class="src">Varena • O(1) timp și memorie</span></h3>
+        <p>
+          Într-o matrice pătratică de dimensiune impară <code>N × N</code> (<code>N ≤ 999.999.999</code>), numărul <code>1</code> este plasat în centru, iar numerele consecutive <code>2, 3, ..., N<sup>2</sup></code> se așază în spirală în sens antiorar (dreapta, sus, stânga, jos). Dându-se <code>N</code> și coordonatele <code>(L, C)</code> (1-indexate), să se determine valoarea aflată pe linia <code>L</code> și coloana <code>C</code>.
+        </p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th></tr></thead><tbody><tr><td class="m">5 1 1</td><td class="m">17</td></tr></tbody></table></div>
+
+        <div class="think">
+          <p class="q">Gândiți-vă: Dacă translatăm originea (0, 0) în centrul matricei ((N+1)/2, (N+1)/2), cum aflăm numărul inelului concentric pe care se află celula (l, c)?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Notând <code>l = L - (N + 1) / 2</code> și <code>c = C - (N + 1) / 2</code>, numărul inelului concentric este <code>P = max(|l|, |c|)</code>. Valoarea maximă de pe acest inel se află în colțul dreapta-jos <code>(P, P)</code> și este egală cu <code>(2P + 1)<sup>2</sup></code>.</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>
+              Scădem din valoarea maximă a inelului <code>(2P + 1)<sup>2</sup></code> distanța parcursă în sens invers spiralei pe cele 4 laturi ale inelului <code>P</code>. Folosim <code>long long</code> deoarece <code>N<sup>2</sup></code> ajunge la <code>10<sup>18</sup></code>.
+            </p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <cmath>
+#include <algorithm>
+using namespace std;
+
+int main()
+{
+    long long n, L, C;
+    cin >> n >> L >> C;
+
+    // Translatam originea (0, 0) in centrul matricei
+    long long l = L - (n + 1) / 2;
+    long long c = C - (n + 1) / 2;
+
+    long long p = max(abs(l), abs(c)); // Inelul concentric (0 = centru)
+    long long lat = 2 * p;             // Lungimea unei laturi a inelului p
+    long long dif = 0;
+
+    if (l == p)
+        dif = p - c;                 // Latura de jos
+    else if (c == -p)
+        dif = lat + p - l;           // Latura din stanga
+    else if (l == -p)
+        dif = 2 * lat + c + p;       // Latura de sus
+    else
+        dif = 3 * lat + l + p;       // Latura din dreapta
+
+    long long maximInel = (lat + 1) * (lat + 1);
+    cout << maximInel - dif << "\n";
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+
+      <!-- PROBLEMA 5B -->
+      <div class="prob" id="p-matrice-rara">
+        <h3>Problema <a href="https://www.pbinfo.ro/probleme/1323" target="_blank" rel="noopener">Suma a două matrici rare</a> <span class="src">pbinfo #1323 • O(TA + TB)</span></h3>
+        <p>
+          Se dau două matrici rare <code>A</code> și <code>B</code> de dimensiune <code>N × M</code> (<code>N, M ≤ 10<sup>6</sup></code>), fiecare fiind dată prin numărul său de elemente nenule (<code>T<sub>A</sub></code>, respectiv <code>T<sub>B</sub></code>) și prin tripletele <code>(linie, coloană, valoare)</code> ordonate crescător lexicografic după linie și coloană. Să se determine matricea sumă <code>C = A + B</code> în aceeași reprezentare rară (eliminând elementele care devin <code>0</code>).
+        </p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th></tr></thead><tbody><tr><td class="m">3 3 2 2
+1 2 5
+2 3 -4
+1 2 -5
+3 1 7</td><td class="m">2
+2 3 -4
+3 1 7</td></tr></tbody></table></div>
+
+        <div class="think">
+          <p class="q">Gândiți-vă: De ce trebuie să verificăm dacă a[i].val + b[j].val != 0 atunci când cele două triplete au aceleași coordonate?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Aplicăm algoritmul de interclasare (merge) pe cei doi vectori de triplete ordonați lexicografic. Dacă două triplete au aceeași poziție <code>(lin, col)</code> și suma valorilor este <code>0</code>, elementul nu mai este nenul, deci nu îl adăugăm în rezultatul <code>C</code>.</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>
+              Algoritmul parcurge ambii vectori o singură dată în complexitate liniară <strong>O(T<sub>A</sub> + T<sub>B</sub>)</strong>.
+            </p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <vector>
+using namespace std;
+
+struct Triplet
+{
+    int lin, col, val;
+};
+
+bool maiMic(const Triplet& a, const Triplet& b)
+{
+    return (a.lin < b.lin) || (a.lin == b.lin && a.col < b.col);
+}
+
+int main()
+{
+    int n, m, ta, tb;
+    cin >> n >> m >> ta >> tb;
+    vector<Triplet> a(ta), b(tb), c;
+
+    for (int i = 0; i < ta; ++i)
+        cin >> a[i].lin >> a[i].col >> a[i].val;
+    for (int i = 0; i < tb; ++i)
+        cin >> b[i].lin >> b[i].col >> b[i].val;
+
+    int i = 0, j = 0;
+    while (i < ta && j < tb)
+    {
+        if (maiMic(a[i], b[j]))
+            c.push_back(a[i++]);
+        else if (maiMic(b[j], a[i]))
+            c.push_back(b[j++]);
+        else
+        {
+            int s = a[i].val + b[j].val;
+            if (s != 0)
+                c.push_back({a[i].lin, a[i].col, s});
+            i++;
+            j++;
+        }
+    }
+    while (i < ta) c.push_back(a[i++]);
+    while (j < tb) c.push_back(b[j++]);
+
+    cout << c.size() << "\n";
+    for (const auto& t : c)
+        cout << t.lin << " " << t.col << " " << t.val << "\n";
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         CAPITOLUL 6: ARITMETICA NUMERELOR MARI (BIGINT)
+         ====================================================================== -->
+    <section id="numere-mari">
+      <h2>6. Aritmetica numerelor mari (BigInt)</h2>
+      <p>
+        Când valorile depășesc capacitatea tipului <code>unsigned long long</code> (20 de cifre, <code>≈ 1.84 × 10<sup>19</sup></code>), reprezentăm numerele mari sub forma unui vector de cifre <code>typedef int NrMare[DIM];</code> în care:
+      </p>
+      <ul>
+        <li><code>A[0]</code> reține <strong>numărul total de cifre</strong> ale numărului;</li>
+        <li><code>A[1], A[2], ..., A[A[0]]</code> rețin cifrele în <strong>ordine inversă</strong> (<code>A[1]</code> este cifra unităților, <code>A[A[0]]</code> este prima cifră a numărului).</li>
+      </ul>
+      <div class="formula-note">
+        // Exemplu: 23142451769000 (14 cifre)<br>
+        A[0] = 14 | A[1..14] = [0, 0, 0, 9, 6, 7, 1, 5, 4, 2, 4, 1, 3, 2]
+      </div>
+      <p>
+        <strong>Criterii rapide de divizibilitate pentru <code>d ∈ [2, 15]</code>:</strong> Pe lângă calculul direct al restului prin împărțire la scalar (<code>r = (r * 10 + A[i]) % d</code>), putem folosi proprietățile cifrelor: divizibilitatea cu <code>2, 5, 10</code> depinde de <code>A[1]</code>; cu <code>4, 25</code> de ultimele două cifre (<code>A[2]*10 + A[1]</code>); cu <code>8</code> de ultimele trei cifre; cu <code>3, 9</code> de suma cifrelor; cu <code>11</code> de diferența dintre suma cifrelor de pe poziții pare și impare; iar numerele compuse <code>6, 12, 14, 15</code> se reduc la factorii lor primi între ei (<code>(2,3)</code>, <code>(3,4)</code>, <code>(2,7)</code>, <code>(3,5)</code>).
+      </p>
+
+      <!-- SIMULATOR INTERACTIV BIGINT -->
+      <div class="algo-sim-card" id="algoSimBigInt">
+        <div class="algo-sim-header">
+          <h3 class="algo-sim-title">Calculator Interactiv BigInt &amp; Vizualizator Vector Intern</h3>
+          <span class="algo-sim-badge">A[0] = lungime • A[1] = unități</span>
+        </div>
+
+        <div class="algo-sim-controls">
+          <div class="algo-sim-field">
+            <label for="biA">A:</label>
+            <input type="text" id="biA" class="algo-sim-wide" value="98765432109876543210987654321">
+          </div>
+          <div class="algo-sim-field">
+            <label for="biB">B:</label>
+            <input type="text" id="biB" class="algo-sim-wide" value="1234567890123456789012345">
+          </div>
+          <div class="algo-sim-field">
+            <label for="biN">N! (N ≤ 100):</label>
+            <input type="number" id="biN" min="0" max="100" value="25" style="width:72px;">
+          </div>
+          <button type="button" class="algo-sim-btn algo-sim-btn-primary" id="biCalcBtn">Calculează (+, -, *, N!)</button>
+        </div>
+
+        <div class="algo-sim-row-wrap">
+          <div class="algo-sim-row-label">Reprezentarea internă în vectorul A[0..A[0]] (cifrele inversate):</div>
+          <div class="algo-sim-cells" id="biCellsRow"></div>
+        </div>
+
+        <div class="formula-note" id="biOutput" style="margin-top:0.75rem; margin-bottom:0; word-break:break-all;"></div>
+      </div>
+
+      <!-- PROBLEMA 6: #534 PBINFO -->
+      <div class="prob" id="p-factorial-mare">
+        <h3>Problema <a href="https://www.pbinfo.ro/probleme/534" target="_blank" rel="noopener">Calculul lui N! pentru N ≤ 1000</a> <span class="src">pbinfo #534 • NrMare</span></h3>
+        <p>
+          Se dă un număr natural <code>N</code> (<code>0 ≤ N ≤ 1000</code>). Să se calculeze și să se afișeze valoarea exactă a lui <code>N! = 1 × 2 × ... × N</code>.
+        </p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th></tr></thead><tbody><tr><td class="m">25</td><td class="m">15511210043330985984000000</td></tr></tbody></table></div>
+
+        <div class="think">
+          <p class="q">Gândiți-vă: De câte cifre are nevoie tabloul NrMare pentru a stoca valoarea lui 1000! (formula lui Stirling / log10)?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Numărul de cifre ale lui <code>1000!</code> este <code>⌊∑<sub>k=1..1000</sub> log<sub>10</sub>(k)⌋ + 1 = 2568</code> cifre, deci dimensionăm <code>typedef int NrMare[3000];</code> și înmulțim succesiv cu <code>i = 2..N</code> folosind operația de înmulțire a unui număr mare cu un scalar.</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>
+              Mai jos este prezentată biblioteca completă <code>NrMare</code> (atribuire, comparare, adunare, scădere, înmulțire cu scalar, înmulțire a două numere mari și împărțire la scalar) împreună cu rezolvarea problemei <code>#534</code>.
+            </p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+
+const int DIM = 3005;
+typedef int NrMare[DIM];
+
+void atribuieMic(NrMare A, long long x)
+{
+    memset(A, 0, sizeof(NrMare));
+    if (x == 0)
+    {
+        A[0] = 1;
+        A[1] = 0;
+        return;
+    }
+    while (x > 0)
+    {
+        A[++A[0]] = (int)(x % 10);
+        x /= 10;
+    }
+}
+
+void afisare(const NrMare A)
+{
+    for (int i = A[0]; i >= 1; --i)
+        cout << A[i];
+    cout << "\n";
+}
+
+// Returneaza -1 daca A < B, 0 daca A == B, 1 daca A > B
+int comparare(const NrMare A, const NrMare B)
+{
+    if (A[0] != B[0])
+        return (A[0] < B[0]) ? -1 : 1;
+    for (int i = A[0]; i >= 1; --i)
+        if (A[i] != B[i])
+            return (A[i] < B[i]) ? -1 : 1;
+    return 0;
+}
+
+// REZ = A + B
+void adunare(const NrMare A, const NrMare B, NrMare REZ)
+{
+    memset(REZ, 0, sizeof(NrMare));
+    int lg = max(A[0], B[0]), t = 0;
+    for (int i = 1; i <= lg || t; ++i)
+    {
+        int s = t + (i <= A[0] ? A[i] : 0) + (i <= B[0] ? B[i] : 0);
+        REZ[i] = s % 10;
+        t = s / 10;
+        REZ[0] = i;
+    }
+}
+
+// REZ = A - B (presupune A >= B)
+void scadere(const NrMare A, const NrMare B, NrMare REZ)
+{
+    memset(REZ, 0, sizeof(NrMare));
+    int t = 0;
+    for (int i = 1; i <= A[0]; ++i)
+    {
+        int dif = A[i] - (i <= B[0] ? B[i] : 0) - t;
+        if (dif < 0)
+        {
+            dif += 10;
+            t = 1;
+        }
+        else
+            t = 0;
+        REZ[i] = dif;
+    }
+    REZ[0] = A[0];
+    while (REZ[0] > 1 && REZ[REZ[0]] == 0)
+        REZ[0]--;
+}
+
+// A = A * x (scalar mic)
+void produsMic(NrMare A, int x)
+{
+    if (x == 0)
+    {
+        atribuieMic(A, 0);
+        return;
+    }
+    long long t = 0;
+    for (int i = 1; i <= A[0] || t; ++i)
+    {
+        t += 1LL * (i <= A[0] ? A[i] : 0) * x;
+        A[i] = (int)(t % 10);
+        t /= 10;
+        if (i > A[0])
+            A[0] = i;
+    }
+}
+
+// REZ = A * B
+void produsMare(const NrMare A, const NrMare B, NrMare REZ)
+{
+    memset(REZ, 0, sizeof(NrMare));
+    for (int i = 1; i <= A[0]; ++i)
+    {
+        int t = 0;
+        for (int j = 1; j <= B[0] || t; ++j)
+        {
+            t += REZ[i + j - 1] + A[i] * (j <= B[0] ? B[j] : 0);
+            REZ[i + j - 1] = t % 10;
+            t /= 10;
+        }
+    }
+    REZ[0] = A[0] + B[0];
+    while (REZ[0] > 1 && REZ[REZ[0]] == 0)
+        REZ[0]--;
+}
+
+// CAT = A / x; returneaza restul A % x
+int impartireMica(const NrMare A, int x, NrMare CAT)
+{
+    memset(CAT, 0, sizeof(NrMare));
+    long long r = 0;
+    for (int i = A[0]; i >= 1; --i)
+    {
+        r = r * 10 + A[i];
+        CAT[i] = (int)(r / x);
+        r %= x;
+    }
+    CAT[0] = A[0];
+    while (CAT[0] > 1 && CAT[CAT[0]] == 0)
+        CAT[0]--;
+    return (int)r;
+}
+
+int main()
+{
+    int n;
+    cin >> n;
+    NrMare fact;
+    atribuieMic(fact, 1);
+    for (int i = 2; i <= n; ++i)
+        produsMic(fact, i);
+
+    afisare(fact);
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         CAPITOLUL 7: APLICAȚII DE CONCURS ȘI TEST GRILĂ
+         ====================================================================== -->
+    <section id="aplicatii">
+      <h2>7. Aplicații de concurs și test grilă</h2>
+      <p>
+        Exersează pe 5 probleme reprezentative date la olimpiadele naționale și județene (ONI / OJI / Varena), apoi verifică-ți cunoștințele în testul grilă de 8 întrebări.
+      </p>
+
+      <!-- CONCURS 1: JOC1 ONI 2011 -->
+      <div class="prob" id="p-joc1-oni">
+        <h3>Problema 1. <a href="https://www.pbinfo.ro/" target="_blank" rel="noopener">Joc1 (ONI 2011, clasa a VII-a)</a> <span class="src">ONI 2011 • Tablouri 3D</span></h3>
+        <p>
+          Se dă o tablă de joc binară <code>N × M</code> (<code>3 ≤ N, M ≤ 99</code>) formată din caractere <code>'0'</code> și <code>'1'</code>. Se cunosc 12 piese distincte încadrate fiecare într-o matrice <code>3 × 3</code>. O piesă se poate așeza peste o zonă <code>3 × 3</code> a tablei dacă peste fiecare <code>1</code> al piesei se află un <code>'1'</code> pe tablă. Să se determine numărul total de potriviri (poziție + piesă).
+        </p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th></tr></thead><tbody><tr><td class="m">3 4
+1110
+1110
+1110</td><td class="m">12</td></tr></tbody></table></div>
+
+        <div class="think">
+          <p class="q">Gândiți-vă: Cum putem stoca elegant cele 12 piese 3 × 3 fără a scrie 12 blocuri separate de condiții if?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Folosiți un tablou tridimensional preinițializat <code>int forme[12][3][3]</code> și testați toate colțurile stânga-sus <code>(lin, col)</code> cu <code>0 ≤ lin ≤ N - 3</code> și <code>0 ≤ col ≤ M - 3</code>.</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>
+              În exemplul dat, submatricea <code>3 × 3</code> din stânga este plină cu <code>'1'</code>, deci toate cele 12 forme se potrivesc acolo (<code>12</code> potriviri).
+            </p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+using namespace std;
+
+char a[105][105];
+int forme[12][3][3] = {
+    {{1,0,0},{1,0,0},{1,1,1}}, {{1,1,1},{1,0,0},{1,0,0}},
+    {{1,1,1},{0,0,1},{0,0,1}}, {{0,0,1},{0,0,1},{1,1,1}},
+    {{1,0,0},{1,1,1},{1,0,0}}, {{1,1,1},{0,1,0},{0,1,0}},
+    {{0,0,1},{1,1,1},{0,0,1}}, {{0,1,0},{0,1,0},{1,1,1}},
+    {{0,1,1},{1,1,0},{0,1,0}}, {{0,1,0},{1,1,1},{0,0,1}},
+    {{0,1,0},{0,1,1},{1,1,0}}, {{1,0,0},{1,1,1},{0,1,0}}
+};
+
+int main()
+{
+    int n, m, nrap = 0;
+    cin >> n >> m;
+    for (int i = 0; i < n; ++i)
+        for (int j = 0; j < m; ++j)
+            cin >> a[i][j];
+
+    for (int lin = 0; lin <= n - 3; ++lin)
+    {
+        for (int col = 0; col <= m - 3; ++col)
+        {
+            for (int f = 0; f < 12; ++f)
+            {
+                bool ok = true;
+                for (int i = 0; i < 3 && ok; ++i)
+                    for (int j = 0; j < 3 && ok; ++j)
+                        if (forme[f][i][j] == 1 && a[lin + i][col + j] != '1')
+                            ok = false;
+                if (ok)
+                    nrap++;
+            }
+        }
+    }
+    cout << nrap << "\n";
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+
+      <!-- CONCURS 2: ACTUALIZĂRI DREPTUNGHIULARE ȘI INTEROGĂRI -->
+      <div class="prob" id="p-mars-2d-queries">
+        <h3>Problema 2. <a href="https://www.pbinfo.ro/" target="_blank" rel="noopener">Actualizări dreptunghiulare și interogări</a> <span class="src">Mars 2D + Sume Parțiale 2D</span></h3>
+        <p>
+          Se dă o matrice <code>N × M</code> (<code>N, M ≤ 1000</code>) inițial plină cu zerouri. Se efectuează <code>U</code> operații de adăugare a unei valori <code>v</code> pe un dreptunghi <code>(x1, y1, x2, y2)</code>, urmate de <code>Q</code> interogări de sumă pe submatrici <code>(r1, c1, r2, c2)</code>. Să se răspundă la toate cele <code>Q</code> interogări.
+        </p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th></tr></thead><tbody><tr><td class="m">3 3 2 2
+1 1 2 2 5
+2 2 3 3 3
+1 1 3 3
+2 2 2 2</td><td class="m">32
+8</td></tr></tbody></table></div>
+
+        <div class="think">
+          <p class="q">Gândiți-vă: De câte ori aplicăm formula sumelor parțiale 2D pe matricea B[][] pentru a trece de la actualizările Mars la interogările de submatrice?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Prima trecere cu sume parțiale 2D reconstruiește valorile reale ale celulelor matricei; a doua trecere cu sume parțiale 2D construiește prefixele de sume necesare interogărilor în <code>O(1)</code>!</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>
+              Complexitatea totală este <strong>O(N · M + U + Q)</strong>.
+            </p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+using namespace std;
+
+long long B[1005][1005];
+
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n, m, u, q;
+    cin >> n >> m >> u >> q;
+    while (u--)
+    {
+        int x1, y1, x2, y2;
+        long long v;
+        cin >> x1 >> y1 >> x2 >> y2 >> v;
+        B[x1][y1] += v;
+        B[x1][y2 + 1] -= v;
+        B[x2 + 1][y1] -= v;
+        B[x2 + 1][y2 + 1] += v;
+    }
+
+    // Pas 1: Reconstruim valorile celulelor (Mars 2D)
+    for (int i = 1; i <= n; ++i)
+        for (int j = 1; j <= m; ++j)
+            B[i][j] += B[i - 1][j] + B[i][j - 1] - B[i - 1][j - 1];
+
+    // Pas 2: Construim matricea sumelor partiale 2D pentru query-uri O(1)
+    for (int i = 1; i <= n; ++i)
+        for (int j = 1; j <= m; ++j)
+            B[i][j] += B[i - 1][j] + B[i][j - 1] - B[i - 1][j - 1];
+
+    while (q--)
+    {
+        int r1, c1, r2, c2;
+        cin >> r1 >> c1 >> r2 >> c2;
+        cout << B[r2][c2] - B[r1 - 1][c2] - B[r2][c1 - 1] + B[r1 - 1][c1 - 1] << "\n";
+    }
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+
+      <!-- CONCURS 3: MATZEB (VARENA) -->
+      <div class="prob" id="p-matzeb">
+        <h3>Problema 3. <a href="https://www.varena.ro/problema/matzeb" target="_blank" rel="noopener">Matrice zebră (matzeb)</a> <span class="src">Varena • O(1) memorie</span></h3>
+        <p>
+          O matrice <code>N × N</code> (<code>N ≤ 10<sup>9</sup></code>) este completată cu numerele <code>1, 2, ..., N<sup>2</sup></code> pe L-uri concentrice pornind din colțul stânga-sus <code>(1, 1)</code>: L-ul 0 conține <code>1</code>; L-ul 1 se parcurge de sus în jos și spre stânga (<code>2, 3, 4</code>); L-ul 2 de jos în sus și spre dreapta (<code>5, 6, 7, 8, 9</code>) ș.a.m.d. Se cere valoarea de la poziția <code>(L, C)</code> (1-indexată).
+        </p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th></tr></thead><tbody><tr><td class="m">3 2</td><td class="m">6</td></tr></tbody></table></div>
+
+        <div class="think">
+          <p class="q">Gândiți-vă: Dacă indexăm de la 0 (l = L - 1, c = C - 1), care este intervalul numerelor plasate în L-ul cu indicele k = max(l, c)?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>L-ul cu indicele <code>k</code> (0-indexat) conține exact numerele din intervalul <code>[k² + 1, (k + 1)²]</code>. Comparați <code>l</code> cu <code>c</code> pentru a determina pe care ramură a L-ului vă aflați și folosiți paritatea <code>r = k % 2</code>.</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>
+              Formula analitică răspunde în <strong>O(1)</strong> timp și <strong>O(1)</strong> memorie pentru orice <code>L, C ≤ 10<sup>9</sup></code>.
+            </p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+using namespace std;
+
+int main()
+{
+    long long L, C;
+    cin >> L >> C;
+    long long l = L - 1, c = C - 1;
+
+    if (l > c)
+    {
+        long long r = l % 2;
+        cout << (1 - r) + (r + l) * (r + l) + (1 - 2 * r) * c << "\n";
+    }
+    else
+    {
+        long long r = (c + 1) % 2;
+        cout << (1 - r) + (r + c) * (r + c) + (1 - 2 * r) * l << "\n";
+    }
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+
+      <!-- CONCURS 4: SUBMATRICE K x K DE SUMĂ MAXIMĂ -->
+      <div class="prob" id="p-submatrice-kxk">
+        <h3>Problema 4. <a href="https://www.pbinfo.ro/" target="_blank" rel="noopener">Submatrice K × K de sumă maximă</a> <span class="src">O(N²) • Benzi verticale / Sume 2D</span></h3>
+        <p>
+          Se dă o matrice pătratică <code>N × N</code> (<code>N ≤ 1000</code>) și un întreg <code>K</code> (<code>1 ≤ K ≤ N</code>). Să se determine suma maximă a unei submatrici pătratice de dimensiune <code>K × K</code>.
+        </p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th></tr></thead><tbody><tr><td class="m">3 2
+1 2 3
+4 5 6
+7 8 9</td><td class="m">28</td></tr></tbody></table></div>
+
+        <div class="think">
+          <p class="q">Gândiți-vă: Cum putem rezolva problema chiar și în O(N) memorie (fără matricea S[][]) glisând benzi verticale de înălțime K?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Menținem un vector <code>colSum[1..N]</code> cu suma primelor <code>K</code> linii pe fiecare coloană, apoi glisăm o fereastră orizontală de lungime <code>K</code> pe <code>colSum[]</code>. La trecerea la linia următoare, actualizăm <code>colSum[j] += A[i][j] - A[i - K][j]</code>!</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>
+              Folosind matricea sumelor parțiale 2D <code>S[i][j]</code>, fiecare submatrice <code>K × K</code> cu colțul dreapta-jos în <code>(i, j)</code> (<code>i ≥ K, j ≥ K</code>) se evaluează în <strong>O(1)</strong>.
+            </p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <algorithm>
+#include <climits>
+using namespace std;
+
+long long S[1005][1005];
+
+int main()
+{
+    int n, k;
+    cin >> n >> k;
+    for (int i = 1; i <= n; ++i)
+    {
+        for (int j = 1; j <= n; ++j)
+        {
+            long long x;
+            cin >> x;
+            S[i][j] = S[i - 1][j] + S[i][j - 1] - S[i - 1][j - 1] + x;
+        }
+    }
+
+    long long maxSum = LLONG_MIN;
+    for (int i = k; i <= n; ++i)
+    {
+        for (int j = k; j <= n; ++j)
+        {
+            long long cur = S[i][j] - S[i - k][j] - S[i][j - k] + S[i - k][j - k];
+            maxSum = max(maxSum, cur);
+        }
+    }
+    cout << maxSum << "\n";
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+
+      <!-- CONCURS 5: SUMA MINIMELOR PE FERESTRE DE LUNGIME K -->
+      <div class="prob" id="p-suma-minime-k">
+        <h3>Problema 5. <a href="https://www.pbinfo.ro/" target="_blank" rel="noopener">Suma minimelor pe ferestre de lungime K</a> <span class="src">O(N) • Deque monoton</span></h3>
+        <p>
+          Se dă un șir cu <code>N</code> numere naturale (<code>1 ≤ K ≤ N ≤ 10<sup>6</sup></code>). Să se calculeze suma elementelor minime din fiecare dintre cele <code>N - K + 1</code> subsecvențe contigue de lungime <code>K</code>.
+        </p>
+        <h4>Exemplu</h4>
+        <div class="tbl"><table class="io"><thead><tr><th>Intrare</th><th>Ieșire</th></tr></thead><tbody><tr><td class="m">5 3
+4 2 5 1 3</td><td class="m">4</td></tr></tbody></table></div>
+
+        <div class="think">
+          <p class="q">Gândiți-vă: Ce se schimbă în algoritmul cu std::deque atunci când căutăm MINIMUL ferestrei în locul maximului?</p>
+          <div class="timer" data-timer></div>
+        </div>
+        <details class="hint"><summary>Indiciu</summary><div><p>Păstrăm indicii în <code>deque</code> în ordine strict <strong>crescătoare</strong> a valorilor (eliminăm din spate cât timp <code>a[dq.back()] ≥ a[i]</code>) și acumulăm rezultatul într-o variabilă <code>long long</code>.</p></div></details>
+        <details class="sol">
+          <summary>Soluție <span class="arr"></span></summary>
+          <div class="body">
+            <p>
+              Pentru <code>[4, 2, 5, 1, 3]</code> și <code>K = 3</code>, minimele ferestrelor sunt <code>2, 1, 1</code>, iar suma lor este <code>4</code>.
+            </p>
+            <script type="text/x-cpp" class="cod">
+#include <iostream>
+#include <vector>
+#include <deque>
+using namespace std;
+
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n, k;
+    cin >> n >> k;
+    vector<int> a(n);
+    for (int i = 0; i < n; ++i)
+        cin >> a[i];
+
+    deque<int> dq;
+    long long sumaMinime = 0;
+
+    for (int i = 0; i < n; ++i)
+    {
+        while (!dq.empty() && dq.front() <= i - k)
+            dq.pop_front();
+        while (!dq.empty() && a[dq.back()] >= a[i])
+            dq.pop_back();
+
+        dq.push_back(i);
+
+        if (i >= k - 1)
+            sumaMinime += a[dq.front()];
+    }
+    cout << sumaMinime << "\n";
+    return 0;
+}
+</script>
+          </div>
+        </details>
+      </div>
+
+      <!-- TEST GRILĂ INTERACTIV (8 ÎNTREBĂRI) -->
+      <div class="algo-sim-card" id="algoSimQuiz">
+        <div class="algo-sim-header">
+          <h3 class="algo-sim-title">Test Grilă Interactiv — Pregătire Olimpiadă (8 Întrebări)</h3>
+          <span class="algo-sim-badge" id="quizScoreBadge">Scor: 0 / 8</span>
+        </div>
+
+        <div id="quizContainer"></div>
+
+        <div class="algo-sim-controls" style="margin-top:0.85rem; margin-bottom:0;">
+          <button type="button" class="algo-sim-btn algo-sim-btn-primary" id="quizCheckBtn">Verifică răspunsurile</button>
+          <button type="button" class="algo-sim-btn" id="quizResetBtn">Resetează testul</button>
+        </div>
+
+        <div class="algo-sim-status" id="quizSummary" style="display:none; margin-top:0.85rem; margin-bottom:0;"></div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         CAPITOLUL 8: TEMA (PROBLEME RECOMANDATE PBINFO & VARENA)
+         ====================================================================== -->
+    <section id="tema">
+      <h2>Tema</h2>
+      <p>
+        Pentru fixarea tehnicilor din această lecție, rezolvați următoarele probleme de antrenament de pe <strong>PbInfo</strong> și <strong>Varena</strong>:
+      </p>
+      <ul>
+        <li><a href="https://www.pbinfo.ro/probleme/534" target="_blank" rel="noopener">Factorial (#534)</a> (PbInfo — aritmetica numerelor mari, înmulțire cu scalar)</li>
+        <li><a href="https://www.pbinfo.ro/probleme/1323" target="_blank" rel="noopener">Matrice Rară (#1323)</a> (PbInfo — vectori de triplete și interclasare)</li>
+        <li><a href="https://www.pbinfo.ro/probleme/1697" target="_blank" rel="noopener">Problema #1697</a> (PbInfo — tablouri bidimensionale și parcurgeri)</li>
+        <li><a href="https://www.pbinfo.ro/probleme/1706" target="_blank" rel="noopener">Problema #1706</a> (PbInfo — sume parțiale / preprocesare pe matrice)</li>
+        <li><a href="https://www.pbinfo.ro/probleme/2229" target="_blank" rel="noopener">Problema #2229</a> (PbInfo — subsecvențe și optimizări liniare)</li>
+        <li><a href="https://www.pbinfo.ro/probleme/2777" target="_blank" rel="noopener">Problema #2777</a> (PbInfo — tehnici pe vectori / sume parțiale)</li>
+        <li><a href="https://www.varena.ro/problema/suml" target="_blank" rel="noopener">sumL — Suma pe L-uri</a> (Varena — optimizarea memoriei O(N) fără matrice)</li>
+        <li><a href="https://www.varena.ro/problema/sumd" target="_blank" rel="noopener">sumD — Suma pe diagonale</a> (Varena — invariantul <code>N - 1 + c - l</code> în O(N) memorie)</li>
+        <li><a href="https://www.varena.ro/problema/matsp" target="_blank" rel="noopener">matsp — Matrice spirală</a> (Varena — calcul analitic în O(1) timp și memorie)</li>
+        <li><a href="https://www.varena.ro/problema/matzeb" target="_blank" rel="noopener">matzeb — Matrice zebră</a> (Varena — L-uri alternate în O(1) memorie)</li>
+      </ul>
+    </section>
+
+  </main>
+</div>
+
+<!-- ==========================================================================
+     SCRIPT AUTONOM PENTRU SIMULATOARE + FALLBACK STANDALONE PENTRU ȘABLON
+     ========================================================================== -->
+<script>
+  (function () {
+    "use strict";
+
+    /* ------------------------------------------------------------------------
+       A. FALLBACK STANDALONE (apelat doar dacă ../assets/site.js nu există)
+       ------------------------------------------------------------------------ */
+    window.__initStandaloneFallback = function () {
+      if (window.__standaloneInitialized) return;
+      window.__standaloneInitialized = true;
+      document.documentElement.classList.add("standalone-preview");
+
+      // 1. Completează eyebrow dacă este gol
+      const eyebrow = document.querySelector(".hero .eyebrow");
+      if (eyebrow && !eyebrow.textContent.trim()) {
+        eyebrow.textContent = "Clasa a IX-a – a XI-a • Pregătire Olimpiadă";
+      }
+
+      // 2. Generează cuprinsul automat în <nav class="toc" data-auto>
+      const tocNav = document.querySelector("nav.toc[data-auto]");
+      const sections = document.querySelectorAll("main.prose section[id]");
+      if (tocNav && sections.length) {
+        const titleEl = document.createElement("div");
+        titleEl.className = "toc-title";
+        titleEl.textContent = "Cuprins";
+        const ul = document.createElement("ul");
+
+        sections.forEach((sec) => {
+          const h2 = sec.querySelector("h2");
+          if (!h2) return;
+          const li = document.createElement("li");
+          const a = document.createElement("a");
+          a.href = "#" + sec.id;
+          a.textContent = h2.textContent;
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        tocNav.innerHTML = "";
+        tocNav.appendChild(titleEl);
+        tocNav.appendChild(ul);
+
+        // Scroll-spy simplu
+        const links = tocNav.querySelectorAll("a");
+        const updateActiveToc = () => {
+          let currentId = sections[0].id;
+          sections.forEach((sec) => {
+            const rect = sec.getBoundingClientRect();
+            if (rect.top <= 140) currentId = sec.id;
+          });
+          links.forEach((lnk) => {
+            lnk.classList.toggle("active", lnk.getAttribute("href") === "#" + currentId);
+          });
+        };
+        window.addEventListener("scroll", updateActiveToc, { passive: true });
+        updateActiveToc();
+      }
+
+      // 3. Randează blocurile <script type="text/x-cpp" class="cod">
+      const codeScripts = document.querySelectorAll('script[type="text/x-cpp"].cod');
+      codeScripts.forEach((sc) => {
+        const raw = sc.textContent.replace(/^\n+|\n+$/g, "");
+        const wrap = document.createElement("div");
+        wrap.className = "cod-wrap";
+
+        const copyBtn = document.createElement("button");
+        copyBtn.type = "button";
+        copyBtn.className = "cod-copy";
+        copyBtn.textContent = "Copiază";
+        copyBtn.addEventListener("click", () => {
+          const ta = document.createElement("textarea");
+          ta.value = raw;
+          ta.style.position = "fixed";
+          ta.style.opacity = "0";
+          document.body.appendChild(ta);
+          ta.select();
+          try {
+            document.execCommand("copy");
+            copyBtn.textContent = "Copiat!";
+            setTimeout(() => (copyBtn.textContent = "Copiază"), 1600);
+          } catch (e) {}
+          document.body.removeChild(ta);
+        });
+
+        const pre = document.createElement("pre");
+        pre.className = "cod-block";
+        const code = document.createElement("code");
+        code.className = "language-cpp";
+        code.textContent = raw;
+        pre.appendChild(code);
+
+        wrap.appendChild(copyBtn);
+        wrap.appendChild(pre);
+        sc.parentNode.replaceChild(wrap, sc);
+
+        if (window.hljs && typeof window.hljs.highlightElement === "function") {
+          window.hljs.highlightElement(code);
+        }
+      });
+
+      // 4. Activează cronometrele <div class="timer" data-timer>
+      const timers = document.querySelectorAll(".timer[data-timer]");
+      timers.forEach((t) => {
+        let seconds = 180;
+        let interval = null;
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.textContent = "Cronometru 03:00";
+
+        const fmt = (s) => {
+          const m = String(Math.floor(s / 60)).padStart(2, "0");
+          const sec = String(s % 60).padStart(2, "0");
+          return `${m}:${sec}`;
+        };
+
+        btn.addEventListener("click", () => {
+          if (interval) {
+            clearInterval(interval);
+            interval = null;
+            btn.textContent = `Pauză (${fmt(seconds)})`;
+            return;
+          }
+          if (seconds <= 0) seconds = 180;
+          btn.textContent = `Timp rămas: ${fmt(seconds)}`;
+          interval = setInterval(() => {
+            seconds--;
+            if (seconds <= 0) {
+              clearInterval(interval);
+              interval = null;
+              btn.textContent = "Timp expirat! (Click pentru 03:00)";
+            } else {
+              btn.textContent = `Timp rămas: ${fmt(seconds)}`;
+            }
+          }, 1000);
+        });
+
+        t.appendChild(btn);
+      });
+    };
+
+    /* ------------------------------------------------------------------------
+       B. SIMULATOR 1: SUME PARȚIALE 1D & ȘMENUL LUI MARS
+       ------------------------------------------------------------------------ */
+    function initSim1D() {
+      const initArr = [5, 6, 2, 4, 7, 3, 8, 1, 9, 4];
+      const diffArr = new Array(12).fill(0);
+      let activeRange = null;
+
+      const initRow = document.getElementById("sim1dInitRow");
+      const diffRow = document.getElementById("sim1dDiffRow");
+      const resRow = document.getElementById("sim1dResRow");
+      const prefRow = document.getElementById("sim1dPrefRow");
+      const statusEl = document.getElementById("sim1dStatus");
+
+      function render() {
+        initRow.innerHTML = "";
+        diffRow.innerHTML = "";
+        resRow.innerHTML = "";
+        prefRow.innerHTML = "";
+
+        prefRow.innerHTML += `<div class="algo-sim-cell is-sentinel"><div class="algo-sim-cell-idx">S[0]</div><div class="algo-sim-cell-val">0</div></div>`;
+
+        let runDiff = 0;
+        let runPref = 0;
+
+        for (let i = 1; i <= 10; i++) {
+          const base = initArr[i - 1];
+          runDiff += diffArr[i];
+          const rez = base + runDiff;
+          runPref += rez;
+
+          let initCls = "algo-sim-cell";
+          let diffCls = "algo-sim-cell";
+          let resCls = "algo-sim-cell";
+
+          if (activeRange) {
+            if (i === activeRange.st) diffCls += " is-start";
+            if (i >= activeRange.st && i <= activeRange.dr) {
+              initCls += " is-range";
+              resCls += " is-range";
+            }
+          }
+
+          const cellInit = document.createElement("div");
+          cellInit.className = initCls;
+          cellInit.innerHTML = `<div class="algo-sim-cell-idx">A[${i}]</div>`;
+          const valWrap = document.createElement("div");
+          valWrap.className = "algo-sim-cell-val";
+          const inp = document.createElement("input");
+          inp.type = "number";
+          inp.value = base;
+          inp.addEventListener("change", () => {
+            initArr[i - 1] = parseInt(inp.value, 10) || 0;
+            render();
+          });
+          valWrap.appendChild(inp);
+          cellInit.appendChild(valWrap);
+          initRow.appendChild(cellInit);
+
+          const dSign = diffArr[i] > 0 ? `+${diffArr[i]}` : `${diffArr[i]}`;
+          diffRow.innerHTML += `<div class="${diffCls}"><div class="algo-sim-cell-idx">B[${i}]</div><div class="algo-sim-cell-val">${dSign}</div></div>`;
+          resRow.innerHTML += `<div class="${resCls}"><div class="algo-sim-cell-idx">A[${i}]</div><div class="algo-sim-cell-val">${rez}</div></div>`;
+          prefRow.innerHTML += `<div class="algo-sim-cell"><div class="algo-sim-cell-idx">S[${i}]</div><div class="algo-sim-cell-val">${runPref}</div></div>`;
+        }
+
+        let b11Cls = "algo-sim-cell is-sentinel";
+        if (activeRange && activeRange.dr + 1 === 11) b11Cls += " is-end";
+        const d11 = diffArr[11] > 0 ? `+${diffArr[11]}` : `${diffArr[11]}`;
+        diffRow.innerHTML += `<div class="${b11Cls}"><div class="algo-sim-cell-idx">B[11]</div><div class="algo-sim-cell-val">${d11}</div></div>`;
+      }
+
+      document.getElementById("sim1dApplyBtn").addEventListener("click", () => {
+        let st = Math.max(1, Math.min(10, parseInt(document.getElementById("sim1dSt").value, 10) || 1));
+        let dr = Math.max(1, Math.min(10, parseInt(document.getElementById("sim1dDr").value, 10) || 1));
+        const x = parseInt(document.getElementById("sim1dVal").value, 10) || 0;
+        if (st > dr) [st, dr] = [dr, st];
+
+        diffArr[st] += x;
+        diffArr[dr + 1] -= x;
+        activeRange = { st, dr };
+        statusEl.innerHTML = `Executat <code>ADUNA(${st}, ${dr}, ${x})</code> → <code>B[${st}] += ${x}</code> și <code>B[${dr + 1}] -= ${x}</code> în O(1).`;
+        render();
+      });
+
+      document.getElementById("sim1dQueryBtn").addEventListener("click", () => {
+        let st = Math.max(1, Math.min(10, parseInt(document.getElementById("sim1dSt").value, 10) || 1));
+        let dr = Math.max(1, Math.min(10, parseInt(document.getElementById("sim1dDr").value, 10) || 1));
+        if (st > dr) [st, dr] = [dr, st];
+
+        const S = [0];
+        let d = 0;
+        for (let i = 1; i <= 10; i++) {
+          d += diffArr[i];
+          S[i] = S[i - 1] + (initArr[i - 1] + d);
+        }
+        activeRange = { st, dr };
+        statusEl.innerHTML = `Interogare <code>SUMA(${st}, ${dr})</code> = <code>S[${dr}] - S[${st - 1}]</code> = ${S[dr]} - ${S[st - 1]} = <strong>${S[dr] - S[st - 1]}</strong>.`;
+        render();
+      });
+
+      document.getElementById("sim1dPresetBtn").addEventListener("click", () => {
+        diffArr.fill(0);
+        const ops = [[1, 4, 2], [2, 5, 10], [3, 4, 2], [1, 4, 3]];
+        ops.forEach(([l, r, v]) => {
+          diffArr[l] += v;
+          diffArr[r + 1] -= v;
+        });
+        activeRange = { st: 1, dr: 5 };
+        statusEl.innerHTML = `Încărcat exemplul: <code>aduna(1,4,2), aduna(2,5,10), aduna(3,4,2), aduna(1,4,3)</code>.`;
+        render();
+      });
+
+      document.getElementById("sim1dResetBtn").addEventListener("click", () => {
+        diffArr.fill(0);
+        activeRange = null;
+        statusEl.textContent = "Vectorul diferențelor B[] a fost resetat la 0.";
+        render();
+      });
+
+      render();
+    }
+
+    /* ------------------------------------------------------------------------
+       C. SIMULATOR 2: SUME PARȚIALE 2D & MARS 2D
+       ------------------------------------------------------------------------ */
+    function initSim2D() {
+      let mat = [
+        [2, 5, 1, 3, 4],
+        [1, 8, -2, 6, 2],
+        [4, 3, 7, 1, 5],
+        [6, -1, 4, 9, 2],
+        [3, 2, 5, 4, 8]
+      ];
+      let corners = [{ r: 2, c: 2 }, { r: 4, c: 4 }];
+      let clickPhase = 0;
+
+      const gridA = document.getElementById("sim2dGridA");
+      const gridS = document.getElementById("sim2dGridS");
+      const formulaEl = document.getElementById("sim2dFormula");
+
+      function selectCell(r, c) {
+        if (clickPhase === 0) {
+          corners = [{ r, c }, { r, c }];
+          clickPhase = 1;
+        } else {
+          corners[1] = { r, c };
+          clickPhase = 0;
+        }
+        render();
+      }
+
+      function render() {
+        const x1 = Math.min(corners[0].r, corners[1].r);
+        const y1 = Math.min(corners[0].c, corners[1].c);
+        const x2 = Math.max(corners[0].r, corners[1].r);
+        const y2 = Math.max(corners[0].c, corners[1].c);
+
+        // Matricea A
+        gridA.style.gridTemplateColumns = "repeat(6, 44px)";
+        gridA.innerHTML = `<div class="algo-sim-mcell is-head">A</div>`;
+        for (let j = 1; j <= 5; j++) gridA.innerHTML += `<div class="algo-sim-mcell is-head">c${j}</div>`;
+
+        for (let i = 1; i <= 5; i++) {
+          gridA.innerHTML += `<div class="algo-sim-mcell is-head">l${i}</div>`;
+          for (let j = 1; j <= 5; j++) {
+            let cls = "algo-sim-mcell";
+            if (i >= x1 && i <= x2 && j >= y1 && j <= y2) cls += " in-rect";
+            if ((i === x1 && j === y1) || (i === x2 && j === y2)) cls += " corner-mark";
+
+            const cell = document.createElement("div");
+            cell.className = cls;
+            const inp = document.createElement("input");
+            inp.type = "number";
+            inp.value = mat[i - 1][j - 1];
+            inp.addEventListener("change", () => {
+              mat[i - 1][j - 1] = parseInt(inp.value, 10) || 0;
+              render();
+            });
+            inp.addEventListener("click", (e) => {
+              e.stopPropagation();
+              selectCell(i, j);
+            });
+            cell.addEventListener("click", () => selectCell(i, j));
+            cell.appendChild(inp);
+            gridA.appendChild(cell);
+          }
+        }
+
+        // Calcul S[0..5][0..5]
+        const S = Array.from({ length: 6 }, () => Array(6).fill(0));
+        for (let i = 1; i <= 5; i++)
+          for (let j = 1; j <= 5; j++)
+            S[i][j] = S[i - 1][j] + S[i][j - 1] - S[i - 1][j - 1] + mat[i - 1][j - 1];
+
+        gridS.style.gridTemplateColumns = "repeat(7, 42px)";
+        gridS.innerHTML = `<div class="algo-sim-mcell is-head" style="width:42px;">S</div>`;
+        for (let j = 0; j <= 5; j++) gridS.innerHTML += `<div class="algo-sim-mcell is-head" style="width:42px;">${j}</div>`;
+
+        for (let i = 0; i <= 5; i++) {
+          gridS.innerHTML += `<div class="algo-sim-mcell is-head" style="width:42px;">${i}</div>`;
+          for (let j = 0; j <= 5; j++) {
+            let cls = "algo-sim-mcell";
+            if (i === 0 || j === 0) cls += " is-pad";
+            if (i === x2 && j === y2) cls += " term-main";
+            else if (i === x1 - 1 && j === y2) cls += " term-top";
+            else if (i === x2 && j === y1 - 1) cls += " term-left";
+            else if (i === x1 - 1 && j === y1 - 1) cls += " term-overlap";
+
+            gridS.innerHTML += `<div class="${cls}" style="width:42px; cursor:default;">${S[i][j]}</div>`;
+          }
+        }
+
+        const total = S[x2][y2] - S[x1 - 1][y2] - S[x2][y1 - 1] + S[x1 - 1][y1 - 1];
+        formulaEl.innerHTML =
+          `Submatricea (${x1}, ${y1}) → (${x2}, ${y2}):<br>` +
+          `<span style="color:#047857;font-weight:700;">+S[${x2}][${y2}] (${S[x2][y2]})</span> ` +
+          `<span style="color:#be123c;font-weight:700;">- S[${x1 - 1}][${y2}] (${S[x1 - 1][y2]}) - S[${x2}][${y1 - 1}] (${S[x2][y1 - 1]})</span> ` +
+          `<span style="color:#0369a1;font-weight:700;">+ S[${x1 - 1}][${y1 - 1}] (${S[x1 - 1][y1 - 1]})</span> = <strong>${total}</strong>`;
+      }
+
+      document.getElementById("sim2dApplyMarsBtn").addEventListener("click", () => {
+        const v = parseInt(document.getElementById("sim2dMarsVal").value, 10) || 0;
+        const x1 = Math.min(corners[0].r, corners[1].r);
+        const y1 = Math.min(corners[0].c, corners[1].c);
+        const x2 = Math.max(corners[0].r, corners[1].r);
+        const y2 = Math.max(corners[0].c, corners[1].c);
+        for (let i = x1; i <= x2; i++)
+          for (let j = y1; j <= y2; j++)
+            mat[i - 1][j - 1] += v;
+        render();
+      });
+
+      document.getElementById("sim2dRandBtn").addEventListener("click", () => {
+        for (let i = 0; i < 5; i++)
+          for (let j = 0; j < 5; j++)
+            mat[i][j] = Math.floor(Math.random() * 14) - 2;
+        render();
+      });
+
+      document.getElementById("sim2dResetBtn").addEventListener("click", () => {
+        mat = [
+          [2, 5, 1, 3, 4],
+          [1, 8, -2, 6, 2],
+          [4, 3, 7, 1, 5],
+          [6, -1, 4, 9, 2],
+          [3, 2, 5, 4, 8]
+        ];
+        render();
+      });
+
+      render();
+    }
+
+    /* ------------------------------------------------------------------------
+       D. SIMULATOR 3: SLIDING WINDOW DEQUE MONOTON
+       ------------------------------------------------------------------------ */
+    function initSimDeque() {
+      const arr = [4, 2, 7, 5, 1, 8, 3, 6, 9];
+      const K = 3;
+      const history = [];
+      let dq = [];
+      let out = [];
+
+      for (let i = 0; i < arr.length; i++) {
+        const logs = [];
+        while (dq.length && dq[0] <= i - K) {
+          const old = dq.shift();
+          logs.push(`pop_front(idx=${old})`);
+        }
+        while (dq.length && arr[dq[dq.length - 1]] <= arr[i]) {
+          const old = dq.pop();
+          logs.push(`pop_back(idx=${old})`);
+        }
+        dq.push(i);
+        logs.push(`push_back(idx=${i})`);
+        if (i >= K - 1) out.push(arr[dq[0]]);
+        history.push({ i, dq: [...dq], out: [...out], msg: logs.join(", ") });
+      }
+
+      let step = -1;
+      const arrRow = document.getElementById("dqArrRow");
+      const qRow = document.getElementById("dqQueueRow");
+      const outRow = document.getElementById("dqOutRow");
+      const statusEl = document.getElementById("dqStatus");
+
+      function render() {
+        arrRow.innerHTML = "";
+        qRow.innerHTML = "";
+        outRow.innerHTML = "";
+
+        const st = step >= 0 ? history[step] : null;
+        const wStart = st ? Math.max(0, st.i - K + 1) : -1;
+        const wEnd = st ? st.i : -1;
+
+        arr.forEach((v, idx) => {
+          let cls = "algo-sim-cell";
+          if (st && idx >= wStart && idx <= wEnd) cls += " is-range";
+          if (st && idx === st.i) cls += " is-start";
+          arrRow.innerHTML += `<div class="${cls}"><div class="algo-sim-cell-idx">i=${idx}</div><div class="algo-sim-cell-val">${v}</div></div>`;
+        });
+
+        if (!st) {
+          statusEl.innerHTML = `Stare inițială. Apasă <strong>„Pasul următor →”</strong> pentru a parcurge vectorul.`;
+          qRow.innerHTML = `<span style="color:var(--sim-muted); font-size:0.82rem;">[ deque gol ]</span>`;
+          outRow.innerHTML = `<span style="color:var(--sim-muted); font-size:0.82rem;">[ niciun rezultat încă ]</span>`;
+        } else {
+          statusEl.innerHTML = `<strong>Pasul i = ${st.i} (A[${st.i}] = ${arr[st.i]}):</strong> <code>${st.msg}</code>`;
+          st.dq.forEach((idx, pos) => {
+            const cls = pos === 0 ? "algo-sim-cell is-start" : "algo-sim-cell";
+            qRow.innerHTML += `<div class="${cls}" style="width:66px;"><div class="algo-sim-cell-idx">idx=${idx}</div><div class="algo-sim-cell-val">${arr[idx]}</div></div>`;
+          });
+          if (!st.out.length) {
+            outRow.innerHTML = `<span style="color:var(--sim-muted); font-size:0.82rem;">[ fereastra are ${st.i + 1}/${K} elemente ]</span>`;
+          } else {
+            st.out.forEach((m, idx) => {
+              outRow.innerHTML += `<div class="algo-sim-cell is-range"><div class="algo-sim-cell-idx">F${idx + 1}</div><div class="algo-sim-cell-val">${m}</div></div>`;
+            });
+          }
+        }
+
+        document.getElementById("dqPrevBtn").disabled = step < 0;
+        document.getElementById("dqNextBtn").disabled = step >= history.length - 1;
+      }
+
+      document.getElementById("dqNextBtn").addEventListener("click", () => {
+        if (step < history.length - 1) { step++; render(); }
+      });
+      document.getElementById("dqPrevBtn").addEventListener("click", () => {
+        if (step >= 0) { step--; render(); }
+      });
+      document.getElementById("dqResetBtn").addEventListener("click", () => {
+        step = -1; render();
+      });
+
+      render();
+    }
+
+    /* ------------------------------------------------------------------------
+       E. VISUALIZER 4: PARCURGERI & ROTAȚII 2D (5x5)
+       ------------------------------------------------------------------------ */
+    function initVis2D() {
+      const baseMat = [
+        ["a", "b", "c", "d", "e"],
+        ["f", "g", "h", "i", "j"],
+        ["k", "l", "m", "n", "o"],
+        ["p", "q", "r", "s", "t"],
+        ["u", "v", "w", "x", "y"]
+      ];
+      let mat = baseMat.map((r) => [...r]);
+      let timer = null;
+
+      const gridEl = document.getElementById("visGrid");
+      const labelEl = document.getElementById("visLabel");
+      const seqEl = document.getElementById("visSeq");
+
+      function renderGrid(doneMap = {}, activeCell = null) {
+        gridEl.style.gridTemplateColumns = "repeat(5, 48px)";
+        gridEl.innerHTML = "";
+        for (let i = 0; i < 5; i++) {
+          for (let j = 0; j < 5; j++) {
+            const key = `${i},${j}`;
+            let cls = "algo-sim-mcell";
+            if (doneMap[key]) cls += " vis-done";
+            if (activeCell && activeCell[0] === i && activeCell[1] === j) cls += " vis-now";
+            const badge = doneMap[key] ? `<span class="algo-sim-step-num">${doneMap[key]}</span>` : "";
+            gridEl.innerHTML += `<div class="${cls}" style="width:48px; height:46px; cursor:default;">${mat[i][j]}${badge}</div>`;
+          }
+        }
+      }
+
+      function computeOrder(mode) {
+        const N = 5;
+        const ord = [];
+        if (mode === "diag-main") {
+          for (let sLin = N - 1; sLin >= 0; sLin--)
+            for (let k = 0; k < N - sLin; k++) ord.push([sLin + k, k]);
+          for (let sCol = 1; sCol < N; sCol++)
+            for (let k = 0; k < N - sCol; k++) ord.push([k, sCol + k]);
+        } else if (mode === "diag-sec") {
+          for (let s = 0; s <= 2 * N - 2; s++)
+            for (let i = 0; i < N; i++) {
+              const j = s - i;
+              if (j >= 0 && j < N) ord.push([i, j]);
+            }
+        } else if (mode === "spiral") {
+          let t = 0, b = N - 1, l = 0, r = N - 1;
+          while (t <= b && l <= r) {
+            for (let j = l; j <= r; j++) ord.push([t, j]);
+            t++;
+            for (let i = t; i <= b; i++) ord.push([i, r]);
+            r--;
+            if (t <= b) { for (let j = r; j >= l; j--) ord.push([b, j]); b--; }
+            if (l <= r) { for (let i = b; i >= t; i--) ord.push([i, l]); l++; }
+          }
+        } else if (mode === "snake") {
+          for (let i = 0; i < N; i++) {
+            if (i % 2 === 0) for (let j = 0; j < N; j++) ord.push([i, j]);
+            else for (let j = N - 1; j >= 0; j--) ord.push([i, j]);
+          }
+        } else if (mode === "zigzag") {
+          let i = 0, j = 0, up = true;
+          for (let k = 0; k < N * N; k++) {
+            ord.push([i, j]);
+            if (up) {
+              if (j === N - 1) { i++; up = false; }
+              else if (i === 0) { j++; up = false; }
+              else { i--; j++; }
+            } else {
+              if (i === N - 1) { j++; up = true; }
+              else if (j === 0) { i++; up = true; }
+              else { i++; j--; }
+            }
+          }
+        }
+        return ord;
+      }
+
+      document.querySelectorAll("#algoVis2D [data-vis-mode]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          clearInterval(timer);
+          const order = computeOrder(btn.dataset.visMode);
+          const done = {};
+          const letters = [];
+          let idx = 0;
+          labelEl.textContent = `Parcurgere: ${btn.textContent.trim()}`;
+          seqEl.textContent = "";
+
+          timer = setInterval(() => {
+            if (idx >= order.length) {
+              clearInterval(timer);
+              renderGrid(done, null);
+              return;
+            }
+            const [r, c] = order[idx];
+            done[`${r},${c}`] = idx + 1;
+            letters.push(mat[r][c]);
+            renderGrid(done, [r, c]);
+            seqEl.textContent = letters.join(" → ");
+            idx++;
+          }, 130);
+        });
+      });
+
+      document.getElementById("visRotCwBtn").addEventListener("click", () => {
+        clearInterval(timer);
+        for (let i = 0; i < 5; i++)
+          for (let j = i + 1; j < 5; j++)
+            [mat[i][j], mat[j][i]] = [mat[j][i], mat[i][j]];
+        for (let i = 0; i < 5; i++) mat[i].reverse();
+        renderGrid();
+        labelEl.textContent = "Rotație 90° Orar (in-place):";
+        seqEl.innerHTML = "1. Transpunere: swap(a[i][j], a[j][i])<br>2. Inversarea fiecărei linii — O(1) memorie suplimentară.";
+      });
+
+      document.getElementById("visRotCcwBtn").addEventListener("click", () => {
+        clearInterval(timer);
+        for (let i = 0; i < 5; i++)
+          for (let j = i + 1; j < 5; j++)
+            [mat[i][j], mat[j][i]] = [mat[j][i], mat[i][j]];
+        for (let j = 0; j < 5; j++) {
+          for (let t = 0, b = 4; t < b; t++, b--)
+            [mat[t][j], mat[b][j]] = [mat[b][j], mat[t][j]];
+        }
+        renderGrid();
+        labelEl.textContent = "Rotație 90° Antiorar (in-place):";
+        seqEl.innerHTML = "1. Transpunere: swap(a[i][j], a[j][i])<br>2. Inversarea fiecărei coloane — O(1) memorie suplimentară.";
+      });
+
+      document.getElementById("visResetBtn").addEventListener("click", () => {
+        clearInterval(timer);
+        mat = baseMat.map((r) => [...r]);
+        renderGrid();
+        labelEl.textContent = "Matrice resetată:";
+        seqEl.textContent = "Ordinea elementelor vizitate va apărea aici...";
+      });
+
+      renderGrid();
+    }
+
+    /* ------------------------------------------------------------------------
+       F. CALCULATOR 5: MATSP O(1)
+       ------------------------------------------------------------------------ */
+    function initMatspCalc() {
+      function calcMatsp(n, L, C) {
+        const mid = (n + 1n) / 2n;
+        const l = L - mid;
+        const c = C - mid;
+        const absL = l < 0n ? -l : l;
+        const absC = c < 0n ? -c : c;
+        const p = absL > absC ? absL : absC;
+        const lat = 2n * p;
+        let dif = 0n;
+        let latura = "Centrul matricei";
+
+        if (p > 0n) {
+          if (l === p) { dif = p - c; latura = "Latura de jos (l == P)"; }
+          else if (c === -p) { dif = lat + p - l; latura = "Latura din stânga (c == -P)"; }
+          else if (l === -p) { dif = 2n * lat + c + p; latura = "Latura de sus (l == -P)"; }
+          else { dif = 3n * lat + l + p; latura = "Latura din dreapta (c == P)"; }
+        }
+        const maxInel = (lat + 1n) * (lat + 1n);
+        return { l, c, p, lat, dif, latura, maxInel, val: maxInel - dif };
+      }
+
+      function update() {
+        let n = BigInt(parseInt(document.getElementById("spN").value, 10) || 5);
+        if (n < 1n) n = 1n;
+        if (n % 2n === 0n) n += 1n;
+        document.getElementById("spN").value = n.toString();
+
+        let L = BigInt(parseInt(document.getElementById("spL").value, 10) || 1);
+        let C = BigInt(parseInt(document.getElementById("spC").value, 10) || 1);
+        if (L < 1n) L = 1n;
+        if (L > n) L = n;
+        if (C < 1n) C = 1n;
+        if (C > n) C = n;
+        document.getElementById("spL").value = L.toString();
+        document.getElementById("spC").value = C.toString();
+
+        const res = calcMatsp(n, L, C);
+        document.getElementById("spMathOut").innerHTML =
+          `Coordonate relative: <strong>(${res.l}, ${res.c})</strong><br>` +
+          `Inel concentric: <strong>P = ${res.p}</strong> | Max inel: <strong>${res.maxInel}</strong><br>` +
+          `Poziție: <strong>${res.latura}</strong> (dif = ${res.dif})<br>` +
+          `Valoare în O(1): <strong style="color:#047857; font-size:1.05rem;">${res.val}</strong>`;
+
+        const grid = document.getElementById("spMiniGrid");
+        const lbl = document.getElementById("spGridLabel");
+        if (n <= 9n) {
+          const nn = Number(n);
+          lbl.textContent = `Matricea Spirală ${nn} × ${nn}:`;
+          grid.style.gridTemplateColumns = `repeat(${nn}, 42px)`;
+          grid.innerHTML = "";
+          for (let i = 1n; i <= n; i++) {
+            for (let j = 1n; j <= n; j++) {
+              const v = calcMatsp(n, i, j).val;
+              const cls = i === L && j === C ? "algo-sim-mcell vis-now" : "algo-sim-mcell";
+              grid.innerHTML += `<div class="${cls}" style="width:42px; height:38px; font-size:0.76rem; cursor:default;">${v}</div>`;
+            }
+          }
+        } else {
+          lbl.textContent = `N = ${n} (prea mare pentru stocare în RAM):`;
+          grid.style.gridTemplateColumns = "1fr";
+          grid.innerHTML = `<div class="algo-sim-status" style="margin:0;">Formula O(1) a calculat instantaneu <strong>${res.val}</strong> fără a aloca matricea!</div>`;
+        }
+      }
+
+      document.getElementById("spCalcBtn").addEventListener("click", update);
+      update();
+    }
+
+    /* ------------------------------------------------------------------------
+       G. CALCULATOR 6: NUMERE MARI (BIGINT)
+       ------------------------------------------------------------------------ */
+    function initBigIntCalc() {
+      function cleanDigits(s) {
+        const d = (s || "").replace(/\D/g, "").replace(/^0+/, "");
+        return d.length ? d : "0";
+      }
+
+      function update() {
+        const sA = cleanDigits(document.getElementById("biA").value);
+        const sB = cleanDigits(document.getElementById("biB").value);
+        let nFact = parseInt(document.getElementById("biN").value, 10);
+        if (isNaN(nFact) || nFact < 0) nFact = 0;
+        if (nFact > 100) nFact = 100;
+
+        document.getElementById("biA").value = sA;
+        document.getElementById("biB").value = sB;
+        document.getElementById("biN").value = nFact;
+
+        const cellsRow = document.getElementById("biCellsRow");
+        cellsRow.innerHTML = "";
+        const rev = sA.split("").reverse();
+        cellsRow.innerHTML += `<div class="algo-sim-cell is-start"><div class="algo-sim-cell-idx">A[0] (lg)</div><div class="algo-sim-cell-val">${rev.length}</div></div>`;
+        const limit = Math.min(rev.length, 15);
+        for (let i = 0; i < limit; i++) {
+          cellsRow.innerHTML += `<div class="algo-sim-cell"><div class="algo-sim-cell-idx">A[${i + 1}]</div><div class="algo-sim-cell-val">${rev[i]}</div></div>`;
+        }
+        if (rev.length > limit) {
+          cellsRow.innerHTML += `<div class="algo-sim-cell is-sentinel"><div class="algo-sim-cell-idx">...</div><div class="algo-sim-cell-val">+${rev.length - limit}</div></div>`;
+        }
+
+        const A = BigInt(sA);
+        const B = BigInt(sB);
+        let fact = 1n;
+        for (let i = 2n; i <= BigInt(nFact); i++) fact *= i;
+
+        const divs = [];
+        for (let d = 2n; d <= 15n; d++) if (A % d === 0n) divs.push(d.toString());
+
+        document.getElementById("biOutput").innerHTML =
+          `A + B = <strong>${(A + B).toString()}</strong><br>` +
+          `|A - B| = <strong>${(A >= B ? A - B : B - A).toString()}</strong><br>` +
+          `A × B = <strong>${(A * B).toString()}</strong><br>` +
+          `${nFact}! = <strong>${fact.toString()}</strong><br>` +
+          `Divizori ai lui A din [2..15]: <strong style="color:#047857;">${divs.length ? divs.join(", ") : "niciunul"}</strong>`;
+      }
+
+      document.getElementById("biCalcBtn").addEventListener("click", update);
+      update();
+    }
+
+    /* ------------------------------------------------------------------------
+       H. TEST GRILĂ INTERACTIV (8 ÎNTREBĂRI)
+       ------------------------------------------------------------------------ */
+    function initQuiz() {
+      const questions = [
+        {
+          q: "1. Care este complexitatea amortizată pentru aflarea maximului în fiecare fereastră de lungime K dintr-un vector de N elemente folosind std::deque?",
+          opts: ["O(N · K)", "O(N log K)", "O(N)", "O(K log N)"],
+          ans: 2,
+          expl: "Fiecare element este adăugat în deque o singură dată și eliminat cel mult o dată (fie din față, fie din spate), rezultând cel mult 2N operații → O(N)."
+        },
+        {
+          q: "2. Avem un vector cu N = 100.000 numere, fiecare până la 10⁹. Ce tip de date este obligatoriu pentru vectorul de sume parțiale S[]?",
+          opts: ["int", "unsigned int", "long long", "short"],
+          ans: 2,
+          expl: "Suma poate ajunge la 10⁵ × 10⁹ = 10¹⁴, depășind cu mult tipul int (~2.14 × 10⁹), deci este necesar long long."
+        },
+        {
+          q: "3. Care este formula corectă pentru suma submatricii (x1, y1) .. (x2, y2) folosind sumele parțiale 2D S[][]?",
+          opts: [
+            "S[x2][y2] - S[x1][y1]",
+            "S[x2][y2] - S[x1 - 1][y2] - S[x2][y1 - 1] + S[x1 - 1][y1 - 1]",
+            "S[x2][y2] - S[x1 - 1][y2] - S[x2][y1 - 1] - S[x1 - 1][y1 - 1]",
+            "S[x2 + 1][y2 + 1] - S[x1][y1]"
+          ],
+          ans: 1,
+          expl: "Prin principiul includerii și excluderii, scădem zona de deasupra S[x1-1][y2] și zona din stânga S[x2][y1-1], apoi adunăm la loc colțul S[x1-1][y1-1] scăzut de două ori."
+        },
+        {
+          q: "4. În Șmenul lui Mars 2D, ce actualizări efectuăm în matricea diferențelor B[][] pentru a aduna v pe submatricea (x1, y1) .. (x2, y2)?",
+          opts: [
+            "B[x1][y1] += v; B[x2][y2] -= v;",
+            "B[x1][y1] += v; B[x1][y2 + 1] -= v; B[x2 + 1][y1] -= v; B[x2 + 1][y2 + 1] += v;",
+            "B[x1][y1] += v; B[x1][y2] -= v; B[x2][y1] -= v; B[x2][y2] += v;",
+            "B[x1 - 1][y1 - 1] += v; B[x2 + 1][y2 + 1] -= v;"
+          ],
+          ans: 1,
+          expl: "Cele 4 colțuri care delimitează dreptunghiul la aplicarea sumelor parțiale 2D sunt (x1, y1) cu +v, (x1, y2+1) cu -v, (x2+1, y1) cu -v și (x2+1, y2+1) cu +v."
+        },
+        {
+          q: "5. Ce expresie este constantă pentru toate celulele (l, c) aflate pe aceeași diagonală paralelă cu diagonala principală?",
+          opts: ["l + c", "c - l", "l * c", "l % c"],
+          ans: 1,
+          expl: "Pe orice paralelă la diagonala principală, la trecerea la elementul următor atât l cât și c cresc cu 1, deci diferența c - l rămâne constantă."
+        },
+        {
+          q: "6. Într-o coadă circulară pe un vector de lungime N (cu o poziție sacrificată), care este condiția de coadă plină?",
+          opts: [
+            "primul == ultimul",
+            "(ultimul + 1) % N == primul",
+            "ultimul == N - 1",
+            "(primul + 1) % N == ultimul"
+          ],
+          ans: 1,
+          expl: "Sacrificăm o poziție pentru a deosebi coada goală (primul == ultimul) de coada plină ((ultimul + 1) % N == primul)."
+        },
+        {
+          q: "7. O permutare P are 3 cicluri disjuncte de lungimi 2, 3 și 4. Care este ordinul permutării (cel mai mic k ≥ 1 cu P^k = I)?",
+          opts: ["9", "24", "12", "6"],
+          ans: 2,
+          expl: "Ordinul unei permutări este cel mai mic multiplu comun al lungimilor ciclurilor sale disjuncte: CMMMC(2, 3, 4) = 12."
+        },
+        {
+          q: "8. De ce în reprezentarea NrMare cifrele se memorează invers (A[1] = cifra unităților)?",
+          opts: [
+            "Pentru a ocupa mai puțină memorie",
+            "Pentru a alinia cifrele de același rang și a adăuga transportul (carry) la dreapta în O(1) fără deplasări",
+            "Deoarece C++ nu permite parcurgerea de la dreapta la stânga",
+            "Pentru ca A[0] să fie mereu par"
+          ],
+          ans: 1,
+          expl: "Având unitățile pe poziția 1, două numere de lungimi diferite sunt aliniate automat pe ranguri, iar creșterea lungimii prin transport se face direct pe poziția A[0] + 1."
+        }
+      ];
+
+      const choices = new Array(questions.length).fill(null);
+      const container = document.getElementById("quizContainer");
+
+      function render() {
+        container.innerHTML = "";
+        questions.forEach((item, qIdx) => {
+          const card = document.createElement("div");
+          card.className = "algo-sim-quiz-q";
+          card.id = `quiz-q-${qIdx}`;
+
+          let optsHtml = "";
+          item.opts.forEach((opt, oIdx) => {
+            const sel = choices[qIdx] === oIdx ? " is-selected" : "";
+            optsHtml += `<button type="button" class="algo-sim-quiz-opt${sel}" data-q="${qIdx}" data-o="${oIdx}">
+              <span style="font-family:var(--sim-mono);font-weight:700;">${String.fromCharCode(65 + oIdx)}.</span>
+              <span>${opt}</span>
+            </button>`;
+          });
+
+          card.innerHTML = `
+            <div class="algo-sim-quiz-prompt">${item.q}</div>
+            <div class="algo-sim-quiz-opts">${optsHtml}</div>
+            <div class="algo-sim-quiz-expl" id="quiz-expl-${qIdx}">${item.expl}</div>
+          `;
+          container.appendChild(card);
+        });
+
+        container.querySelectorAll(".algo-sim-quiz-opt").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const q = Number(btn.dataset.q);
+            const o = Number(btn.dataset.o);
+            choices[q] = o;
+            btn.parentElement.querySelectorAll(".algo-sim-quiz-opt").forEach((b) => {
+              b.classList.remove("is-selected", "is-correct", "is-wrong");
+            });
+            btn.classList.add("is-selected");
+          });
+        });
+      }
+
+      document.getElementById("quizCheckBtn").addEventListener("click", () => {
+        let score = 0;
+        questions.forEach((item, qIdx) => {
+          const card = document.getElementById(`quiz-q-${qIdx}`);
+          const opts = card.querySelectorAll(".algo-sim-quiz-opt");
+          const expl = document.getElementById(`quiz-expl-${qIdx}`);
+          opts.forEach((btn, oIdx) => {
+            btn.classList.remove("is-selected", "is-correct", "is-wrong");
+            if (oIdx === item.ans) btn.classList.add("is-correct");
+            else if (choices[qIdx] === oIdx) btn.classList.add("is-wrong");
+          });
+          if (choices[qIdx] === item.ans) score++;
+          expl.classList.add("is-visible");
+        });
+
+        document.getElementById("quizScoreBadge").textContent = `Scor: ${score} / ${questions.length}`;
+        const summary = document.getElementById("quizSummary");
+        summary.style.display = "block";
+        summary.innerHTML = `<strong>Rezultat: ${score} din ${questions.length} răspunsuri corecte.</strong> ${score === 8 ? "Excelent, pregătit pentru faza națională!" : "Verifică explicațiile de mai sus pentru întrebările greșite."}`;
+      });
+
+      document.getElementById("quizResetBtn").addEventListener("click", () => {
+        choices.fill(null);
+        document.getElementById("quizScoreBadge").textContent = `Scor: 0 / ${questions.length}`;
+        document.getElementById("quizSummary").style.display = "none";
+        render();
+      });
+
+      render();
+    }
+
+    /* ------------------------------------------------------------------------
+       INIȚIALIZARE SIMULATOARE LA ÎNCĂRCAREA DOM-ULUI
+       ------------------------------------------------------------------------ */
+    document.addEventListener("DOMContentLoaded", () => {
+      initSim1D();
+      initSim2D();
+      initSimDeque();
+      initVis2D();
+      initMatspCalc();
+      initBigIntCalc();
+      initQuiz();
+    });
+  })();
+</script>
+
+<!-- Scripturile exacte ale șablonului _sablon.html -->
+<script src="../assets/catalog.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="../assets/site.js" onerror="window.__initStandaloneFallback && window.__initStandaloneFallback()"></script>
+</body>
+</html>
